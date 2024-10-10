@@ -1,8 +1,10 @@
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import SendCodeRegisterPage from "../pages/auth/SendCodePage";
+import CartPage from "../pages/cart/CartPage";
 import HomePage from "../pages/home/HomePage";
 import NotFoundPage from "../pages/notFound/NotFoundPage";
+import ProductDetailPage from "../pages/product/ProductDetailPage";
 import AllProductPage from "../pages/shop/AllProductPage";
 
 const routes = [
@@ -30,6 +32,16 @@ const routes = [
     path: "/shop",
     name: "shop",
     page: AllProductPage,
+  },
+  {
+    path: "/product",
+    name: "product",
+    page: ProductDetailPage,
+  },
+  {
+    path: "/cart",
+    name: "cart",
+    page: CartPage,
   },
   {
     path: "*",

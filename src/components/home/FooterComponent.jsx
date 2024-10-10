@@ -8,7 +8,7 @@ const FooterComponent = () => {
 
   return (
     <footer>
-      <div className="max-w-screen-2xl container mx-auto xl:px-20 px-4">
+      <div className="container mx-auto max-w-screen-2xl xl:px-20 px-4">
         <div className="mt-10 flex flex-col md:flex-row items-start justify-between gap-6">
           <div className="md:w-[400px]">
             <Link to={"/"}>

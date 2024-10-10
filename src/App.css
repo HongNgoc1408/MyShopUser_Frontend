@@ -11,11 +11,11 @@
 }
 
 .price-card-product {
-  @apply text-lg text-nowrap text-red-600 truncate font-semibold cursor-pointer
+  @apply text-lg text-nowrap truncate font-semibold cursor-pointer mr-1 
 }
 
 .service-title {
-  @apply text-xl font-serif capitalize text-center cursor-pointer text-white;
+  @apply text-xl font-bold capitalize text-center cursor-pointer text-Black;
 }
 
 .service-title:hover {

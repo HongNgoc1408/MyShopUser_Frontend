@@ -28,9 +28,9 @@ const HeaderComponent = ({ showDrawer }) => {
           onClick={toggleMenu}
           aria-label="Toggle navigation"
         />
-        <Col span={6} offset={2} className="flex text-base p-2">
+        <Col span={4} offset={2} className="flex text-base p-2">
           <Link to={"/"} className="flex items-center cursor-pointer">
-            <img src={logo} alt="" className="lg:w-1/2" />
+            <img src={logo} alt="" className="lg:w-1/2 md:w-2/3 sm:w-3/4" />
           </Link>
         </Col>
         <div
@@ -39,10 +39,10 @@ const HeaderComponent = ({ showDrawer }) => {
           } flex-grow basis-full items-center lg:flex lg:basis-auto`}
         >
           <Col
-            span={6}
-            className="flex flex-col lg:flex-row text-base p-2 list-style-none me-auto ps-0 "
+            span={8}
+            offset={7}
+            className="flex flex-col lg:flex-row text-base p-2 list-style-none me-auto ps-0"
           >
-            {/* <Link className="flex text-lg p-2 cursor-pointer">Home</Link> */}
             <Link to={"/shop"} className="flex text-lg p-2 cursor-pointer">
               Shop
             </Link>
@@ -55,33 +55,36 @@ const HeaderComponent = ({ showDrawer }) => {
             <Link to={"/contact"} className="flex text-lg p-2 cursor-pointer">
               Contacts
             </Link>
+            <Link className="flex text-lg p-2 cursor-pointer">Collection</Link>
           </Col>
         </div>
-        <div className="flex items-center">
-          <Link
-            className="flex text-base p-2 cursor-pointer"
-            onClick={showDrawer}
-          >
-            <CiSearch size={30} fontWeight={800} />
-          </Link>
-          <Dropdown overlay={menu1} placement="bottomRight">
-            {/* <Link className="flex text-base p-2 cursor-pointer">
+        <Col span={4} offset={2}>
+          <div className="flex items-center">
+            <Link
+              className="flex text-base p-2 cursor-pointer"
+              onClick={showDrawer}
+            >
+              <CiSearch size={30} fontWeight={800} />
+            </Link>
+            <Dropdown overlay={menu1} placement="bottomRight">
+              {/* <Link className="flex text-base p-2 cursor-pointer">
               <CiUser size={24} />
             </Link> */}
-            <Link href="/" className="flex text-base p-2 cursor-pointer">
-              <Avatar
-                src="https://tecdn.b-cdn.net/img/new/avatars/2.jpg"
-                size={30}
-                fontWeight={800}
-              />
+              <Link href="/" className="flex text-base p-2 cursor-pointer">
+                <Avatar
+                  src="https://tecdn.b-cdn.net/img/new/avatars/2.jpg"
+                  size={30}
+                  fontWeight={800}
+                />
+              </Link>
+            </Dropdown>
+            <Link to={"/cart"} className="flex text-base p-2 cursor-pointer">
+              <Badge count={1} offset={[0, 0]} color="blue">
+                <CiShoppingCart size={30} fontWeight={800} />
+              </Badge>
             </Link>
-          </Dropdown>
-          <Link href="#" className="flex text-base p-2 cursor-pointer">
-            <Badge count={1} offset={[0, 0]} color="blue">
-              <CiShoppingCart size={30} fontWeight={800} />
-            </Badge>
-          </Link>
-        </div>
+          </div>
+        </Col>
       </div>
     </nav>
   );

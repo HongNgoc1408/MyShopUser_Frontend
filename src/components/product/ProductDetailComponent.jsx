@@ -1,11 +1,11 @@
 import React from "react";
 import {
+  Breadcrumb,
   Carousel,
   Collapse,
   ConfigProvider,
   Form,
   InputNumber,
-  Modal,
   Select,
 } from "antd";
 import { Link } from "react-router-dom";
@@ -15,13 +15,13 @@ import { Option } from "antd/es/mentions";
 import product from "../../assets/product/AoSoMi/SoMiVang.jpeg";
 import color from "../../assets/color/AoSoMi/SoMiVang.jpeg";
 import color1 from "../../assets/color/AoSoMi/SoMiXanh.jpeg";
+import { Tabs } from "antd";
 const text = `
   A dog is a type of domesticated animal.
   Known for its loyalty and faithfulness,
   it can be found as a welcome guest in many households across the world.
 `;
-
-const ModelProductComponent = ({ open, setOpen }) => {
+const ProductDetailComponent = () => {
   const onChange = (key) => {
     console.log(key);
   };
@@ -38,34 +38,31 @@ const ModelProductComponent = ({ open, setOpen }) => {
       children: <div>{text}</div>,
     },
   ];
+
+  const onChange1 = (key) => {
+    console.log(key);
+  };
+  const items1 = [
+    {
+      key: "1",
+      label: "Chi tiết sản phẩm",
+      children: "Chi tiết sản phẩm",
+    },
+    {
+      key: "2",
+      label: "Đánh giá sản phẩm",
+      children: "Đánh giá sản phẩm",
+    },
+    {
+      key: "3",
+      label: "Hướng dẫn mua hàng",
+      children: "Hướng dẫn mua hàng",
+    },
+  ];
   return (
-    <ConfigProvider
-      theme={{
-        components: {
-          Modal: {
-            titleFontSize: "20px",
-          },
-        },
-      }}
-    >
-      <Modal
-        title="Thêm vào giỏ hàng"
-        open={open}
-        onCancel={() => setOpen(false)}
-        footer={null}
-        width={950}
-        styles={{
-          body: {
-            height: "500px",
-            overflowY: "auto",
-            overflowX: "hidden",
-          },
-          header: {
-            textAlign: "center",
-            borderBottom: "1px solid #999",
-          },
-        }}
-      >
+    <div className="container mx-auto max-lg:px-8 px-24">
+      <div className="my-5">
+        <Breadcrumb className="text-lg my-5">Trang chủ | Nữ | Áo</Breadcrumb>
         <div class="grid grid-cols-5 gap-5 my-5">
           <div className="col-span-3 flex flex-row">
             <div className="w-1/4">
@@ -115,7 +112,7 @@ const ModelProductComponent = ({ open, setOpen }) => {
               </ConfigProvider>
             </div>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-2 ml-10">
             <div className="flex">
               <p className="w-11/12 font-bold text-2xl">
                 Áo sơ mi nữ oversize tn cổ bẻ viền 1túi 002.003
@@ -124,21 +121,22 @@ const ModelProductComponent = ({ open, setOpen }) => {
                 <CiHeart />
               </button>
             </div>
-
-            <div className="flex">
-              <div className="price-card-product text-orange-600">
-                <p className="text-2xl"> &#8363;189.000</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex">
+                <div className="price-card-product text-orange-600">
+                  <p className="text-2xl"> &#8363;189.000</p>
+                </div>
+                <div className="price-card-product text-gray-500 line-through">
+                  <p className="text-2xl">&#8363;245.700</p>
+                </div>
+                <div className="cursor-pointer font-semibold bg-orange-50 m-1 text-orange-600">
+                  <p className="text-xl">30%</p>
+                </div>
               </div>
-              <div className="price-card-product text-gray-500 line-through">
-                <p className="text-2xl">&#8363;245.700</p>
+              <div className="flex justify-end">
+                <p className="mx-1 my-auto p-auto text-xl">Còn lại: 33 | </p>
+                <p className="mx-1 my-auto p-auto text-xl">Đã bán: 97</p>
               </div>
-              <div className="cursor-pointer font-semibold bg-orange-50 m-1 text-orange-600">
-                <p className="text-xl">30%</p>
-              </div>
-            </div>
-            <div className="flex">
-              <p className="mr-1 my-auto p-auto text-lg">Còn lại: 33 | </p>
-              <p className="my-auto p-auto text-lg">Đã bán: 97</p>
             </div>
             <div className="flex">
               <p className="mr-1 text-lg">Màu sắc:</p>
@@ -206,8 +204,12 @@ const ModelProductComponent = ({ open, setOpen }) => {
             </div>
           </div>
         </div>
-      </Modal>
-    </ConfigProvider>
+        <div className="ml-10 uppercase text-2xl">
+          <Tabs defaultActiveKey="1" items={items1} onChange={onChange1} />
+        </div>
+      </div>
+    </div>
   );
 };
-export default ModelProductComponent;
+
+export default ProductDetailComponent;

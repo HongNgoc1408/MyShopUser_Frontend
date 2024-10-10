@@ -1,0 +1,35 @@
+
+/* Tùy chỉnh nút Prev và Next */
+/* CustomArrows.css */
+
+.custom-prev-arrow,
+.custom-next-arrow {
+  background-color: black !important;
+  border-radius: 50% !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  border: none; /* Loại bỏ viền mặc định của Button */
+}
+
+.custom-prev-arrow:hover,
+.custom-next-arrow:hover {
+  background-color: #333 !important;
+}
+
+.custom-prev-arrow .anticon,
+.custom-next-arrow .anticon {
+  color: white !important;
+  font-size: 20px !important;
+}
+/* BrandComponent.css */
+
+/* Tùy chỉnh nút Prev và Next trong carousel-container */
+.carousel-container .slick-prev,
+.carousel-container .slick-next {
+  top: 50%;                           /* Đặt nút ở giữa chiều cao của Carousel */
+  transform: translateY(-50%);        /* Dịch chuyển nút để hoàn toàn căn giữa */
+}
