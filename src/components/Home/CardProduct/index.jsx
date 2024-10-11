@@ -1,34 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Badge, Image, Rate } from "antd";
-
-import product from "../../../assets/product/AoSoMi/SoMiVang.jpeg";
-import color from "../../../assets/color/AoSoMi/SoMiVang.jpeg";
-import color1 from "../../../assets/color/AoSoMi/SoMiXanh.jpeg";
 import { CiHeart } from "react-icons/ci";
-
 import { Link } from "react-router-dom";
 import ModelProduct from "../ModelProduct";
-const CardProduct = () => {
+import ProductService from "../../../services/ProductService";
+import {
+  formatDis,
+  formatVND,
+  toImageSrc,
+} from "../../../services/commonService";
+const CardProduct = ({ id }) => {
   const [open, setOpen] = useState(false);
+  const [product, setProduct] = useState([]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await ProductService.getById(id);
+        // console.log("getById", res.data);
+        setProduct(res.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
   return (
     <div className="">
       <Badge.Ribbon
-        text="Sale"
+        text={formatDis(product.discount)}
         color="red"
         placement="start"
-        className="text-base z-10 cursor-pointer"
+        className={`text-base z-10 cursor-pointer ${
+          product.discount > 0 ? "" : "hidden"
+        }`}
       >
         <div className="border-2 hover:shadow-md">
           <div className="relative flex flex-col items-end group">
             <Link
-              to="/product"
+              to={`/product-details/${product.id}`}
               className="z-10 hover:no-underline hover:text-current"
             >
               <Image
+                height={350}
                 preview={false}
-                src={product}
-                alt="Product 1"
-                className="w-full"
+                src={
+                  product.imageUrls && product.imageUrls.length > 0
+                    ? toImageSrc(product.imageUrls[0])
+                    : ""
+                }
+                alt={product.name || "Product Image"}
               />
             </Link>
             <div className="absolute bottom-3 inset-0 flex items-end justify-center">
@@ -46,41 +69,66 @@ const CardProduct = () => {
             </button>
           </div>
           <Link
-            to={{ pathname: "/product" }}
+            to={`/product-details/${product.id}`}
             className="hover:no-underline hover:text-current"
           >
             <div className="p-2">
               <div className="flex flex-nowrap">
-                <div className="m-1 justify-center">
-                  <img src={color} alt="" className="w-6 h-6 rounded-full" />
-                </div>
-                <div className="m-1 justify-center">
-                  <img src={color1} alt="" className="w-6 h-6 rounded-full" />
-                </div>
+                {product.colorSizes && product.colorSizes.length > 0
+                  ? product.colorSizes.map((item, index) => (
+                      <div className="m-1 justify-center" key={index}>
+                        <Image
+                          height={30}
+                          width={30}
+                          preview={false}
+                          src={toImageSrc(item.imageUrl)}
+                          alt={`color-${index}`}
+                          className="rounded-full"
+                        />
+                      </div>
+                    ))
+                  : ""}
               </div>
               <div className="flex flex-nowrap">
                 <div className="price-card-product text-orange-600">
-                  <p> &#8363;189.000</p>
+                  <p>
+                    {product.discount > 0
+                      ? formatVND(
+                          (product.price * (100 - product.discount)) / 100
+                        )
+                      : formatVND(product.price)}
+                  </p>
                 </div>
                 <div className="price-card-product text-gray-500 line-through">
-                  <p>&#8363;245.700</p>
+                  <p>{product.discount > 0 ? formatVND(product.price) : ""}</p>
                 </div>
                 <div className="cursor-pointer font-semibold bg-orange-50 m-1 text-orange-600">
-                  <p>30%</p>
+                  <p>
+                    {product.discount > 0 ? formatDis(product.discount) : ""}
+                  </p>
                 </div>
               </div>
 
               <Link
-                to={"/product"}
+                to={`/product-details/${product.id}`}
                 className="hover:no-underline hover:text-current"
               >
-                <p className="title-card-product">
-                  Áo sơ mi nữ oversize cổ bẻ viền
-                </p>
+                <p className="title-card-product">{product.name}</p>
               </Link>
               <div className="flex">
-                <Rate disabled defaultValue={2} className="text-sm" />
-                <p> Đã bán 100 </p>
+                <div>
+                  <Rate
+                    disabled
+                    defaultValue={product.rating > 0 ? product.rating : "0"}
+                    className="text-sm"
+                  />
+                </div>
+
+                <div>
+                  <p className="text-sm mx-2">
+                    Đã bán: {product.sold > 0 ? product.sold : "0"}
+                  </p>
+                </div>
               </div>
             </div>
           </Link>

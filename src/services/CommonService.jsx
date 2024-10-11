@@ -42,6 +42,13 @@ export const formatVND = (value) => {
   return format.format(value);
 };
 
+export const formatDis = (value) => {
+  const format = new Intl.NumberFormat("vi", {
+    style: "percent",
+  });
+  return format.format(value / 100);
+};
+
 export const formatDateTime = (date) => new Date(date).toLocaleString("vi-VN");
 
 export const toTextLabel = (data) => {

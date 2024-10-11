@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { CiFilter } from "react-icons/ci";
 import { Checkbox } from "antd";
-import BrandService from "../../services/BrandService";
-import CategoryService from "../../services/CategoryService";
+import BrandService from "../../../services/BrandService";
+import CategoryService from "../../../services/CategoryService";
+
 const FilterComponent = () => {
   const [brands, setBrands] = useState([]);
   const [categorys, setCategorys] = useState([]);
@@ -13,7 +14,7 @@ const FilterComponent = () => {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const res = await BrandService.getAllBrand();
+        const res = await BrandService.getAll();
         setBrands(res.data);
       } catch (error) {
         console.error("Error fetching brands:", error);
@@ -26,7 +27,7 @@ const FilterComponent = () => {
   useEffect(() => {
     const fetchCategorys = async () => {
       try {
-        const res = await CategoryService.getAllCategory();
+        const res = await CategoryService.getAll();
         setCategorys(res.data);
       } catch (error) {
         console.error("Error fetching categorys:", error);

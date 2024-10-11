@@ -5,6 +5,7 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Shop from "../pages/Shop/Shop";
+import ProductDetails from "../pages/Product/ProductDetail";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -15,8 +16,7 @@ export const publicRoutes = [
   // { path: '/reset-password', component: ResetPassword, Layout: null },
   // { path: '/register', component: Register, Layout: null },
   { path: "/shop", component: Shop },
-  // { path: '/product', component: Product },
-  // { path: '/product-details/:id', component: ProductDetail },
+  { path: "/product-details/:id", component: ProductDetails },
 ];
 
 export const privateRoutes = [

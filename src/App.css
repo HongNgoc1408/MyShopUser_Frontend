@@ -7,7 +7,7 @@
 }
 
 .title-card-product {
-  @apply text-lg text-nowrap truncate font-semibold cursor-pointer hover:text-orange-500;
+  @apply text-lg text-nowrap capitalize truncate font-semibold cursor-pointer hover:text-orange-500;
 }
 
 .price-card-product {

@@ -1,13 +1,13 @@
 import React from "react";
 import { Pagination, Select } from "antd";
-// import FilterComponent from "../product/FilterComponent";
 import CardProduct from "../../Home/CardProduct";
+import FilterComponent from "../../Product/Filter";
 const AllProduct = () => {
   return (
     <div className="container mx-auto max-lg:px-8 px-20">
       <div className="my-5">
         <div class="grid grid-cols-6 gap-6 py-5">
-          {/* <FilterComponent /> */}
+          <FilterComponent />
           <div className="col-span-5">
             <div className="grid grid-cols-2 gap-2  text-base font-extrabold border-b-2 pb-2">
               <div className="flex col-start-1 col-end-3">

@@ -5,6 +5,8 @@ const API_URL = process.env.REACT_APP_API_URL + "/api/sizes";
 
 const getAll = async () => await axios.get(API_URL);
 
+const getById = async (id) => await axios.get(API_URL + `/${id}`);
+
 const create = async (data) =>
   await axios.post(API_URL + "/create", data, { headers: authHeader() });
 
@@ -16,6 +18,7 @@ const remove = async (id) =>
 
 const SizeService = {
   getAll,
+  getById,
   create,
   update,
   remove,

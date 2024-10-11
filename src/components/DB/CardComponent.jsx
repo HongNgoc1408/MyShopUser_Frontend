@@ -21,7 +21,7 @@ const CardComponent = () => {
         <div className="border-2 hover:shadow-md">
           <div className="relative flex flex-col items-end group">
             <Link
-              to="/product"
+              to={`/product-details/${product.id}`}
               className="z-10 hover:no-underline hover:text-current"
             >
               <Image
