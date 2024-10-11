@@ -1,70 +1,70 @@
 import axios from "axios";
+import { authHeader, authImageHeader } from "./authHeader";
+import CategoryService from "./CategoryService";
+import SizeService from "./SizeService";
+import BrandService from "./BrandService";
 
-const API_URL = process.env.REACT_APP_API_URL + "/api/product";
+const API_URL = process.env.REACT_APP_API_URL + "/api/products";
 
-const getAllProduct = async () => await axios.get(API_URL);
+const getAll = async (page, pageSize, keySearch) =>
+  await axios.get(API_URL, {
+    params: {
+      page: page,
+      pageSize: pageSize,
+      key: keySearch ?? "",
+    },
+  });
 
-const getByIdProduct = async (id, data) =>
+const getById = async (id, data) =>
   await axios.get(API_URL + `/${id}`, data);
 
-// const fetchProductAttributes = async () => {
-//   try {
-//     const brands = await brandService.getBrands();
-//     const categories = await categoryService.getAllCategory();
-//     const data = {
-//       brands: brands.data,
-//       categories: categories.data,
-//     };
-//     return data;
-//   } catch (error) {
-//     return new Error(error);
-//   }
-// };
+const add = async (data) =>
+  await axios.post(API_URL + "/create", data, { headers: authImageHeader() });
 
-// const addProduct = async (data) => await axios.post(API_URL + "/create", data);
+const update = async (id, data) =>
+  await axios.put(API_URL + `/update/${id}`, data, {
+    headers: authImageHeader(),
+  });
 
-// const updateProduct = async (id, data) =>
-//   await axios.put(API_URL + `/update/${id}`, data);
+const remove = async (id) =>
+  await axios.delete(API_URL + `/delete/${id}`, { headers: authHeader() });
 
-// const deleteProduct = async (id) =>
-//   await axios.delete(API_URL + `/delete/${id}`);
+const updateEnable = async (id, data) =>
+  await axios.put(API_URL + `/updateEnable/${id}`, data, {
+    headers: authHeader(),
+  });
 
-// const getFilteredProducts = async (
-//   page,
-//   pageSize,
-//   discount,
-//   sorter,
-//   categoryIds,
-//   brandIds,
-//   rating,
-//   minPrice,
-//   maxPrice,
-//   flashSale
-// ) =>
-//   await axios.get(API_URL + "/filters", {
-//     params: {
-//       page: page,
-//       pageSize: pageSize,
-//       discount: discount ?? false,
-//       sorter: sorter ?? 0,
-//       categoryIds: categoryIds.length > 0 ? categoryIds : [],
-//       brandIds: brandIds.length > 0 ? brandIds : [],
-//       rating: rating ?? null,
-//       minPrice: minPrice ?? null,
-//       maxPrice: maxPrice ?? null,
-//       flashSale: flashSale ?? false,
-//     },
-//     paramsSerializer: { indexes: true },
-//   });
+const fetchProductAttributes = async () => {
+  try {
+    const brandsData = BrandService.getAll();
+    const categoriesData = CategoryService.getAll();
+    const sizesData = SizeService.getAll();
+
+    const [brands, categories, sizes] = await Promise.all([
+      brandsData,
+      categoriesData,
+      sizesData,
+    ]);
+    const data = {
+      brands: brands.data,
+      categories: categories.data,
+      sizes: sizes.data,
+    };
+
+    return data;
+  } catch (error) {
+    return new Error(error);
+  }
+};
 
 const ProductService = {
-  getAllProduct,
-  getByIdProduct,
-  //   fetchProductAttributes,
-  //   addProduct,
-
-  //   updateProduct,
-  //   deleteProduct,
-  //   getFilteredProducts,
+  getAll,
+  add,
+  getById,
+  update,
+  remove,
+  updateEnable,
+  fetchProductAttributes,
 };
+
 export default ProductService;
