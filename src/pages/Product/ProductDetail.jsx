@@ -29,7 +29,6 @@ const ProductDetail = () => {
   const [colorSizes, setColorSizes] = useState([]);
   const [selectedColorSize, setSelectedColorSize] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -81,8 +80,7 @@ const ProductDetail = () => {
   };
 
   const handleThumbnailClick = (index) => {
-    console.log(`Thumbnail clicked: ${index}`);
-    setCurrentImageIndex(index);
+    // console.log(`Thumbnail clicked: ${index}`);
     carouselRef.current.goTo(index);
   };
 
@@ -132,7 +130,7 @@ const ProductDetail = () => {
             <div className="w-1/4">
               {product.imageUrls && product.imageUrls.length > 0
                 ? product.imageUrls.map((item, index) => (
-                    <div className="" key={index}>
+                    <div key={index}>
                       <Image
                         preview={false}
                         style={{ width: "58%" }}
@@ -160,7 +158,6 @@ const ProductDetail = () => {
                   dotPosition="right"
                   arrows
                   infinite={false}
-                  afterChange={(current) => setCurrentImageIndex(current)}
                 >
                   {product.imageUrls && product.imageUrls.length > 0
                     ? product.imageUrls.map((item, index) => (

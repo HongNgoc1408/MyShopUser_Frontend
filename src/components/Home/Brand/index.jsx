@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Carousel, Image } from "antd";
 import { Link } from "react-router-dom";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+
 import BrandService from "../../../services/BrandService";
 import { toImageSrc } from "../../../services/commonService";
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 
 const Brand = () => {
   const carouselRef = useRef(null);
@@ -62,7 +63,7 @@ const Brand = () => {
           className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center opacity-70 hover:opacity-100 z-10"
           aria-label="Previous Slide"
         >
-          <LeftOutlined />
+          <ArrowLeftOutlined />
         </button>
 
         <Carousel
@@ -88,7 +89,7 @@ const Brand = () => {
           className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white rounded-full w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center opacity-70 hover:opacity-100"
           aria-label="Next Slide"
         >
-          <RightOutlined />
+          <ArrowRightOutlined />
         </button>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { Checkbox } from "antd";
 import BrandService from "../../../services/BrandService";
 import CategoryService from "../../../services/CategoryService";
 
-const FilterComponent = () => {
+const Filter = () => {
   const [brands, setBrands] = useState([]);
   const [categorys, setCategorys] = useState([]);
   const onChange = (e) => {
@@ -111,4 +111,4 @@ const FilterComponent = () => {
   );
 };
 
-export default FilterComponent;
+export default Filter;

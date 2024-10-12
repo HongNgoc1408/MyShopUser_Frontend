@@ -23,7 +23,7 @@ const Product = () => {
   return (
     <div className="container mx-auto max-lg:px-8 px-20">
       <div className="my-5 p-5 bg-white shadow-md">
-        <TitleBody title="Thời trang" link="/" />
+        <TitleBody title="Thời trang" link="/shop" />
         <div className="grid lg:grid-cols-5 gap-5 sm:grid-cols-3 grid-cols-1 border-t-2 py-5">
           {products.map((product) => (
             <CardProduct key={product.id} id={product.id} />

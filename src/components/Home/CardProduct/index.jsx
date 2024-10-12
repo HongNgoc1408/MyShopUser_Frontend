@@ -28,7 +28,10 @@ const CardProduct = ({ id }) => {
   }, [id]);
 
   return (
-    <div className="">
+    <Link
+      to={`/product-details/${product.id}`}
+      className="z-10 hover:no-underline hover:text-current"
+    >
       <Badge.Ribbon
         text={formatDis(product.discount)}
         color="red"
@@ -38,35 +41,44 @@ const CardProduct = ({ id }) => {
         }`}
       >
         <div className="border-2 hover:shadow-md">
-          <div className="relative flex flex-col items-end group">
-            <Link
+          <div className="relative group">
+            {/* <Link
               to={`/product-details/${product.id}`}
               className="z-10 hover:no-underline hover:text-current"
-            >
-              <Image
-                height={350}
-                preview={false}
-                src={
-                  product.imageUrls && product.imageUrls.length > 0
-                    ? toImageSrc(product.imageUrls[0])
-                    : ""
-                }
-                alt={product.name || "Product Image"}
-              />
-            </Link>
+            > */}
+            <Image
+              preview={false}
+              src={
+                product.imageUrls && product.imageUrls.length > 0
+                  ? toImageSrc(product.imageUrls[0])
+                  : ""
+              }
+              alt={product.name || "Product Image"}
+              style={{
+                width: "100%",
+                height: "380px",
+                objectFit: "cover",
+              }}
+            />
+            {/* </Link> */}
             <div className="absolute bottom-3 inset-0 flex items-end justify-center">
               <button
                 className="w-10/12 light-button opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
-                onClick={() => setOpen(true)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpen(true);
+                }}
               >
                 Thêm vào giỏ hàng
               </button>
             </div>
 
-            <ModelProduct open={open} setOpen={setOpen} />
-            <button className="absolute z-10 top-1 right-2 text-3xl font-bold hover:text-red-600">
-              <CiHeart />
-            </button>
+            <div onClick={(e) => e.preventDefault()}>
+              <ModelProduct open={open} setOpen={setOpen} id={product.id} />
+              <button className="absolute z-10 top-1 right-2 text-3xl font-bold hover:text-red-600">
+                <CiHeart />
+              </button>
+            </div>
           </div>
           <Link
             to={`/product-details/${product.id}`}
@@ -134,7 +146,7 @@ const CardProduct = ({ id }) => {
           </Link>
         </div>
       </Badge.Ribbon>
-    </div>
+    </Link>
   );
 };
 

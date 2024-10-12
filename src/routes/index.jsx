@@ -5,23 +5,26 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Shop from "../pages/Shop/Shop";
-import ProductDetails from "../pages/Product/ProductDetail";
+import ResetPassword from "../pages/ResetPassword";
+import Profile from "../pages/Profile";
+import CartDetail from "../pages/Cart/CartDetail";
+import ProductDetail from "../pages/Product/ProductDetail";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
 export const publicRoutes = [
   { path: "/", component: Home },
-  { path: "/login", component: Login, Layout: null },
-  { path: "/register", component: Register, Layout: null },
-  // { path: '/reset-password', component: ResetPassword, Layout: null },
-  // { path: '/register', component: Register, Layout: null },
+  { path: "/login", component: Login },
+  { path: "/register", component: Register },
+  { path: "/reset-password", component: ResetPassword },
   { path: "/shop", component: Shop },
-  { path: "/product-details/:id", component: ProductDetails },
+  { path: "/product-details/:id", component: ProductDetail },
 ];
 
 export const privateRoutes = [
-  // { path: '/cart', component: CartItem },
-  // { path: '/profile', component: Profile },
+  // { path: "/cart", component: Cart },
+  { path: "/cart", component: CartDetail },
+  { path: "/profile", component: Profile },
 ];
 
 export const generatePublicRoutes = () => {
