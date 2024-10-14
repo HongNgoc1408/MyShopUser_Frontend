@@ -3,22 +3,15 @@ import { authHeader } from "./authHeader";
 
 const API_URL = process.env.REACT_APP_API_URL + "/api/user";
 
-const getAllUser = async (page, pageSize, search) => {
-  const headers = authHeader();
-  console.log("Authorization header:", headers);
+const getAddress = async () =>
+  await axios.get(API_URL + "/address", { headers: authHeader() });
 
-  return await axios.get(API_URL, {
-    headers: headers,
-    params: {
-      page: page,
-      pageSize: pageSize,
-      search: search ?? "",
-    },
-  });
-};
+const updateAddress = async (data) =>
+  await axios.put(API_URL + "/address", data, { headers: authHeader() });
 
 const UserService = {
-  getAllUser,
+  getAddress,
+  updateAddress,
 };
 
 export default UserService;

@@ -1,198 +1,648 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
-  Checkbox,
-  Col,
-  Flex,
+  Card,
+  ConfigProvider,
+  Divider,
+  Form,
+  Image,
+  Input,
   InputNumber,
+  Modal,
   notification,
-  Popconfirm,
-  Row,
+  Radio,
+  Select,
+  Skeleton,
+  Steps,
   Table,
 } from "antd";
-import { Link } from "react-router-dom";
-import { FiDelete } from "react-icons/fi";
-
+import CartService from "../../services/CartService";
+import {
+  formatVND,
+  showError,
+  toImageLink,
+} from "../../services/commonService";
+import { DeleteOutlined } from "@ant-design/icons";
+import AddressService from "../../services/AddressService";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import BreadcrumbLink from "../../components/BreadcrumbLink";
+import TextArea from "antd/es/input/TextArea";
+import UserService from "../../services/UserService";
+const breadcrumb = [
+  {
+    path: "/",
+    title: "Trang chủ",
+  },
+  {
+    title: "Giỏ hàng",
+  },
+];
 const CartDetail = () => {
+  const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [approximatePrice, setApproximatePrice] = useState(0);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [dataAddress, setDataAddress] = useState({});
+
+  const [provinces, setProvince] = useState([]);
+  const [districts, setDistrict] = useState([]);
+  const [wards, setWard] = useState([]);
+
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  //   (onUpdate, handleDelete) =>
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await CartService.getAllByUserId();
+        const address = await UserService.getAddress();
+        const result = await AddressService.getProvince();
+
+        setData(res.data);
+        setDataAddress(address.data);
+        setProvince(result.data || []);
+      } catch (error) {
+        showError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const showModal = () => {
+    form.setFieldsValue(dataAddress);
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleProvinceChange = async (value, option) => {
+    setSelectedProvince(value);
+    try {
+      const res = await AddressService.getDistrictsProvice(value);
+      setDistrict(res.data?.districts ?? []);
+      setWard([]); // Reset wards
+      form.setFieldsValue({ province_name: option.label });
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const handleDistrictChange = async (value, option) => {
+    setSelectedDistrict(value);
+    try {
+      const res = await AddressService.getWardsProvice(value);
+      setWard(res.data?.wards ?? []);
+      form.setFieldsValue({ district_name: option.label });
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const handleWardChange = (value, option) => {
+    form.setFieldsValue({ ward_name: option.label });
+  };
+
+  const handleOk = async () => {
+    setLoadingUpdate(true);
+    try {
+      const value = await form.validateFields();
+      await UserService.updateAddress(value);
+      notification.success({ message: "Cập nhật địa chỉ thành công." });
+      setIsModalOpen(false);
+      setDataAddress(value);
+    } catch (error) {
+      showError(error);
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
+
+  const [value, setValue] = useState(1);
+  const onChange = (e) => {
+    console.log("Radio checked", e.target.value);
+    setValue(e.target.value);
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    try {
+      if (selectedRowKeys.length === 0) {
+        notification.warning({ message: "Vui lòng chọn sản phẩm cần xóa" });
+        return;
+      }
+      await CartService.remove([productId]);
+      notification.success({ message: "Xóa thành công." });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+
+      setSelectedRowKeys([]);
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const handleDeleteSelectedProducts = async () => {
+    if (selectedRowKeys.length === 0) {
+      notification.warning({ message: "Vui lòng chọn sản phẩm cần xóa" });
+      return;
+    }
+
+    try {
+      const selectedItems = data.filter((item) =>
+        selectedRowKeys.includes(item.id)
+      );
+
+      const selectedProductIds = selectedItems.map((item) => item.productId);
+      // console.log(" Product IDs:", selectedProductIds);
+
+      await CartService.remove(selectedProductIds);
+      notification.success({ message: "Xóa sản phẩm thành công" });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      setSelectedRowKeys([]);
+    } catch (error) {
+      notification.error({
+        message: "Xóa sản phẩm thất bại",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleQuantityChange = async (value, record) => {
+    const updatedItem = {
+      ...record,
+      quantity: value,
+    };
+    await updateCartItem(record.id, updatedItem);
+  };
+
+  const handleSizeChange = async (value, record) => {
+    const updatedItem = {
+      ...record,
+      sizeId: value,
+      sizeName: record.sizeInStocks.find((size) => size.sizeId === value)
+        ?.sizeName,
+    };
+    await updateCartItem(record.id, updatedItem);
+  };
+
+  const updateCartItem = async (id, updatedData) => {
+    try {
+      await CartService.update(id, updatedData);
+      notification.success({ message: "Cập nhật sản phẩm thành công." });
+
+      const res = await CartService.getAllByUserId();
+      setData(res.data);
+    } catch (error) {
+      showError(error);
+    }
+  };
   const columns = [
     {
-      title: "Sản phẩm",
-      dataIndex: "name",
+      dataIndex: "imageUrl",
       align: "center",
-      render: (text) => <Link>{text}</Link>,
-    },
-    {
-      title: "Đơn giá",
-      className: "price",
-      dataIndex: "price",
-      width: "200px",
-    },
-    {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      render: (_, record) => (
-        <Flex justify="center" align="center" className="space-x-1">
-          <InputNumber min={1} />
-        </Flex>
+
+      render: (imageUrl, record) => (
+        <div className="flex items-center">
+          <Image
+            width={100}
+            height={120}
+            src={toImageLink(imageUrl)}
+            alt={record.productName}
+          />
+        </div>
       ),
     },
     {
-      title: "Số tiền",
-      dataIndex: "total",
-      width: "200px",
+      title: "Tên sản phẩm",
+      dataIndex: "productName",
+      render: (_, record) => (
+        <span className="text-base capitalize ml-4 md:truncate md:w-96 truncate w-40">
+          {record.productName}
+        </span>
+      ),
+    },
+
+    {
+      title: "Màu sắc",
+      dataIndex: "colorName",
+      render: (_, record) => (
+        <span className="text-base ml-4 md:truncate md:w-96 truncate w-40">
+          {record.colorName}
+        </span>
+      ),
     },
     {
-      title: "Thực hiện",
+      title: "Kích thước",
+      dataIndex: "sizeName",
+      render: (value, record) => {
+        const sizeOptions = record.sizeInStocks.map((size) => ({
+          label: size.sizeName,
+          value: size.sizeId,
+        }));
+
+        return (
+          <Select
+            defaultValue={record.sizeId}
+            onChange={(value) => handleSizeChange(value, record)}
+            options={sizeOptions}
+          />
+        );
+      },
+    },
+    {
+      title: "Đơn giá",
+      dataIndex: "price",
       align: "center",
       render: (_, record) => (
-        <Flex justify="center" align="center" className="space-x-1">
-          {/* <Tooltip title="Chỉnh sửa">
-              <Button onClick={() => onUpdate(record)}>
-                <EditTwoTone />
-              </Button>
-            </Tooltip> */}
-          <Popconfirm
-            title={`Xác nhận xóa ${record.name}`}
-            // onConfirm={() => handleDelete(record.id)}
-            loading={loadingDelete}
-          >
-            <Button>
-              <FiDelete />
-            </Button>
-          </Popconfirm>
-        </Flex>
+        <>
+          <span className="price-card-product text-gray-500 line-through">
+            {formatVND(record.originPrice)}
+          </span>
+          <span className="price-card-product">{formatVND(record.price)}</span>
+        </>
+      ),
+    },
+    {
+      title: "Số lượng",
+      align: "center",
+      dataIndex: "quantity",
+      render: (value, record) => {
+        const currentSize = record.sizeInStocks.find(
+          (size) => size.sizeId === record.sizeId
+        );
+        const maxQuantity = currentSize ? currentSize.inStock : 0;
+        return (
+          <InputNumber
+            min={1}
+            max={maxQuantity} // Set the max to inStock of the current size
+            className="cursor-pointer"
+            value={value}
+            onChange={(newValue) => handleQuantityChange(newValue, record)}
+          />
+        );
+      },
+    },
+    {
+      title: "Số tiền",
+      align: "center",
+      key: "total",
+      render: (_, record) => {
+        const total = record.price * record.quantity;
+        return <span className="price-card-product">{formatVND(total)}</span>;
+      },
+    },
+    {
+      title: (
+        <Button
+          danger
+          className="border-0 flex items-center"
+          onClick={handleDeleteSelectedProducts}
+        >
+          <DeleteOutlined />
+        </Button>
+      ),
+      align: "center",
+      render: (text, record) => (
+        <Button
+          danger
+          className="border-0 flex items-center"
+          onClick={() => handleDeleteProduct(record.productId)}
+        >
+          <DeleteOutlined />
+        </Button>
       ),
     },
   ];
 
-  const data = [];
   const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
+    selectedRowKeys,
+    onChange: (newSelectedRowKeys) => {
+      setSelectedRowKeys(newSelectedRowKeys);
+
+      const selectedItems = data.filter((item) =>
+        newSelectedRowKeys.includes(item.id)
       );
+
+      const selectedProductIds = selectedItems.map((item) => item.productId);
+      console.log("Selected Product IDs:", selectedProductIds);
+
+      const approximate = selectedItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      );
+      setApproximatePrice(approximate);
+      totalShippingFee(approximate);
     },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User",
-      name: record.name,
-    }),
   };
 
-  //   const onUpdate = (record) => {
-  //     form.setFieldsValue(record);
-  //     setUpdateID(record.id);
-  //     setIsUpdate(true);
-  //   };
-
-  //   const handleUpdate = async () => {
-  //     setLoadingUpdate(true);
-  //     try {
-  //       const values = await form.getFieldsValue();
-
-  //       await CategoryService.update(updateID, values);
-  //       notification.success({
-  //         message: `Cập nhật ${values.name} thành công.`,
-  //       });
-  //       setUpdate(!update);
-  //       setIsUpdate(false);
-  //       form.resetFields();
-  //     } catch (error) {
-  //       showError(error);
-  //     } finally {
-  //       setLoadingUpdate(false);
-  //     }
-  //   };
-
-  //   const handleDelete = async (id) => {
-  //     setLoadingDelete(true);
-  //     try {
-  //       await CategoryService.remove(id);
-  //       const newData = data.filter((item) => !(item.id === id));
-  //       setData(newData);
-  //       notification.success({
-  //         message: "Xóa thành công",
-  //       });
-  //     } catch (error) {
-  //       showError(error);
-  //     } finally {
-  //       setLoadingDelete(false);
-  //     }
-  //   };
-
-  //   const handleClear = () => {
-  //     setIsUpdate(false);
-  //     form.resetFields();
-  //   };
+  const totalShippingFee = (approximate) => {
+    if (approximate < 200000) {
+      setShippingFee(30000);
+      setCurrentStep(1);
+    } else if (approximate >= 200000 && approximate < 500000) {
+      setShippingFee(20000);
+      setCurrentStep(2);
+    } else {
+      setShippingFee(0);
+      setCurrentStep(3);
+    }
+  };
 
   return (
     <>
       <div className="bg-gray-100">
-        <div className="container mx-auto max-lg:px-8 px-20">
-          <div className="my-5 p-5 bg-white shadow-md">
-            <Table
-              rowSelection={{
-                type: "checkbox",
-                ...rowSelection,
-              }}
-              pagination={false}
-              loading={isLoading}
-              columns={columns}
-              //   columns={columns(onUpdate, handleDelete)}
-              dataSource={data}
-              rowKey={(record) => record.id}
-              className="overflow-x-auto"
-            />
-          </div>
-        </div>
-        <div className="container mx-auto max-lg:px-8 px-20 fixed bottom-0">
-          <div className="p-5 bg-white shadow-md">
-            <Row
-              gutter={{
-                xs: 8,
-                sm: 16,
-                md: 24,
-                lg: 32,
-              }}
-            >
-              <Col className="gutter-row" span={12}>
-                <div className="flex">
-                  <div className="justify-center items-center ">
-                    <Checkbox>
-                      <p className="text-xl">Chọn tất cả</p>
-                    </Checkbox>
-                  </div>
-                  <div className="text-xl mx-5 hover:text-orange-600 justify-center items-center ">
-                    <p>Xóa</p>
-                  </div>
-                </div>
-              </Col>
-              <Col className="gutter-row" span={6}>
-                <div className="flex">
-                  <div className="justify-center items-center ">
-                    <p className="text-2xl">Tổng thanh toán: </p>
-                  </div>
+        {isLoading ? (
+          <Skeleton paragraph={{ rows: 15 }} />
+        ) : (
+          <>
+            <div className="container mx-20">
+              <BreadcrumbLink breadcrumb={breadcrumb} />
+            </div>
 
-                  <div className="price-card-product text-orange-600 justify-center items-center ">
-                    <p className="text-2xl ml-5 ">100.000đ</p>
-                  </div>
+            <div className="flex flex-col lg:flex-row sm:flex-col justify-between lg:space-x-4">
+              <div className="container mx-auto max-lg:px-8 pl-20 pr-10 w-full lg:w-2/3 sm:w-full">
+                <div className="my-5 p-5 bg-white shadow-md text-base">
+                  <Steps initial={0} current={currentStep}>
+                    <Steps.Step
+                      className="text-base"
+                      title={formatVND(30000)}
+                      description={"dưới " + formatVND(200000)}
+                    />
+                    <Steps.Step
+                      className="text-base"
+                      title={formatVND(20000)}
+                      description={
+                        "từ " +
+                        formatVND(200000) +
+                        "đến dưới " +
+                        formatVND(500000)
+                      }
+                    />
+                    <Steps.Step
+                      className="text-base"
+                      title="Miễn phí"
+                      description={"trên " + formatVND(500000)}
+                    />
+                  </Steps>
                 </div>
-              </Col>
-              <Col className="gutter-row" span={6}>
-                <div className="w-full">
-                  <button className="dark-button text-xl w-72">
-                    <span className="relative z-10">Mua hàng</span>
+
+                <div className="my-5 p-5 bg-white shadow-md">
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Table: {
+                          cellFontSize: 16,
+                        },
+                      },
+                      token: {
+                        fontSize: 16,
+                      },
+                    }}
+                  >
+                    <Table
+                      rowSelection={rowSelection}
+                      pagination={false}
+                      loading={isLoading}
+                      columns={columns}
+                      dataSource={data}
+                      rowKey={(record) => record.id}
+                      className="overflow-x-auto"
+                    />
+                  </ConfigProvider>
+                </div>
+                {/* <div className="my-5 p-5 bg-white shadow-md">
+                  <Row
+                    gutter={{
+                      xs: 8,
+                      sm: 16,
+                      md: 24,
+                      lg: 32,
+                    }}
+                    className="flex flex-wrap"
+                  >
+                    <Col className="gutter-row" span={12}>
+                      <div className="flex">
+                        <div className="justify-center items-center ">
+                          <p className="text-2xl">Tổng thanh toán: </p>
+                        </div>
+
+                        <div className="price-card-product text-orange-600 justify-center items-center ">
+                          <p className="text-2xl ml-5 ">100.000đ</p>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col className="gutter-row" span={12}>
+                      <div className="w-full">
+                        <button className="dark-button text-xl w-full">
+                          <span className="relative z-10">Mua hàng</span>
+                        </button>
+                      </div>
+                    </Col>
+                  </Row>
+                </div> */}
+              </div>
+              <div className="container mx-auto max-lg:px-8 pr-20 w-full lg:w-1/3 sm:w-full">
+                <Card className="text-base my-5 p-5 bg-white shadow-md rounded-none">
+                  <div className="space-x-2">
+                    <div className="flex-col flex">
+                      <div className="flex justify-between">
+                        <div className="flex space-x-1 py-2">
+                          <FaMapMarkerAlt className="text-xl text-red-700" />
+                          <span className="font-bold">
+                            {dataAddress.name} - {dataAddress.phoneNumber}
+                          </span>
+                        </div>
+                        <span
+                          onClick={showModal}
+                          className="text-blue-500 cursor-pointer hover:text-sky-300 py-2"
+                        >
+                          Thay đổi
+                        </span>
+                      </div>
+                      <span className="truncate w-80 lg:w-80 md:w-full">
+                        {dataAddress.detail} - {dataAddress.ward_name} -{" "}
+                        {dataAddress.district_name} -{" "}
+                        {dataAddress.province_name}
+                      </span>
+                    </div>
+                  </div>
+                  <Divider className="my-[0.8rem]" />
+                  <div className="flex justify-between py-2">
+                    <div>Tạm tính</div>
+                    <div>{formatVND(approximatePrice)}</div>
+                  </div>
+                  <div className="flex justify-between">
+                    <div>Phí giao hàng</div>
+                    <div>{formatVND(shippingFee)}</div>
+                  </div>
+                  <Divider />
+                  <div className="flex justify-between">
+                    <div>Tổng tiền</div>
+                    <div className="text-xl font-bold text-red-600">
+                      {formatVND(approximatePrice + shippingFee)}
+                    </div>
+                  </div>
+                </Card>
+                <Card className="rounded-sm" title="Thanh toán">
+                  <Radio.Group
+                    onChange={onChange}
+                    value={value}
+                    className="flex flex-col space-y-3"
+                  >
+                    <Radio value={1}>
+                      <div className="flex p-2 items-center">
+                        <span>Thanh toán khi nhận hàng</span>
+                      </div>
+                    </Radio>
+                    <Radio value={2}>
+                      <div className="flex space-x-4 p-2 items-center">
+                        <img
+                          src="/payos-logo.svg"
+                          alt="Logo"
+                          className="w-12 mx-auto"
+                        />
+                        <span>PayOS</span>
+                      </div>
+                    </Radio>
+
+                    <Radio value={3}>
+                      <div className="flex space-x-4 items-center">
+                        <img
+                          src="/logo_momo.webp"
+                          alt="Logo"
+                          className="w-12 mx-auto"
+                        />
+                        <span>Momo</span>
+                      </div>
+                    </Radio>
+                    <Radio value={4}>
+                      <div className="flex space-x-4 p-2 items-center">
+                        <img
+                          src="/VNPAY-QR.webp"
+                          alt="Logo"
+                          className="w-12 mx-auto"
+                        />
+                        <span>VNPay</span>
+                      </div>
+                    </Radio>
+                  </Radio.Group>
+                </Card>
+                <Divider className="my-[0.1rem] border-0" />
+                <div className="w-full text-left my-4">
+                  <button className="default-button border-2 text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6">
+                    <span className="relative z-10">Mua ngay</span>
                   </button>
                 </div>
-              </Col>
-            </Row>
-          </div>
-        </div>
+              </div>
+              <Modal
+                title="Địa chỉ giao hàng"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                loading={loadingUpdate}
+              >
+                <Form form={form} layout="vertical">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Form.Item
+                      name="name"
+                      label="Họ và tên"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Họ và tên không được để trống",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Nhập họ và tên" />
+                    </Form.Item>
+                    <Form.Item
+                      name="phoneNumber"
+                      label="Số điện thoại"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Số điện thoại không được để trống",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Nhập số điện thoại" />
+                    </Form.Item>
+                  </div>
+                  <Form.Item
+                    name="province_id"
+                    label="Tỉnh/Thành phố"
+                    rules={[{ required: true }]}
+                  >
+                    <Select
+                      showSearch
+                      onChange={handleProvinceChange}
+                      value={selectedProvince}
+                      options={provinces.map((item) => ({
+                        value: item.code,
+                        label: item.name,
+                      }))}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="district_id"
+                    label="Quận/Huyện"
+                    rules={[{ required: true }]}
+                  >
+                    <Select
+                      showSearch
+                      onChange={handleDistrictChange}
+                      value={selectedDistrict}
+                      options={districts.map((item) => ({
+                        value: item.code,
+                        label: item.name,
+                      }))}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="ward_id"
+                    label="Phường/Xã"
+                    rules={[{ required: true }]}
+                  >
+                    <Select
+                      showSearch
+                      onChange={handleWardChange}
+                      options={wards.map((item) => ({
+                        value: item.code,
+                        label: item.name,
+                      }))}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="detail"
+                    label="Địa chỉ cụ thể"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Địa chỉ không được để trống",
+                      },
+                    ]}
+                  >
+                    <TextArea placeholder="Nhập địa chỉ cụ thể" />
+                  </Form.Item>
+                </Form>
+              </Modal>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

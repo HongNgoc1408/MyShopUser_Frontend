@@ -12,5 +12,11 @@ export const itemRender = (currentRoute, params, items, paths) => {
 };
 
 export default function BreadcrumbLink({ breadcrumb }) {
-  return <Breadcrumb itemRender={itemRender} items={breadcrumb} />;
+  return (
+    <Breadcrumb
+      className="text-lg my-5"
+      itemRender={itemRender}
+      items={breadcrumb}
+    />
+  );
 }

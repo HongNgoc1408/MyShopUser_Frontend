@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 
 export const authHeader = () => {
-  const token = Cookies.get("access_token_admin");
+  const token = Cookies.get("access_token");
   if (token) {
     return {
       Authorization: "Bearer " + token,
@@ -10,7 +10,7 @@ export const authHeader = () => {
 };
 
 export const authImageHeader = () => {
-  const token = Cookies.get("access_token_admin");
+  const token = Cookies.get("access_token");
   if (token) {
     return {
       Authorization: "Bearer " + token,

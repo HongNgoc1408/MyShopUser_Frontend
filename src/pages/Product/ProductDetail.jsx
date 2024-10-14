@@ -1,23 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Breadcrumb,
   Carousel,
   Collapse,
   ConfigProvider,
   Form,
   Image,
   InputNumber,
+  notification,
   Rate,
   Select,
 } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import { Option } from "antd/es/mentions";
-
 import { Tabs } from "antd";
 import ProductService from "../../services/ProductService";
 import { formatDis, formatVND, toImageSrc } from "../../services/commonService";
 import SizeService from "../../services/SizeService";
+import CartService from "../../services/CartService";
+import BreadcrumbLink from "../../components/BreadcrumbLink";
+
 const text = `
   A dog is a type of domesticated animal.
   Known for its loyalty and faithfulness,
@@ -25,11 +27,31 @@ const text = `
 `;
 const ProductDetail = () => {
   const { id } = useParams();
+  const carouselRef = useRef(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const [isAddCart, setIsAddCart] = useState(false);
   const [product, setProduct] = useState([]);
+  const [quantity, setQuantity] = useState(1);
   const [colorSizes, setColorSizes] = useState([]);
   const [selectedColorSize, setSelectedColorSize] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-  const carouselRef = useRef(null);
+  const productName =
+    queryParams.get("name") || product.name || "Sản phẩm không tên";
+
+  const breadcrumb = (id, name) => [
+    {
+      path: "/",
+      title: "Trang chủ",
+    },
+    {
+      path: "/shop",
+      title: "Sản phẩm",
+    },
+    {
+      title: `${name}`,
+    },
+  ];
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -121,10 +143,48 @@ const ProductDetail = () => {
       children: "Hướng dẫn mua hàng",
     },
   ];
+
+  const addToCart = async () => {
+    setIsAddCart(true);
+    try {
+      const sizeInStock = selectedColorSize.sizeInStocks.find(
+        (sizeStock) => sizeStock.sizeName === selectedSize
+      );
+
+      if (!sizeInStock) {
+        notification.error({ message: "Vui lòng chọn kích thước hợp lệ." });
+        return;
+      }
+
+      const cartItem = {
+        productId: id,
+        sizeId: sizeInStock.sizeId,
+        colorId: selectedColorSize.id,
+        quantity: quantity,
+      };
+      console.log(cartItem);
+      await CartService.add(cartItem);
+
+      notification.success({ message: "Thêm vào giỏ hàng thành công." });
+    } catch (error) {
+      if (error.response?.status === 401) {
+        notification.error({
+          message: error.response.data || "Bạn chưa đăng nhập tài khoản!",
+        });
+      } else {
+        notification.error({
+          message: "Có lỗi xảy ra, vui lòng thử lại sau.",
+        });
+      }
+    } finally {
+      setIsAddCart(false);
+    }
+  };
+
   return (
     <div className="container mx-auto max-lg:px-8 px-24">
       <div className="my-5">
-        <Breadcrumb className="text-lg my-5">Trang chủ | Nữ | Áo</Breadcrumb>
+        <BreadcrumbLink breadcrumb={breadcrumb(id, productName)} />
         <div class="grid grid-cols-5 gap-5 my-5">
           <div className="col-span-3 flex flex-row">
             <div className="w-1/4">
@@ -300,6 +360,8 @@ const ProductDetail = () => {
                     >
                       <InputNumber
                         max={selectedColorSize.inStock}
+                        value={quantity}
+                        onChange={(value) => setQuantity(value)}
                         min={1}
                         defaultValue={1}
                         className="w-full"
@@ -311,7 +373,12 @@ const ProductDetail = () => {
             )}
 
             <div className="w-full text-left my-4">
-              <button className="dark-button text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6">
+              <button
+                onClick={addToCart}
+                loading={isAddCart}
+                disabled={isAddCart}
+                className="dark-button text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6"
+              >
                 <span className="relative z-10">Thêm vào giỏ hàng</span>
               </button>
             </div>
