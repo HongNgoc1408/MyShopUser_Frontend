@@ -210,6 +210,11 @@ const CartDetail = () => {
     };
 
     debounceUpdateCartItem(record.id, updatedItem);
+
+    const updatedData = data.map((item) =>
+      item.id === record.id ? { ...item, quantity: value } : item
+    );
+    updateApproximatePriceAndShippingFee(updatedData);
   };
 
   const handleSizeChange = (value, record) => {
@@ -221,36 +226,60 @@ const CartDetail = () => {
     };
 
     debounceUpdateCartItem(record.id, updatedItem);
+
+    const updatedData = data.map((item) =>
+      item.id === record.id ? { ...item, sizeId: value } : item
+    );
+
+    updateApproximatePriceAndShippingFee(updatedData);
   };
 
-  // const handleQuantityChange = async (value, record) => {
-  //   const updatedItem = {
-  //     ...record,
-  //     quantity: value,
-  //   };
-  //   await updateCartItem(record.id, updatedItem);
-  // };
+  const updateApproximatePriceAndShippingFee = (updatedData) => {
+    const selectedItems = updatedData.filter((item) =>
+      selectedRowKeys.includes(item.id)
+    );
 
-  // const handleSizeChange = async (value, record) => {
-  //   const updatedItem = {
-  //     ...record,
-  //     sizeId: value,
-  //     sizeName: record.sizeInStocks.find((size) => size.sizeId === value)
-  //       ?.sizeName,
-  //   };
-  //   await updateCartItem(record.id, updatedItem);
-  // };
+    const approximate = selectedItems.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+    setApproximatePrice(approximate);
+    totalShippingFee(approximate);
+  };
 
-  // const updateCartItem = async (id, updatedData) => {
-  //   try {
-  //     await CartService.update(id, updatedData);
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (newSelectedRowKeys) => {
+      setSelectedRowKeys(newSelectedRowKeys);
 
-  //     const res = await CartService.getAllByUserId();
-  //     setData(res.data);
-  //   } catch (error) {
-  //     showError(error);
-  //   }
-  // };
+      const selectedItems = data.filter((item) =>
+        newSelectedRowKeys.includes(item.id)
+      );
+
+      const selectedProductIds = selectedItems.map((item) => item.productId);
+      console.log("Selected Product IDs:", selectedProductIds);
+
+      const approximate = selectedItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      );
+      setApproximatePrice(approximate);
+      totalShippingFee(approximate);
+    },
+  };
+
+  const totalShippingFee = (approximate) => {
+    if (approximate < 200000) {
+      setShippingFee(30000);
+      setCurrentStep(1);
+    } else if (approximate >= 200000 && approximate < 500000) {
+      setShippingFee(20000);
+      setCurrentStep(2);
+    } else {
+      setShippingFee(0);
+      setCurrentStep(3);
+    }
+  };
 
   const handleAddOrder = async () => {
     try {
@@ -394,40 +423,6 @@ const CartDetail = () => {
       ),
     },
   ];
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (newSelectedRowKeys) => {
-      setSelectedRowKeys(newSelectedRowKeys);
-
-      const selectedItems = data.filter((item) =>
-        newSelectedRowKeys.includes(item.id)
-      );
-
-      const selectedProductIds = selectedItems.map((item) => item.productId);
-      console.log("Selected Product IDs:", selectedProductIds);
-
-      const approximate = selectedItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      );
-      setApproximatePrice(approximate);
-      totalShippingFee(approximate);
-    },
-  };
-
-  const totalShippingFee = (approximate) => {
-    if (approximate < 200000) {
-      setShippingFee(30000);
-      setCurrentStep(1);
-    } else if (approximate >= 200000 && approximate < 500000) {
-      setShippingFee(20000);
-      setCurrentStep(2);
-    } else {
-      setShippingFee(0);
-      setCurrentStep(3);
-    }
-  };
 
   return (
     <>
