@@ -9,6 +9,7 @@ import ResetPassword from "../pages/ResetPassword";
 import Profile from "../pages/Profile";
 import CartDetail from "../pages/Cart/CartDetail";
 import ProductDetail from "../pages/Product/ProductDetail";
+import Order from "../pages/Order/Order";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -25,6 +26,7 @@ export const privateRoutes = [
   // { path: "/cart", component: Cart },
   { path: "/cart", component: CartDetail },
   { path: "/profile", component: Profile },
+  { path: "/order", component: Order },
 ];
 
 export const generatePublicRoutes = () => {

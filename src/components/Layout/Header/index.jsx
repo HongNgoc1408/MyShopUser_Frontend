@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Menu,
   Dropdown,
@@ -9,17 +9,22 @@ import {
   Modal,
   Drawer,
   Input,
+  Spin,
 } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import { CiMenuBurger, CiSearch, CiShoppingCart, CiUser } from "react-icons/ci";
 import AuthAction from "../../../services/AuthAction";
 import authService from "../../../services/authService";
 import { useAuth } from "../../../App";
+import CartService from "../../../services/CartService";
+import { showError } from "../../../services/commonService";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { state, dispatch } = useAuth();
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   // const [username, setUsername] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,6 +32,22 @@ const Header = () => {
   //   const user = authService.getCurrentUser()
   //   user ? setUsername(user.name) : setUsername('')
   // }, [state.isAuthenticated])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await CartService.count();
+        // console.log("OrderService", res.data);
+        setData(res.data);
+      } catch (error) {
+        showError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const showDrawer = () => {
     setOpen(true);
@@ -56,15 +77,13 @@ const Header = () => {
   const menu = (
     <Menu>
       <Menu.Item key="1">
-        <Link to="/profile">Thông tin</Link>
+        <Link to={"/profile"}>Thông tin</Link>
       </Menu.Item>
       <Menu.Item key="2">
-        <Link to="/favorite">Yêu thích</Link>
+        <Link to={"/favorite"}>Yêu thích</Link>
       </Menu.Item>
       <Menu.Item key="3">
-        <Link target="_blank" rel="noopener noreferrer" to="/">
-          Đơn đặt hàng
-        </Link>
+        <Link to={"/order"}>Đơn đặt hàng</Link>
       </Menu.Item>
       <Menu.Item key="4">
         <div onClick={showModal} className="cursor-pointer">
@@ -209,9 +228,15 @@ const Header = () => {
                     : "text-sky-700"
                 }`}
               >
-                <Badge count={1} offset={[0, 0]} color="blue">
-                  <CiShoppingCart size={30} fontWeight={800} />
-                </Badge>
+                {!isLoading ? (
+                  <>
+                    <Badge count={data} offset={[0, 0]} color="red">
+                      <CiShoppingCart size={30} fontWeight={800} />
+                    </Badge>
+                  </>
+                ) : (
+                  <Spin />
+                )}
               </Link>
             </div>
           </Col>

@@ -23,11 +23,11 @@ import {
   toImageLink,
 } from "../../services/commonService";
 import { DeleteOutlined } from "@ant-design/icons";
-import userService from "../../services/UserService";
 import AddressService from "../../services/AddressService";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import TextArea from "antd/es/input/TextArea";
+import UserService from "../../services/UserService";
+import { CiLocationOn } from "react-icons/ci";
 const breadcrumb = [
   {
     path: "/",
@@ -37,7 +37,7 @@ const breadcrumb = [
     title: "Giỏ hàng",
   },
 ];
-const Cart = () => {
+const CartDetail = () => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,10 +61,13 @@ const Cart = () => {
       setIsLoading(true);
       try {
         const res = await CartService.getAllByUserId();
-        // const address = await userService.getAddress()
-        // const result = await addressService.getProvince()
-        // console.log("res", res.data);
+        const address = await UserService.getAddress();
+        const result = await AddressService.getProvince();
+
+        console.log(result.data);
         setData(res.data);
+        setDataAddress(address.data);
+        setProvince(result.data || []);
       } catch (error) {
         showError(error);
       } finally {
@@ -72,17 +75,6 @@ const Cart = () => {
       }
     };
     fetchData();
-
-    const fetchProvinces = async () => {
-      try {
-        const res = await AddressService.getProvince();
-        // console.log("getProvinces", res.data);
-        setProvince(res.data);
-      } catch (error) {
-        showError(error);
-      }
-    };
-    fetchProvinces();
   }, []);
 
   const showModal = () => {
@@ -98,8 +90,9 @@ const Cart = () => {
     setSelectedProvince(value);
     try {
       const res = await AddressService.getDistrictsProvice(value);
+      console.log(res.data?.districts);
       setDistrict(res.data?.districts ?? []);
-      setWard([]); // Reset wards
+      setWard([]);
       form.setFieldsValue({ province_name: option.label });
     } catch (error) {
       showError(error);
@@ -110,6 +103,7 @@ const Cart = () => {
     setSelectedDistrict(value);
     try {
       const res = await AddressService.getWardsProvice(value);
+      console.log(res.data?.wards);
       setWard(res.data?.wards ?? []);
       form.setFieldsValue({ district_name: option.label });
     } catch (error) {
@@ -125,7 +119,7 @@ const Cart = () => {
     setLoadingUpdate(true);
     try {
       const value = await form.validateFields();
-      await userService.updateAddress(value);
+      await UserService.updateAddress(value);
       notification.success({ message: "Cập nhật địa chỉ thành công." });
       setIsModalOpen(false);
       setDataAddress(value);
@@ -151,8 +145,6 @@ const Cart = () => {
       await CartService.remove([productId]);
       notification.success({ message: "Xóa thành công." });
 
-      // const updatedCart = await CartService.getAllByUserId();
-      // setData(updatedCart.data);
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -170,18 +162,16 @@ const Cart = () => {
     }
 
     try {
-      console.log(data);
       const selectedItems = data.filter((item) =>
         selectedRowKeys.includes(item.id)
       );
 
       const selectedProductIds = selectedItems.map((item) => item.productId);
-      console.log(" Product IDs:", selectedProductIds);
+      // console.log(" Product IDs:", selectedProductIds);
 
       await CartService.remove(selectedProductIds);
       notification.success({ message: "Xóa sản phẩm thành công" });
-      // const updatedCart = await CartService.getAllByUserId();
-      // setData(updatedCart.data);
+
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -194,6 +184,35 @@ const Cart = () => {
     }
   };
 
+  const handleQuantityChange = async (value, record) => {
+    const updatedItem = {
+      ...record,
+      quantity: value,
+    };
+    await updateCartItem(record.id, updatedItem);
+  };
+
+  const handleSizeChange = async (value, record) => {
+    const updatedItem = {
+      ...record,
+      sizeId: value,
+      sizeName: record.sizeInStocks.find((size) => size.sizeId === value)
+        ?.sizeName,
+    };
+    await updateCartItem(record.id, updatedItem);
+  };
+
+  const updateCartItem = async (id, updatedData) => {
+    try {
+      await CartService.update(id, updatedData);
+      notification.success({ message: "Cập nhật sản phẩm thành công." });
+
+      const res = await CartService.getAllByUserId();
+      setData(res.data);
+    } catch (error) {
+      showError(error);
+    }
+  };
   const columns = [
     {
       dataIndex: "imageUrl",
@@ -219,6 +238,7 @@ const Cart = () => {
         </span>
       ),
     },
+
     {
       title: "Màu sắc",
       dataIndex: "colorName",
@@ -231,18 +251,25 @@ const Cart = () => {
     {
       title: "Kích thước",
       dataIndex: "sizeName",
+      render: (value, record) => {
+        const sizeOptions = record.sizeInStocks.map((size) => ({
+          label: size.sizeName,
+          value: size.sizeId,
+        }));
 
-      render: (_, record) => (
-        <span className="text-base ml-4 md:truncate md:w-96 truncate w-40">
-          {record.sizeName}
-        </span>
-      ),
+        return (
+          <Select
+            defaultValue={record.sizeId}
+            onChange={(value) => handleSizeChange(value, record)}
+            options={sizeOptions}
+          />
+        );
+      },
     },
     {
       title: "Đơn giá",
       dataIndex: "price",
       align: "center",
-
       render: (_, record) => (
         <>
           <span className="price-card-product text-gray-500 line-through">
@@ -256,7 +283,21 @@ const Cart = () => {
       title: "Số lượng",
       align: "center",
       dataIndex: "quantity",
-      render: (value) => <InputNumber className="w-14" value={value} />,
+      render: (value, record) => {
+        const currentSize = record.sizeInStocks.find(
+          (size) => size.sizeId === record.sizeId
+        );
+        const maxQuantity = currentSize ? currentSize.inStock : 0;
+        return (
+          <InputNumber
+            min={1}
+            max={maxQuantity} // Set the max to inStock of the current size
+            className="cursor-pointer"
+            value={value}
+            onChange={(newValue) => handleQuantityChange(newValue, record)}
+          />
+        );
+      },
     },
     {
       title: "Số tiền",
@@ -417,29 +458,30 @@ const Cart = () => {
                   </Row>
                 </div> */}
               </div>
-              <div className="container mx-auto max-lg:px-8 pr-20 pl-10 w-full lg:w-1/3 sm:w-full">
+              <div className="container mx-auto max-lg:px-8 pr-20 w-full lg:w-1/3 sm:w-full">
                 <Card className="text-base my-5 p-5 bg-white shadow-md rounded-none">
                   <div className="space-x-2">
                     <div className="flex-col flex">
                       <div className="flex justify-between">
                         <div className="flex space-x-1 py-2">
-                          <FaMapMarkerAlt className="text-xl text-red-700" />
+                          <CiLocationOn className="text-xl text-orange-600" />
                           <span className="font-bold">
                             {dataAddress.name} - {dataAddress.phoneNumber}
                           </span>
                         </div>
                         <span
                           onClick={showModal}
-                          className="text-blue-500 cursor-pointer hover:text-sky-300 py-2"
+                          className="text-blue-500 cursor-pointer hover:text-orange-600 py-2"
                         >
                           Thay đổi
                         </span>
                       </div>
-                      <span className="truncate w-80 lg:w-80 md:w-full">
-                        {dataAddress.detail} - {dataAddress.ward_name} -{" "}
-                        {dataAddress.district_name} -{" "}
-                        {dataAddress.province_name}
-                      </span>
+                      <div className="flex space-x-1 py-2">
+                        <span className="truncate w-80 lg:w-80 md:w-full">
+                          {dataAddress.detail} - {dataAddress.province_name} -
+                          {dataAddress.district_name} - {dataAddress.ward_name}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <Divider className="my-[0.8rem]" />
@@ -470,18 +512,8 @@ const Cart = () => {
                         <span>Thanh toán khi nhận hàng</span>
                       </div>
                     </Radio>
-                    <Radio value={2}>
-                      <div className="flex space-x-4 p-2 items-center">
-                        <img
-                          src="/payos-logo.svg"
-                          alt="Logo"
-                          className="w-12 mx-auto"
-                        />
-                        <span>PayOS</span>
-                      </div>
-                    </Radio>
 
-                    <Radio value={3}>
+                    <Radio value={2}>
                       <div className="flex space-x-4 items-center">
                         <img
                           src="/logo_momo.webp"
@@ -491,7 +523,7 @@ const Cart = () => {
                         <span>Momo</span>
                       </div>
                     </Radio>
-                    <Radio value={4}>
+                    <Radio value={3}>
                       <div className="flex space-x-4 p-2 items-center">
                         <img
                           src="/VNPAY-QR.webp"
@@ -504,14 +536,11 @@ const Cart = () => {
                   </Radio.Group>
                 </Card>
                 <Divider className="my-[0.1rem] border-0" />
-                <Button
-                  danger
-                  type="primary"
-                  size="large"
-                  className="w-full rounded-sm"
-                >
-                  Mua hàng
-                </Button>
+                <div className="w-full text-left my-4">
+                  <button className="default-button border-2 text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6">
+                    <span className="relative z-10">Mua ngay</span>
+                  </button>
+                </div>
               </div>
               <Modal
                 title="Địa chỉ giao hàng"
@@ -521,34 +550,32 @@ const Cart = () => {
                 loading={loadingUpdate}
               >
                 <Form form={form} layout="vertical">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Form.Item
-                      name="full_name"
-                      label="Họ và tên"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Họ và tên không được để trống",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="Nhập họ và tên" />
-                    </Form.Item>
-                    <Form.Item
-                      name="phone_number"
-                      label="Số điện thoại"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Số điện thoại không được để trống",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="Nhập số điện thoại" />
-                    </Form.Item>
-                  </div>
                   <Form.Item
-                    name="province"
+                    name="name"
+                    label="Họ và tên"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Họ và tên không được để trống",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Nhập họ và tên" />
+                  </Form.Item>
+                  <Form.Item
+                    name="phoneNumber"
+                    label="Số điện thoại"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Số điện thoại không được để trống",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Nhập số điện thoại" />
+                  </Form.Item>
+                  <Form.Item
+                    name="province_name"
                     label="Tỉnh/Thành phố"
                     rules={[{ required: true }]}
                   >
@@ -563,7 +590,7 @@ const Cart = () => {
                     />
                   </Form.Item>
                   <Form.Item
-                    name="district"
+                    name="district_name"
                     label="Quận/Huyện"
                     rules={[{ required: true }]}
                   >
@@ -578,7 +605,7 @@ const Cart = () => {
                     />
                   </Form.Item>
                   <Form.Item
-                    name="ward"
+                    name="ward_name"
                     label="Phường/Xã"
                     rules={[{ required: true }]}
                   >
@@ -592,7 +619,7 @@ const Cart = () => {
                     />
                   </Form.Item>
                   <Form.Item
-                    name="address"
+                    name="detail"
                     label="Địa chỉ cụ thể"
                     rules={[
                       {
@@ -613,4 +640,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default CartDetail;

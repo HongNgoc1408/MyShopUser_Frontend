@@ -24,10 +24,14 @@ import {
 } from "../../services/commonService";
 import { DeleteOutlined } from "@ant-design/icons";
 import AddressService from "../../services/AddressService";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import TextArea from "antd/es/input/TextArea";
 import UserService from "../../services/UserService";
+import { CiLocationOn } from "react-icons/ci";
+import OrderService from "../../services/OrderService";
+import { useNavigate } from "react-router-dom";
+import PaymentsService from "../../services/PaymentsService";
+import debounce from "debounce";
 const breadcrumb = [
   {
     path: "/",
@@ -47,7 +51,7 @@ const CartDetail = () => {
   const [shippingFee, setShippingFee] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [dataAddress, setDataAddress] = useState({});
-
+  const [payment, setPayment] = useState([]);
   const [provinces, setProvince] = useState([]);
   const [districts, setDistrict] = useState([]);
   const [wards, setWard] = useState([]);
@@ -56,6 +60,7 @@ const CartDetail = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -63,10 +68,14 @@ const CartDetail = () => {
         const res = await CartService.getAllByUserId();
         const address = await UserService.getAddress();
         const result = await AddressService.getProvince();
+        const payment = await PaymentsService.getAll();
+
+        console.log(payment.data);
 
         setData(res.data);
         setDataAddress(address.data);
         setProvince(result.data || []);
+        setPayment(payment.data);
       } catch (error) {
         showError(error);
       } finally {
@@ -89,8 +98,9 @@ const CartDetail = () => {
     setSelectedProvince(value);
     try {
       const res = await AddressService.getDistrictsProvice(value);
+      // console.log(res.data?.districts);
       setDistrict(res.data?.districts ?? []);
-      setWard([]); // Reset wards
+      setWard([]);
       form.setFieldsValue({ province_name: option.label });
     } catch (error) {
       showError(error);
@@ -101,6 +111,7 @@ const CartDetail = () => {
     setSelectedDistrict(value);
     try {
       const res = await AddressService.getWardsProvice(value);
+      // console.log(res.data?.wards);
       setWard(res.data?.wards ?? []);
       form.setFieldsValue({ district_name: option.label });
     } catch (error) {
@@ -181,40 +192,96 @@ const CartDetail = () => {
     }
   };
 
-  const handleQuantityChange = async (value, record) => {
-    const updatedItem = {
-      ...record,
-      quantity: value,
-    };
-    await updateCartItem(record.id, updatedItem);
-  };
-
-  const handleSizeChange = async (value, record) => {
-    const updatedItem = {
-      ...record,
-      sizeId: value,
-      sizeName: record.sizeInStocks.find((size) => size.sizeId === value)
-        ?.sizeName,
-    };
-    await updateCartItem(record.id, updatedItem);
-  };
-
-  const updateCartItem = async (id, updatedData) => {
+  const debounceUpdateCartItem = debounce(async (id, updatedData) => {
     try {
       await CartService.update(id, updatedData);
-      notification.success({ message: "Cập nhật sản phẩm thành công." });
 
       const res = await CartService.getAllByUserId();
       setData(res.data);
     } catch (error) {
       showError(error);
     }
+  }, 500);
+
+  const handleQuantityChange = (value, record) => {
+    const updatedItem = {
+      ...record,
+      quantity: value,
+    };
+
+    debounceUpdateCartItem(record.id, updatedItem);
   };
+
+  const handleSizeChange = (value, record) => {
+    const updatedItem = {
+      ...record,
+      sizeId: value,
+      sizeName: record.sizeInStocks.find((size) => size.sizeId === value)
+        ?.sizeName,
+    };
+
+    debounceUpdateCartItem(record.id, updatedItem);
+  };
+
+  // const handleQuantityChange = async (value, record) => {
+  //   const updatedItem = {
+  //     ...record,
+  //     quantity: value,
+  //   };
+  //   await updateCartItem(record.id, updatedItem);
+  // };
+
+  // const handleSizeChange = async (value, record) => {
+  //   const updatedItem = {
+  //     ...record,
+  //     sizeId: value,
+  //     sizeName: record.sizeInStocks.find((size) => size.sizeId === value)
+  //       ?.sizeName,
+  //   };
+  //   await updateCartItem(record.id, updatedItem);
+  // };
+
+  // const updateCartItem = async (id, updatedData) => {
+  //   try {
+  //     await CartService.update(id, updatedData);
+
+  //     const res = await CartService.getAllByUserId();
+  //     setData(res.data);
+  //   } catch (error) {
+  //     showError(error);
+  //   }
+  // };
+
+  const handleAddOrder = async () => {
+    try {
+      const order = {
+        total: approximatePrice + shippingFee,
+
+        shippingCost: shippingFee,
+        receiver: `${dataAddress.name} - ${dataAddress.phoneNumber}`,
+        deliveryAddress: `${dataAddress.detail}, ${dataAddress.ward_name},
+                          ${dataAddress.district_name}, ${dataAddress.province_name}`,
+        //code: 'string',
+        cartIds: selectedRowKeys.map(String),
+        paymentMethodId: value,
+        //userIP: 'string',
+      };
+      if (selectedRowKeys.length === 0) {
+        notification.warning({ message: "Vui lòng chọn sản phẩm muốn mua" });
+        return;
+      }
+      await OrderService.add(order);
+      notification.success({ message: "Đặt hàng thành công." });
+      navigate("/");
+    } catch (error) {
+      showError(error);
+    }
+  };
+
   const columns = [
     {
       dataIndex: "imageUrl",
       align: "center",
-
       render: (imageUrl, record) => (
         <div className="flex items-center">
           <Image
@@ -288,7 +355,7 @@ const CartDetail = () => {
         return (
           <InputNumber
             min={1}
-            max={maxQuantity} // Set the max to inStock of the current size
+            max={maxQuantity}
             className="cursor-pointer"
             value={value}
             onChange={(newValue) => handleQuantityChange(newValue, record)}
@@ -461,23 +528,24 @@ const CartDetail = () => {
                     <div className="flex-col flex">
                       <div className="flex justify-between">
                         <div className="flex space-x-1 py-2">
-                          <FaMapMarkerAlt className="text-xl text-red-700" />
+                          <CiLocationOn className="text-xl text-orange-600" />
                           <span className="font-bold">
                             {dataAddress.name} - {dataAddress.phoneNumber}
                           </span>
                         </div>
                         <span
                           onClick={showModal}
-                          className="text-blue-500 cursor-pointer hover:text-sky-300 py-2"
+                          className="text-blue-500 cursor-pointer hover:text-orange-600 py-2"
                         >
                           Thay đổi
                         </span>
                       </div>
-                      <span className="truncate w-80 lg:w-80 md:w-full">
-                        {dataAddress.detail} - {dataAddress.ward_name} -{" "}
-                        {dataAddress.district_name} -{" "}
-                        {dataAddress.province_name}
-                      </span>
+                      <div className="flex space-x-1 py-2">
+                        <span className="truncate w-80 lg:w-80 md:w-full">
+                          {dataAddress.detail} - {dataAddress.province_name} -
+                          {dataAddress.district_name} - {dataAddress.ward_name}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <Divider className="my-[0.8rem]" />
@@ -503,47 +571,21 @@ const CartDetail = () => {
                     value={value}
                     className="flex flex-col space-y-3"
                   >
-                    <Radio value={1}>
-                      <div className="flex p-2 items-center">
-                        <span>Thanh toán khi nhận hàng</span>
-                      </div>
-                    </Radio>
-                    <Radio value={2}>
-                      <div className="flex space-x-4 p-2 items-center">
-                        <img
-                          src="/payos-logo.svg"
-                          alt="Logo"
-                          className="w-12 mx-auto"
-                        />
-                        <span>PayOS</span>
-                      </div>
-                    </Radio>
-
-                    <Radio value={3}>
-                      <div className="flex space-x-4 items-center">
-                        <img
-                          src="/logo_momo.webp"
-                          alt="Logo"
-                          className="w-12 mx-auto"
-                        />
-                        <span>Momo</span>
-                      </div>
-                    </Radio>
-                    <Radio value={4}>
-                      <div className="flex space-x-4 p-2 items-center">
-                        <img
-                          src="/VNPAY-QR.webp"
-                          alt="Logo"
-                          className="w-12 mx-auto"
-                        />
-                        <span>VNPay</span>
-                      </div>
-                    </Radio>
+                    {payment.map((p) => (
+                      <Radio value={p.id}>
+                        <div className="flex space-x-4 items-center">
+                          <span>{p.name}</span>
+                        </div>
+                      </Radio>
+                    ))}
                   </Radio.Group>
                 </Card>
                 <Divider className="my-[0.1rem] border-0" />
                 <div className="w-full text-left my-4">
-                  <button className="default-button border-2 text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6">
+                  <button
+                    onClick={() => handleAddOrder()}
+                    className="default-button border-2 text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6"
+                  >
                     <span className="relative z-10">Mua ngay</span>
                   </button>
                 </div>
@@ -556,34 +598,32 @@ const CartDetail = () => {
                 loading={loadingUpdate}
               >
                 <Form form={form} layout="vertical">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Form.Item
-                      name="name"
-                      label="Họ và tên"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Họ và tên không được để trống",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="Nhập họ và tên" />
-                    </Form.Item>
-                    <Form.Item
-                      name="phoneNumber"
-                      label="Số điện thoại"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Số điện thoại không được để trống",
-                        },
-                      ]}
-                    >
-                      <Input placeholder="Nhập số điện thoại" />
-                    </Form.Item>
-                  </div>
                   <Form.Item
-                    name="province_id"
+                    name="name"
+                    label="Họ và tên"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Họ và tên không được để trống",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Nhập họ và tên" />
+                  </Form.Item>
+                  <Form.Item
+                    name="phoneNumber"
+                    label="Số điện thoại"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Số điện thoại không được để trống",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Nhập số điện thoại" />
+                  </Form.Item>
+                  <Form.Item
+                    name="province_name"
                     label="Tỉnh/Thành phố"
                     rules={[{ required: true }]}
                   >
@@ -598,7 +638,7 @@ const CartDetail = () => {
                     />
                   </Form.Item>
                   <Form.Item
-                    name="district_id"
+                    name="district_name"
                     label="Quận/Huyện"
                     rules={[{ required: true }]}
                   >
@@ -613,7 +653,7 @@ const CartDetail = () => {
                     />
                   </Form.Item>
                   <Form.Item
-                    name="ward_id"
+                    name="ward_name"
                     label="Phường/Xã"
                     rules={[{ required: true }]}
                   >
