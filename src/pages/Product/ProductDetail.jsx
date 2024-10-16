@@ -15,7 +15,12 @@ import { CiHeart } from "react-icons/ci";
 import { Option } from "antd/es/mentions";
 import { Tabs } from "antd";
 import ProductService from "../../services/ProductService";
-import { formatDis, formatVND, toImageSrc } from "../../services/commonService";
+import {
+  formatDis,
+  formatVND,
+  showError,
+  toImageSrc,
+} from "../../services/commonService";
 import SizeService from "../../services/SizeService";
 import CartService from "../../services/CartService";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
@@ -162,7 +167,7 @@ const ProductDetail = () => {
         colorId: selectedColorSize.id,
         quantity: quantity,
       };
-      console.log(cartItem);
+      // console.log(cartItem);
       await CartService.add(cartItem);
 
       notification.success({ message: "Thêm vào giỏ hàng thành công." });
@@ -172,9 +177,11 @@ const ProductDetail = () => {
           message: error.response.data || "Bạn chưa đăng nhập tài khoản!",
         });
       } else {
-        notification.error({
-          message: "Có lỗi xảy ra, vui lòng thử lại sau.",
-        });
+        showError(error);
+        // notification.error({
+        //   message: "Có lỗi xảy ra, vui lòng thử lại sau.",
+        //   error,
+        // });
       }
     } finally {
       setIsAddCart(false);

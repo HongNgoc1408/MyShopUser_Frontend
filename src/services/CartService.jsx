@@ -6,6 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL + "/api/cart";
 const count = async () =>
   await axios.get(API_URL + "/count", { headers: authHeader() });
 const getAllByUserId = async () =>
+  
   await axios.get(API_URL, { headers: authHeader() });
 
 const add = async (data) =>

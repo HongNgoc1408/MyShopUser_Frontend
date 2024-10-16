@@ -10,6 +10,8 @@ import Profile from "../pages/Profile";
 import CartDetail from "../pages/Cart/CartDetail";
 import ProductDetail from "../pages/Product/ProductDetail";
 import Order from "../pages/Order/Order";
+import OrderDetail from "../pages/Order/OrderDetail";
+import Payment from "../pages/Payment";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -23,10 +25,11 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
-  // { path: "/cart", component: Cart },
   { path: "/cart", component: CartDetail },
   { path: "/profile", component: Profile },
   { path: "/order", component: Order },
+  { path: "/order-detail/:id", component: OrderDetail },
+  { path: "/payment", component: Payment },
 ];
 
 export const generatePublicRoutes = () => {

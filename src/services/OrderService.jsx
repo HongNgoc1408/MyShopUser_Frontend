@@ -4,7 +4,8 @@ import { authHeader } from "./authHeader";
 const API_URL = process.env.REACT_APP_API_URL + "/api/orders";
 
 const getAll = async () => await axios.get(API_URL, { headers: authHeader() });
-const getAllByUserId = async (id) =>
+
+const getDetail = async (id) =>
   await axios.get(API_URL + `/${id}`, { headers: authHeader() });
 
 const add = async (data) =>
@@ -16,11 +17,11 @@ const update = async (id, data) =>
   });
 
 const remove = async (id) =>
-  await axios.delete(API_URL + `/delete/${id}`, { headers: authHeader() });
+  await axios.delete(API_URL + `/cancel/${id}`, { headers: authHeader() });
 
 const OrderService = {
   getAll,
-  getAllByUserId,
+  getDetail,
   add,
   update,
   remove,

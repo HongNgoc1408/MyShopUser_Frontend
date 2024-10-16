@@ -32,6 +32,7 @@ import OrderService from "../../services/OrderService";
 import { useNavigate } from "react-router-dom";
 import PaymentsService from "../../services/PaymentsService";
 import debounce from "debounce";
+
 const breadcrumb = [
   {
     path: "/",
@@ -61,6 +62,7 @@ const CartDetail = () => {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -70,11 +72,9 @@ const CartDetail = () => {
         const result = await AddressService.getProvince();
         const payment = await PaymentsService.getAll();
 
-        console.log(payment.data);
-
         setData(res.data);
         setDataAddress(address.data);
-        setProvince(result.data || []);
+        setProvince(result.data.data || []);
         setPayment(payment.data);
       } catch (error) {
         showError(error);
@@ -97,9 +97,8 @@ const CartDetail = () => {
   const handleProvinceChange = async (value, option) => {
     setSelectedProvince(value);
     try {
-      const res = await AddressService.getDistrictsProvice(value);
-      // console.log(res.data?.districts);
-      setDistrict(res.data?.districts ?? []);
+      const res = await AddressService.getDistrictsProvince(value);
+      setDistrict(res.data.data ?? []);
       setWard([]);
       form.setFieldsValue({ province_name: option.label });
     } catch (error) {
@@ -110,9 +109,8 @@ const CartDetail = () => {
   const handleDistrictChange = async (value, option) => {
     setSelectedDistrict(value);
     try {
-      const res = await AddressService.getWardsProvice(value);
-      // console.log(res.data?.wards);
-      setWard(res.data?.wards ?? []);
+      const res = await AddressService.getWardsProvince(value);
+      setWard(res.data.data ?? []);
       form.setFieldsValue({ district_name: option.label });
     } catch (error) {
       showError(error);
@@ -139,6 +137,7 @@ const CartDetail = () => {
   };
 
   const [value, setValue] = useState(1);
+
   const onChange = (e) => {
     console.log("Radio checked", e.target.value);
     setValue(e.target.value);
@@ -175,7 +174,6 @@ const CartDetail = () => {
       );
 
       const selectedProductIds = selectedItems.map((item) => item.productId);
-      // console.log(" Product IDs:", selectedProductIds);
 
       await CartService.remove(selectedProductIds);
       notification.success({ message: "Xóa sản phẩm thành công" });
@@ -283,27 +281,57 @@ const CartDetail = () => {
 
   const handleAddOrder = async () => {
     try {
-      const order = {
-        total: approximatePrice + shippingFee,
+      const hasEmptyField =
+        !dataAddress || Object.values(dataAddress).some((value) => !value);
 
-        shippingCost: shippingFee,
-        receiver: `${dataAddress.name} - ${dataAddress.phoneNumber}`,
-        deliveryAddress: `${dataAddress.detail}, ${dataAddress.ward_name},
-                          ${dataAddress.district_name}, ${dataAddress.province_name}`,
-        //code: 'string',
-        cartIds: selectedRowKeys.map(String),
-        paymentMethodId: value,
-        //userIP: 'string',
-      };
-      if (selectedRowKeys.length === 0) {
-        notification.warning({ message: "Vui lòng chọn sản phẩm muốn mua" });
+      if (hasEmptyField) {
+        notification.error({
+          message: "Thông tin đơn hàng không được để trống",
+        });
         return;
       }
-      await OrderService.add(order);
-      notification.success({ message: "Đặt hàng thành công." });
-      navigate("/");
+
+      if (selectedRowKeys.length === 0) {
+        notification.warning({
+          message: "Vui lòng chọn sản phẩm muốn mua",
+        });
+        return;
+      }
+
+      // console.log(data);
+
+      if (value) {
+        const order = {
+          total: approximatePrice + shippingFee,
+          shippingCost: shippingFee,
+          receiver: `${dataAddress.name} - ${dataAddress.phoneNumber}`,
+          deliveryAddress: `${dataAddress.detail}, ${dataAddress.ward_name}, ${dataAddress.district_name}, ${dataAddress.province_name}`,
+          cartIds: selectedRowKeys.map(String),
+          paymentMethodId: value,
+        };
+
+        const res = await OrderService.add(order);
+
+        // console.log(res);
+
+        if (order.paymentMethodId !== 1) {
+          window.location.replace(res.data);
+        } else {
+          notification.success({
+            message: "Đặt hàng thành công.",
+          });
+          navigate("/");
+        }
+      } else {
+        notification.error({
+          message: "Vui lòng chọn phương thức thanh toán",
+        });
+      }
     } catch (error) {
-      showError(error);
+      notification.error({
+        message: "Đặt hàng thất bại",
+        description: showError(error),
+      });
     }
   };
 
@@ -537,8 +565,9 @@ const CartDetail = () => {
                       </div>
                       <div className="flex space-x-1 py-2">
                         <span className="truncate w-80 lg:w-80 md:w-full">
-                          {dataAddress.detail} - {dataAddress.province_name} -
-                          {dataAddress.district_name} - {dataAddress.ward_name}
+                          {dataAddress.detail} - {dataAddress.ward_name} -{" "}
+                          {dataAddress.district_name} -{" "}
+                          {dataAddress.province_name}
                         </span>
                       </div>
                     </div>
@@ -627,8 +656,8 @@ const CartDetail = () => {
                       onChange={handleProvinceChange}
                       value={selectedProvince}
                       options={provinces.map((item) => ({
-                        value: item.code,
-                        label: item.name,
+                        value: item.ProvinceID,
+                        label: item.ProvinceName,
                       }))}
                     />
                   </Form.Item>
@@ -642,8 +671,8 @@ const CartDetail = () => {
                       onChange={handleDistrictChange}
                       value={selectedDistrict}
                       options={districts.map((item) => ({
-                        value: item.code,
-                        label: item.name,
+                        value: item.DistrictID,
+                        label: item.DistrictName,
                       }))}
                     />
                   </Form.Item>
@@ -656,8 +685,8 @@ const CartDetail = () => {
                       showSearch
                       onChange={handleWardChange}
                       options={wards.map((item) => ({
-                        value: item.code,
-                        label: item.name,
+                        value: item.WardCode,
+                        label: item.WardName,
                       }))}
                     />
                   </Form.Item>
