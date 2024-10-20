@@ -16,7 +16,7 @@ const update = async (id, data) =>
     headers: authHeader(),
   });
 
-const remove = async (id) =>
+const cancel = async (id) =>
   await axios.delete(API_URL + `/cancel/${id}`, { headers: authHeader() });
 
 const OrderService = {
@@ -24,7 +24,7 @@ const OrderService = {
   getDetail,
   add,
   update,
-  remove,
+  cancel,
 };
 
 export default OrderService;

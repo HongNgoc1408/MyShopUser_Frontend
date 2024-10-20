@@ -9,8 +9,12 @@ const getAddress = async () =>
 const updateAddress = async (data) =>
   await axios.put(API_URL + "/address", data, { headers: authHeader() });
 
+const getProfile = async () =>
+  await axios.get(API_URL + "/profile", { headers: authHeader() });
+
 const UserService = {
   getAddress,
+  getProfile,
   updateAddress,
 };
 

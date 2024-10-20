@@ -72,6 +72,8 @@ const CartDetail = () => {
         const result = await AddressService.getProvince();
         const payment = await PaymentsService.getAll();
 
+        console.log("address", address);
+
         setData(res.data);
         setDataAddress(address.data);
         setProvince(result.data.data || []);
@@ -86,6 +88,7 @@ const CartDetail = () => {
   }, []);
 
   const showModal = () => {
+    console.log("showModal", dataAddress);
     form.setFieldsValue(dataAddress);
     setIsModalOpen(true);
   };
@@ -95,37 +98,53 @@ const CartDetail = () => {
   };
 
   const handleProvinceChange = async (value, option) => {
+    // console.log("handleProvinceChange", value);
     setSelectedProvince(value);
     try {
       const res = await AddressService.getDistrictsProvince(value);
       setDistrict(res.data.data ?? []);
       setWard([]);
-      form.setFieldsValue({ province_name: option.label });
+
+      form.setFieldsValue({
+        province_id: value,
+        province_name: option.label,
+      });
     } catch (error) {
       showError(error);
     }
   };
 
   const handleDistrictChange = async (value, option) => {
+    // console.log("handleDistrictChange", value);
     setSelectedDistrict(value);
     try {
       const res = await AddressService.getWardsProvince(value);
       setWard(res.data.data ?? []);
-      form.setFieldsValue({ district_name: option.label });
+
+      form.setFieldsValue({
+        district_id: value,
+        district_name: option.label,
+      });
     } catch (error) {
       showError(error);
     }
   };
 
   const handleWardChange = (value, option) => {
-    form.setFieldsValue({ ward_name: option.label });
+    // console.log("handleWardChange", value);
+    form.setFieldsValue({
+      ward_id: value,
+      ward_name: option.label,
+    });
   };
 
   const handleOk = async () => {
     setLoadingUpdate(true);
     try {
       const value = await form.validateFields();
+      console.log("handleOk", value);
       await UserService.updateAddress(value);
+
       notification.success({ message: "Cập nhật địa chỉ thành công." });
       setIsModalOpen(false);
       setDataAddress(value);
@@ -297,8 +316,7 @@ const CartDetail = () => {
         });
         return;
       }
-
-      // console.log(data);
+      console.log(value);
 
       if (value) {
         const order = {
@@ -308,11 +326,13 @@ const CartDetail = () => {
           deliveryAddress: `${dataAddress.detail}, ${dataAddress.ward_name}, ${dataAddress.district_name}, ${dataAddress.province_name}`,
           cartIds: selectedRowKeys.map(String),
           paymentMethodId: value,
+          district_Id: dataAddress.district_id,
+          ward_Id: `${dataAddress.ward_id}`,
         };
 
-        const res = await OrderService.add(order);
+        console.log(data);
 
-        // console.log(res);
+        const res = await OrderService.add(order);
 
         if (order.paymentMethodId !== 1) {
           window.location.replace(res.data);
@@ -320,7 +340,7 @@ const CartDetail = () => {
           notification.success({
             message: "Đặt hàng thành công.",
           });
-          navigate("/");
+          navigate("/order");
         }
       } else {
         notification.error({
@@ -632,7 +652,11 @@ const CartDetail = () => {
                       },
                     ]}
                   >
-                    <Input placeholder="Nhập họ và tên" />
+                    <Input
+                      style={{ fontFamily: "serif" }}
+                      className="text-sm"
+                      placeholder="Nhập họ và tên"
+                    />
                   </Form.Item>
                   <Form.Item
                     name="phoneNumber"
@@ -644,7 +668,14 @@ const CartDetail = () => {
                       },
                     ]}
                   >
-                    <Input placeholder="Nhập số điện thoại" />
+                    <Input
+                      style={{ fontFamily: "serif" }}
+                      className="text-sm"
+                      placeholder="Nhập số điện thoại"
+                    />
+                  </Form.Item>
+                  <Form.Item name="province_id" hidden>
+                    <Input type="hidden" />
                   </Form.Item>
                   <Form.Item
                     name="province_name"
@@ -661,6 +692,9 @@ const CartDetail = () => {
                       }))}
                     />
                   </Form.Item>
+                  <Form.Item name="district_id" hidden>
+                    <Input type="hidden" />
+                  </Form.Item>
                   <Form.Item
                     name="district_name"
                     label="Quận/Huyện"
@@ -675,6 +709,9 @@ const CartDetail = () => {
                         label: item.DistrictName,
                       }))}
                     />
+                  </Form.Item>
+                  <Form.Item name="ward_id" hidden>
+                    <Input type="hidden" />
                   </Form.Item>
                   <Form.Item
                     name="ward_name"
@@ -700,7 +737,10 @@ const CartDetail = () => {
                       },
                     ]}
                   >
-                    <TextArea placeholder="Nhập địa chỉ cụ thể" />
+                    <TextArea
+                      style={{ fontFamily: "serif" }}
+                      className="text-sm"
+                    />
                   </Form.Item>
                 </Form>
               </Modal>

@@ -1,4 +1,13 @@
-import { Button, Card, Col, Divider, Image, Row, Skeleton } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Divider,
+  Image,
+  notification,
+  Row,
+  Skeleton,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import OrderService from "../../services/OrderService";
@@ -30,7 +39,7 @@ const Order = () => {
       try {
         const res = await OrderService.getAll();
         const orderData = res.data.items;
-        console.log(res.data);
+        // console.log(res.data);
 
         const orderDetail = orderData.map(async (order) => {
           const detail = await OrderService.getDetail(order.id);
@@ -52,6 +61,16 @@ const Order = () => {
     fetchOrder();
   }, []);
 
+  const handleCancelOrder = async (id) => {
+    console.log(id);
+    try {
+      const cancel = await OrderService.cancel(id);
+      setOrders(cancel);
+      notification.success("Hủy đơn thành công");
+    } catch (error) {
+      showError(error);
+    }
+  };
   const getStatusOrder = (status) => {
     const stt = statusOrders.find((item) => item.value === status);
     return stt ? stt.label : "Phương thức không xác định";
@@ -147,7 +166,14 @@ const Order = () => {
                     </p>
                   </div>
                   <div className="flex justify-end items-center space-x-2">
-                    <Button danger type="primary" className="text-lg mt-5">
+                    <Button
+                      onClick={() => handleCancelOrder(order.id)}
+                      danger
+                      type="primary"
+                      className={`text-lg mt-5 ${
+                        order.detail.orderStatus === "Canceled" ? "hidden" : ""
+                      }`}
+                    >
                       Hủy đơn hàng
                     </Button>
                     <Button type="primary" className="text-lg mt-5">

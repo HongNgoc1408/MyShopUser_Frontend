@@ -9,7 +9,6 @@ const Payment = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [params, setParams] = useState();
-  //   const [callbackUrl, setCallbackUrl] = useState();
 
   useEffect(() => {
     const newParams = Object.fromEntries(searchParams.entries());
