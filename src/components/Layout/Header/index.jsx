@@ -9,9 +9,8 @@ import {
   Modal,
   Drawer,
   Input,
-  Spin,
 } from "antd";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CiMenuBurger, CiSearch, CiShoppingCart, CiUser } from "react-icons/ci";
 import AuthAction from "../../../services/AuthAction";
 import authService from "../../../services/authService";
@@ -19,15 +18,15 @@ import { useAuth } from "../../../App";
 import CartService from "../../../services/CartService";
 import { showError } from "../../../services/commonService";
 
-const Header = () => {
+const Header = ({ onSearch }) => {
+  const navigator = useNavigate();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { state, dispatch } = useAuth();
   const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   // const [username, setUsername] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [searchValue, setSearchValue] = useState("");
   // useEffect(() => {
   //   const user = authService.getCurrentUser()
   //   user ? setUsername(user.name) : setUsername('')
@@ -35,15 +34,12 @@ const Header = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
         const res = await CartService.count();
         // console.log("OrderService", res.data);
         setData(res.data);
       } catch (error) {
         showError(error);
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchData();
@@ -54,6 +50,12 @@ const Header = () => {
   };
   const onClose = () => {
     setOpen(false);
+  };
+
+  const handleSearch = (value) => {
+    onSearch(value);
+    navigator("/shop");
+    onClose();
   };
 
   const showModal = () => {
@@ -228,15 +230,11 @@ const Header = () => {
                     : "text-sky-700"
                 }`}
               >
-                {!isLoading ? (
-                  <>
-                    <Badge count={data} offset={[0, 0]} color="red">
-                      <CiShoppingCart size={30} fontWeight={800} />
-                    </Badge>
-                  </>
-                ) : (
-                  <Spin />
-                )}
+                <>
+                  <Badge count={data} offset={[0, 0]} color="red">
+                    <CiShoppingCart size={30} fontWeight={800} />
+                  </Badge>
+                </>
               </Link>
             </div>
           </Col>
@@ -244,7 +242,13 @@ const Header = () => {
       </nav>
 
       <Drawer onClose={onClose} open={open} placement="top" height={150}>
-        <Input.Search placeholder="Tìm kiếm" size="large" />
+        <Input.Search
+          placeholder="Tìm kiếm"
+          size="large"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onSearch={handleSearch}
+        />
       </Drawer>
     </>
   );

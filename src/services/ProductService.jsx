@@ -15,8 +15,7 @@ const getAll = async (page, pageSize, keySearch) =>
     },
   });
 
-const getById = async (id, data) =>
-  await axios.get(API_URL + `/${id}`, data);
+const getById = async (id, data) => await axios.get(API_URL + `/${id}`, data);
 
 const add = async (data) =>
   await axios.post(API_URL + "/create", data, { headers: authImageHeader() });
@@ -57,6 +56,12 @@ const fetchProductAttributes = async () => {
   }
 };
 
+const getFilterProducts = async (filters) =>
+  await axios.get(API_URL + "/filters", {
+    params: filters,
+    paramsSerializer: { indexes: true },
+  });
+
 const ProductService = {
   getAll,
   add,
@@ -65,6 +70,7 @@ const ProductService = {
   remove,
   updateEnable,
   fetchProductAttributes,
+  getFilterProducts,
 };
 
 export default ProductService;

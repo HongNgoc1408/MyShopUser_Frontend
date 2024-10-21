@@ -12,6 +12,7 @@ import ProductDetail from "../pages/Product/ProductDetail";
 import Order from "../pages/Order/Order";
 import OrderDetail from "../pages/Order/OrderDetail";
 import Payment from "../pages/Payment";
+import Favorites from "../pages/Favorite/Favorites";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -27,6 +28,7 @@ export const publicRoutes = [
 export const privateRoutes = [
   { path: "/cart", component: CartDetail },
   { path: "/profile", component: Profile },
+  { path: "/favorite", component: Favorites },
   { path: "/order", component: Order },
   { path: "/order-detail/:id", component: OrderDetail },
   { path: "/payment", component: Payment },

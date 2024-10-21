@@ -12,10 +12,41 @@ const updateAddress = async (data) =>
 const getProfile = async () =>
   await axios.get(API_URL + "/profile", { headers: authHeader() });
 
+const getFavorite = async () =>
+  await axios.get(API_URL + "/favorite", { headers: authHeader() });
+
+const getFavoriteProduct = async (page, pageSize, keySearch) =>
+  await axios.get(API_URL + "/favorite/products", {
+    headers: authHeader(),
+    params: {
+      page: page,
+      pageSize: pageSize,
+      key: keySearch ?? "",
+    },
+  });
+
+const addFavorite = async (productId) =>
+  await axios.post(
+    API_URL + "/favorite",
+    { id: productId },
+    {
+      headers: authHeader(),
+    }
+  );
+
+const deleteFavoriteProduct = async (productId) =>
+  await axios.delete(API_URL + `/favorite/${productId}`, {
+    headers: authHeader(),
+  });
+
 const UserService = {
   getAddress,
   getProfile,
   updateAddress,
+  getFavorite,
+  getFavoriteProduct,
+  addFavorite,
+  deleteFavoriteProduct,
 };
 
 export default UserService;

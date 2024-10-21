@@ -1,31 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Badge, Image, Rate } from "antd";
-import { CiHeart } from "react-icons/ci";
 import { Link } from "react-router-dom";
 import ModelProduct from "../ModelProduct";
-import ProductService from "../../../services/ProductService";
 import {
   formatDis,
   formatVND,
   toImageSrc,
 } from "../../../services/commonService";
-const CardProduct = ({ id }) => {
+import { FavoriteContext } from "../../Layout/DefaultLayout";
+import UserService from "../../../services/UserService";
+import { HeartFilled } from "@ant-design/icons";
+
+const CardProduct = ({ product }) => {
   const [open, setOpen] = useState(false);
-  const [product, setProduct] = useState([]);
+  const favorites = useContext(FavoriteContext);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await ProductService.getById(id);
-        // console.log("getById", res.data);
-        setProduct(res.data);
-      } catch (error) {
-        console.error("Error:", error);
+  const isFavorite = favorites.includes(product.id);
+
+  const toggleFavorite = async () => {
+    try {
+      if (isFavorite) {
+        await UserService.deleteFavoriteProduct(product.id);
+      } else {
+        await UserService.addFavorite(product.id);
       }
-    };
-
-    fetchProduct();
-  }, [id]);
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+    }
+  };
 
   return (
     <Link
@@ -42,17 +44,9 @@ const CardProduct = ({ id }) => {
       >
         <div className="border-2 hover:shadow-md">
           <div className="relative group">
-            {/* <Link
-              to={`/product-details/${product.id}`}
-              className="z-10 hover:no-underline hover:text-current"
-            > */}
             <Image
               preview={false}
-              src={
-                product.imageUrls && product.imageUrls.length > 0
-                  ? toImageSrc(product.imageUrls[0])
-                  : ""
-              }
+              src={product.imageUrl ? toImageSrc(product.imageUrl) : ""}
               alt={product.name || "Product Image"}
               style={{
                 width: "100%",
@@ -60,7 +54,6 @@ const CardProduct = ({ id }) => {
                 objectFit: "cover",
               }}
             />
-            {/* </Link> */}
             <div className="absolute bottom-3 inset-0 flex items-end justify-center">
               <button
                 className="w-10/12 light-button opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
@@ -75,13 +68,16 @@ const CardProduct = ({ id }) => {
 
             <div onClick={(e) => e.preventDefault()}>
               <ModelProduct open={open} setOpen={setOpen} id={product.id} />
-              <button className="absolute z-10 top-1 right-2 text-3xl font-bold hover:text-red-600">
-                <CiHeart />
+              <button
+                className="absolute z-10 top-1 right-2 text-3xl font-bold"
+                onClick={toggleFavorite}
+              >
+                <HeartFilled style={{ color: isFavorite ? "red" : "black" }} />
               </button>
             </div>
           </div>
           <Link
-            to={`/product-details/${product.id}`}
+            // to={`/product-details/${product.id}`}
             className="hover:no-underline hover:text-current"
           >
             <div className="p-2">
@@ -122,7 +118,7 @@ const CardProduct = ({ id }) => {
               </div>
 
               <Link
-                to={`/product-details/${product.id}`}
+                // to={`/product-details/${product.id}`}
                 className="hover:no-underline hover:text-current"
               >
                 <p className="title-card-product">{product.name}</p>
@@ -131,7 +127,7 @@ const CardProduct = ({ id }) => {
                 <div>
                   <Rate
                     disabled
-                    defaultValue={product.rating > 0 ? product.rating : "0"}
+                    defaultValue={product.rating > 0 ? product.rating : "5"}
                     className="text-sm"
                   />
                 </div>

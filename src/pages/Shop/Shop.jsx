@@ -7,7 +7,7 @@ import Banner from "../../components/Home/Banner";
 import Brand from "../../components/Home/Brand";
 import AllProduct from "../../components/Shop/AllProduct";
 
-const Shop = () => {
+const Shop = ({ keySearch }) => {
   return (
     <div className="bg-gray-100">
       <Banner
@@ -17,7 +17,7 @@ const Shop = () => {
         banner4={banner4}
       />
       <Brand />
-      <AllProduct />
+      <AllProduct keySearch={keySearch} />
     </div>
   );
 };

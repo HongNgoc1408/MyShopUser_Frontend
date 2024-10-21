@@ -8,6 +8,7 @@ import Brand from "../../components/Home/Brand";
 import Service from "../../components/Home/Service";
 import Product from "../../components/Home/Product";
 const Home = () => {
+  // console.log("keySearchHome", keySearch);
   return (
     <div className="bg-gray-100">
       <Banner

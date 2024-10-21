@@ -2,16 +2,23 @@ import React, { useEffect, useState } from "react";
 import TitleBody from "../TitleBody/TitleBody";
 import CardProduct from "../CardProduct";
 import ProductService from "../../../services/ProductService";
+import { Result } from "antd";
+import { SmileOutlined } from "@ant-design/icons";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    // console.log("Product", keySearch);
     const fetchProducts = async () => {
       try {
-        const res = await ProductService.getAll();
-        // console.log("getAll", res.data);
-        setProducts(res.data.items);
+        const page = 1;
+        const pageSize = 10;
+        const keySearch = "";
+        const res = await ProductService.getAll(page, pageSize, keySearch);
+
+        // console.log(res.data.items);
+        setProducts(res.data.items || []);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -24,11 +31,22 @@ const Product = () => {
     <div className="container mx-auto max-lg:px-8 px-20">
       <div className="my-5 p-5 bg-white shadow-md">
         <TitleBody title="Thời trang" link="/shop" />
-        <div className="grid lg:grid-cols-5 gap-5 sm:grid-cols-3 grid-cols-1 border-t-2 py-5">
-          {products.map((product) => (
-            <CardProduct key={product.id} id={product.id} />
-          ))}
-        </div>
+        {products.length > 0 ? (
+          <>
+            <div className="grid lg:grid-cols-5 gap-5 sm:grid-cols-3 grid-cols-1 border-t-2 py-5">
+              {products.map((product) => (
+                <CardProduct product={product} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div>
+            <Result
+              icon={<SmileOutlined />}
+              title="Không tìm thấy sản phẩm bạn cần tìm!"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
