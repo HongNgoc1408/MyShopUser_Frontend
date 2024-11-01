@@ -4,6 +4,7 @@ import {
   Col,
   Divider,
   Image,
+  notification,
   Popover,
   Row,
   Skeleton,
@@ -47,7 +48,7 @@ const OrderDetail = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState();
   const onChange = (value) => {
     console.log("onChange:", value);
     setCurrent(value);
@@ -68,6 +69,17 @@ const OrderDetail = () => {
 
     fetchOrder();
   }, [id]);
+
+  const handleCancelOrder = async (id) => {
+    console.log(id);
+    try {
+      const cancel = await OrderService.cancel(id);
+      setOrders(cancel);
+      notification.success("Hủy đơn thành công");
+    } catch (error) {
+      showError(error);
+    }
+  };
 
   const getPaymentMethodLabel = (method) => {
     const payment = paymentMethod.find((item) => item.value === method);
@@ -103,7 +115,16 @@ const OrderDetail = () => {
                   },
                   {
                     icon: (
-                      <Popover content={<span>Đơn hàng đã thanh toán</span>}>
+                      <Popover
+                        content={
+                          <span>
+                            Đơn hàng đã thanh toán
+                            {orders.paymentMethod === "VNPay"
+                              ? `${formatVND(orders.total)}`
+                              : ""}
+                          </span>
+                        }
+                      >
                         <CiCreditCard1 size={30} className="items-center" />
                       </Popover>
                     ),
@@ -283,15 +304,35 @@ const OrderDetail = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex justify-end items-center space-x-2">
-                  <Button danger type="primary" className="text-lg mt-5">
+                  <Button
+                    onClick={() => handleCancelOrder(orders.id)}
+                    danger
+                    type="primary"
+                    className={`text-lg mt-5 ${
+                      orders.orderStatus === "Canceled"
+                        ? "hidden"
+                        : orders.orderStatus === "Processing"
+                        ? ""
+                        : "hidden"
+                    }`}
+                  >
                     Hủy đơn hàng
                   </Button>
-                  <Button type="primary" className="text-lg mt-5">
+                  <Button
+                    type="primary"
+                    className={`text-lg mt-5 ${
+                      orders.orderStatus === "AwaitingPickup" ? "" : "hidden"
+                    }`}
+                  >
                     Đã nhận hàng
                   </Button>
-                  <Button type="primary" className="text-lg mt-5">
+                  <Button
+                    type="primary"
+                    className={`text-lg mt-5 ${
+                      orders.orderStatus === "Received" ? "" : "hidden"
+                    }`}
+                  >
                     Đánh giá
                   </Button>
                 </div>

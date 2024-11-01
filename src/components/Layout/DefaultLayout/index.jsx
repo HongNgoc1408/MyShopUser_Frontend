@@ -12,15 +12,15 @@ export const FavoriteContext = createContext();
 const DefaultLayout = ({ children }) => {
   const location = useLocation();
   const [keySearch, setKeySearch] = useState("");
-  const [isFavorite, setIsFavorite] = useState([]);
+  const [favoriteList, setFavoriteList] = useState([]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
         const res = await UserService.getFavorite();
-        console.log("res", res.data);
+        // console.log("res", res.data);
 
-        setIsFavorite(res.data);
+        setFavoriteList(res.data);
       } catch (error) {
         console.error("Error fetching favorites:", error);
       }
@@ -49,7 +49,7 @@ const DefaultLayout = ({ children }) => {
         <Layout>
           <Layout>
             <Header onSearch={handleSearch} />
-            <FavoriteContext.Provider value={isFavorite}>
+            <FavoriteContext.Provider value={{ favoriteList, setFavoriteList }}>
               <Content>{modifiedChildren}</Content>
             </FavoriteContext.Provider>
             {location.pathname !== "/cart" ? (

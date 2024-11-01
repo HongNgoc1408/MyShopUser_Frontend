@@ -33,7 +33,7 @@ const Product = () => {
         <TitleBody title="Thời trang" link="/shop" />
         {products.length > 0 ? (
           <>
-            <div className="grid lg:grid-cols-5 gap-5 sm:grid-cols-3 grid-cols-1 border-t-2 py-5">
+            <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5 border-t-2 py-5">
               {products.map((product) => (
                 <CardProduct product={product} />
               ))}

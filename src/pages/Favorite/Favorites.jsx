@@ -19,7 +19,7 @@ const Favorites = () => {
           pageSize,
           keySearch
         );
-        console.log(res.data.items);
+        // console.log(res.data.items);
         setFavorite(res.data.items);
       } catch (error) {
         console.error("Error fetching favorites:", error);
@@ -27,11 +27,11 @@ const Favorites = () => {
     };
     fetchFavorites();
   }, []);
-  
+
   return (
     <div className="container mx-auto max-lg:px-8 px-20">
       <div className="my-5 p-5 bg-white shadow-md">
-        <TitleBody title="Sản phẩm yêu thích" link="" />
+        <TitleBody title="Sản phẩm yêu thích" link="/shop" />
         {favorites.length > 0 ? (
           <>
             <div className="grid lg:grid-cols-5 gap-5 sm:grid-cols-3 grid-cols-1 border-t-2 py-5">

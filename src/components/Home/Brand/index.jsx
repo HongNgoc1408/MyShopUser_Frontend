@@ -9,7 +9,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 const Brand = () => {
   const carouselRef = useRef(null);
   const [brands, setBrands] = useState([]);
-  const [slidesToShow, setSlidesToShow] = useState(6);
+  const [slidesToShow, setSlidesToShow] = useState(null);
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -26,8 +26,10 @@ const Brand = () => {
 
   const updateSlidesToShow = () => {
     const width = window.innerWidth;
-    if (width >= 1024) {
+    if (width >= 1536) {
       setSlidesToShow(6);
+    } else if (width >= 1024) {
+      setSlidesToShow(4);
     } else if (width >= 768) {
       setSlidesToShow(3);
     } else {

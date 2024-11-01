@@ -27,6 +27,7 @@ const AllProduct = ({ keySearch }) => {
   const [selectedBrandIds, setSelectedBrandIds] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [selectedSorter, setSelectedSorter] = useState(null);
+  const [discount, setDiscount] = useState(false);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
   const [showAllBrands, setShowAllBrands] = useState(false);
@@ -45,6 +46,7 @@ const AllProduct = ({ keySearch }) => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      
       try {
         const res = await ProductService.getFilterProducts({
           page,
@@ -53,6 +55,7 @@ const AllProduct = ({ keySearch }) => {
           brandIds: selectedBrandIds,
           categoryIds: selectedCategoryIds,
           sorter: selectedSorter,
+          discount,
           minPrice,
           maxPrice,
         });
@@ -61,7 +64,7 @@ const AllProduct = ({ keySearch }) => {
         setTotalItems(res.data.totalItems);
       } catch (error) {
         console.error("Error:", error);
-      }
+      } 
     };
 
     fetchProducts();
@@ -72,6 +75,7 @@ const AllProduct = ({ keySearch }) => {
     selectedBrandIds,
     selectedCategoryIds,
     selectedSorter,
+    discount,
     minPrice,
     maxPrice,
   ]);
@@ -122,12 +126,17 @@ const AllProduct = ({ keySearch }) => {
     setSelectedSorter(value);
   };
 
+  const handleDiscountChange = () => {
+    if (discount) {
+      setDiscount(false);
+    } else setDiscount(true);
+  };
   return (
     <div className="container mx-auto max-lg:px-8 px-20">
       <div className="my-5">
-        <div class="grid grid-cols-6 gap-6 py-5">
+        <div className="grid grid-cols-6 gap-6 py-5">
           <div className="col-span-1">
-            <div>
+            <div className="truncate">
               <div className="flex flex-nowrap text-lg uppercase font-extrabold pb-5">
                 <div className=" mr-1 m-auto">
                   <CiFilter />
@@ -148,6 +157,7 @@ const AllProduct = ({ keySearch }) => {
                       .map((brand) => (
                         <Checkbox
                           key={brand.id}
+                          checked={selectedBrandIds.includes(brand.id)}
                           onChange={() => handleBrandChange(brand.id)}
                           className="text-lg"
                         >
@@ -175,6 +185,7 @@ const AllProduct = ({ keySearch }) => {
                       .map((category) => (
                         <Checkbox
                           key={category.id}
+                          checked={selectedCategoryIds.includes(category.id)}
                           onChange={() => handleCategoryChange(category.id)}
                           className="text-lg"
                         >
@@ -268,23 +279,23 @@ const AllProduct = ({ keySearch }) => {
             </div>
           </div>
           <div className="col-span-5">
-            <div className="grid grid-cols-2 gap-2  text-base font-extrabold border-b-2 pb-2">
+            <div className="grid grid-cols-2 gap-2 text-base font-extrabold border-b-2 pb-2 md:grid-cols-2 sm:grid-cols-3">
               <div className="flex col-start-1 col-end-3">
                 <div className="mr-2">
                   <p>Sắp xếp theo </p>
                 </div>
                 <div className="mr-2">
+                  <Button
+                    onClick={() => handleDiscountChange(true)}
+                    className="border-2"
+                  >
+                    Giảm giá
+                  </Button>
+                </div>
+                <div className="mr-2">
                   <Select
-                    value={
-                      selectedSorter === 1
-                        ? "Cao đến Thấp"
-                        : selectedSorter === 2
-                        ? "Thấp đến Cao"
-                        : selectedSorter === 3
-                        ? "Mới nhất"
-                        : "Bán chạy"
-                    }
-                    style={{ width: 120 }}
+                    value={selectedSorter}
+                    style={{ width: 150 }}
                     allowClear
                     onChange={handleSorterChange}
                     placeholder="Giá"
@@ -310,22 +321,24 @@ const AllProduct = ({ keySearch }) => {
               </div>
             </div>
 
-            {products.length > 0 ? (
-              <>
-                <div className="grid grid-cols-4 gap-5 py-5">
-                  {products.map((product) => (
-                    <CardProduct key={product.id} product={product} />
-                  ))}
+            <>
+              {products.length > 0 ? (
+                <>
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5 py-5">
+                    {products.map((product) => (
+                      <CardProduct key={product.id} product={product} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <Result
+                    icon={<SmileOutlined />}
+                    title="Không tìm thấy sản phẩm bạn cần tìm!"
+                  />
                 </div>
-              </>
-            ) : (
-              <div>
-                <Result
-                  icon={<SmileOutlined />}
-                  title="Không tìm thấy sản phẩm bạn cần tìm!"
-                />
-              </div>
-            )}
+              )}
+            </>
 
             <div>
               <Pagination
