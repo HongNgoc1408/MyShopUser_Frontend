@@ -304,7 +304,7 @@ const OrderDetail = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-end items-center space-x-2">
+                {/* <div className="flex justify-end items-center space-x-2">
                   <Button
                     onClick={() => handleCancelOrder(orders.id)}
                     danger
@@ -335,7 +335,7 @@ const OrderDetail = () => {
                   >
                     Đánh giá
                   </Button>
-                </div>
+                </div> */}
               </Card>
             </div>
           </div>
