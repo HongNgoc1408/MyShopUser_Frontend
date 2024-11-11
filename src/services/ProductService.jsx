@@ -62,6 +62,16 @@ const getFilterProducts = async (filters) =>
     paramsSerializer: { indexes: true },
   });
 
+const getReview = async (id, page, pageSize, key) =>
+  await axios.get(API_URL + `/${id}/reviews`, {
+    params: {
+      page: page,
+      pageSize: pageSize,
+      key: key ?? "",
+    },
+    headers: authHeader(),
+  });
+
 const ProductService = {
   getAll,
   add,
@@ -71,6 +81,7 @@ const ProductService = {
   updateEnable,
   fetchProductAttributes,
   getFilterProducts,
+  getReview,
 };
 
 export default ProductService;

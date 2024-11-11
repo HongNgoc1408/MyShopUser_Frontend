@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Carousel,
   Collapse,
@@ -12,7 +12,6 @@ import {
 } from "antd";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
-import { Option } from "antd/es/mentions";
 import { Tabs } from "antd";
 import ProductService from "../../services/ProductService";
 import {
@@ -24,12 +23,11 @@ import {
 import SizeService from "../../services/SizeService";
 import CartService from "../../services/CartService";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
+import Review from "../Review";
+import { HeartFilled, HeartOutlined, HeartTwoTone } from "@ant-design/icons";
+import { FavoriteContext } from "../../components/Layout/DefaultLayout";
+import UserService from "../../services/UserService";
 
-const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
 const ProductDetail = () => {
   const { id } = useParams();
   const carouselRef = useRef(null);
@@ -41,6 +39,9 @@ const ProductDetail = () => {
   const [colorSizes, setColorSizes] = useState([]);
   const [selectedColorSize, setSelectedColorSize] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const { favoriteList, setFavoriteList } = useContext(FavoriteContext);
+  const isFavorite = favoriteList.includes(product.id);
+
   const productName =
     queryParams.get("name") || product.name || "Sản phẩm không tên";
 
@@ -54,7 +55,7 @@ const ProductDetail = () => {
       title: "Sản phẩm",
     },
     {
-      title: `${name}`,
+      title: <span className="capitalize">{name}</span>,
     },
   ];
 
@@ -114,17 +115,40 @@ const ProductDetail = () => {
   const onChange = (key) => {
     console.log(key);
   };
-
+  const toggleFavorite = async () => {
+    try {
+      if (isFavorite) {
+        await UserService.deleteFavoriteProduct(product.id);
+        setFavoriteList((prevFavorites) =>
+          prevFavorites.filter((favId) => favId !== product.id)
+        );
+      } else {
+        await UserService.addFavorite(product.id);
+        setFavoriteList((prevFavorites) => [...prevFavorites, product.id]);
+      }
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+    }
+  };
   const items = [
     {
       key: "1",
-      label: "Hướng dẫn chọn size",
-      children: <div>{text}</div>,
+      label: "Chính sách vận chuyển",
+      children: (
+        <div>Ưu đãi miễn phí vận chuyển cho đơn hàng của từ 500,000 VNĐ</div>
+      ),
     },
     {
       key: "2",
-      label: "Hướng dẫn bảo quản",
-      children: <div>{text}</div>,
+      label: "Bảo hành và đổi trả",
+      children: (
+        <div>
+          Miễn phí Trả hàng trong 15 ngày nếu Đổi ý (hàng trả phải còn nguyên
+          seal, tem, hộp sản phẩm), áp dụng cho một số sản phẩm nhất định. Ngoài
+          ra, tại thời điểm nhận hàng, bạn có thể đồng kiểm và được trả hàng
+          miễn phí.
+        </div>
+      ),
     },
   ];
 
@@ -134,18 +158,59 @@ const ProductDetail = () => {
   const items1 = [
     {
       key: "1",
-      label: "Chi tiết sản phẩm",
-      children: "Chi tiết sản phẩm",
+      label: (
+        <>
+          <span className="uppercase">Mô tả sản phẩm</span>
+        </>
+      ),
+      children: (
+        <span className="text-base">
+          {product.description ? (
+            product.description.split("-").map((item, index) => (
+              <span key={index}>
+                {item.trim()}
+                {index < product.description.split("-").length - 1 && <br />}
+                {index < product.description.split("-").length - 1 && (
+                  <span>- </span>
+                )}
+              </span>
+            ))
+          ) : (
+            <span>Chưa có mô tả sản phẩm</span>
+          )}
+        </span>
+      ),
     },
     {
       key: "2",
-      label: "Đánh giá sản phẩm",
-      children: "Đánh giá sản phẩm",
+      label: (
+        <>
+          <span className="uppercase">Đánh giá sản phẩm</span>
+        </>
+      ),
+      children: (
+        <>
+          <Review id={id} rating={product.rating} />
+        </>
+      ),
     },
     {
       key: "3",
-      label: "Hướng dẫn mua hàng",
+      label: (
+        <>
+          <span className="uppercase">Hướng dẫn mua hàng</span>
+        </>
+      ),
       children: "Hướng dẫn mua hàng",
+    },
+    {
+      key: "4",
+      label: (
+        <>
+          <span className="uppercase">Hướng dẫn chọn size</span>
+        </>
+      ),
+      children: "Hướng dẫn chọn size",
     },
   ];
 
@@ -192,7 +257,7 @@ const ProductDetail = () => {
     <div className="container mx-auto max-lg:px-8 px-24">
       <div className="my-5">
         <BreadcrumbLink breadcrumb={breadcrumb(id, productName)} />
-        <div class="grid grid-cols-5 gap-5 my-5">
+        <div className="grid grid-cols-5 gap-5 my-5">
           <div className="col-span-3 flex flex-row">
             <div className="w-1/4">
               {product.imageUrls && product.imageUrls.length > 0
@@ -250,8 +315,13 @@ const ProductDetail = () => {
               <p className="w-11/12 font-bold text-2xl capitalize">
                 {product.name}
               </p>
-              <button className="w-1/12 text-3xl justify-items-center">
-                <CiHeart />
+              <button
+                onClick={toggleFavorite}
+                className="w-1/12 text-3xl justify-items-center"
+              >
+                <HeartOutlined
+                  style={{ color: isFavorite ? "red" : "black" }}
+                />
               </button>
             </div>
             <div className="grid grid-cols-1 gap-1">
@@ -348,9 +418,12 @@ const ProductDetail = () => {
                       >
                         {selectedColorSize.sizeInStocks.map(
                           (sizeStock, sizeIndex) => (
-                            <Option key={sizeIndex} value={sizeStock.sizeName}>
+                            <Select.Option
+                              key={sizeIndex}
+                              value={sizeStock.sizeName}
+                            >
                               {sizeStock.sizeName}
-                            </Option>
+                            </Select.Option>
                           )
                         )}
                       </Select>
@@ -405,7 +478,7 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
-        <div className="ml-10 uppercase text-2xl">
+        <div className="ml-10 text-2xl">
           <Tabs defaultActiveKey="1" items={items1} onChange={onChange1} />
         </div>
       </div>

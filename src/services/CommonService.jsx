@@ -94,3 +94,13 @@ export const statusOrders = [
   { value: 4, label: "Đã nhận" },
   { value: 5, label: "Đã hủy" },
 ];
+
+export const statusOrder = [
+  { value: "Processing", label: "Đang xử lý" },
+  { value: "Confirmed", label: "Đã duyệt" },
+  { value: "AwaitingPickup", label: "Đang chờ lấy hàng" },
+  { value: "Shipping", label: "Đang vận chuyển" },
+  // { value: "BeingDelivered", label: "Đang giao hàng" },
+  { value: "Received", label: "Đã nhận" },
+  { value: "Canceled", label: "Đã hủy" },
+];

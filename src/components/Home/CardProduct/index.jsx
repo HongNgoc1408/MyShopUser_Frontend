@@ -31,7 +31,9 @@ const CardProduct = ({ product }) => {
       console.error("Error updating favorite:", error);
     }
   };
-  return (
+  console.log("product", product);
+
+  return product.enable ? (
     <Link
       to={`/product-details/${product.id}`}
       className="z-10 hover:no-underline hover:text-current"
@@ -140,7 +142,7 @@ const CardProduct = ({ product }) => {
         </div>
       </Badge.Ribbon>
     </Link>
-  );
+  ) : null;
 };
 
 export default CardProduct;

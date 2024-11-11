@@ -1,15 +1,4 @@
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Image,
-  notification,
-  Popover,
-  Row,
-  Skeleton,
-  Steps,
-} from "antd";
+import { Card, Divider, Image, Skeleton, Steps } from "antd";
 import React, { useEffect, useState } from "react";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import OrderService from "../../services/OrderService";
@@ -18,7 +7,7 @@ import {
   formatVND,
   paymentMethod,
   showError,
-  statusOrders,
+  statusOrder,
   toImageSrc,
 } from "../../services/commonService";
 import { Link, useParams } from "react-router-dom";
@@ -48,9 +37,9 @@ const OrderDetail = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
-  const [current, setCurrent] = useState();
+  const [current, setCurrent] = useState(0);
   const onChange = (value) => {
-    console.log("onChange:", value);
+    // console.log("onChange:", value);
     setCurrent(value);
   };
   useEffect(() => {
@@ -70,16 +59,16 @@ const OrderDetail = () => {
     fetchOrder();
   }, [id]);
 
-  const handleCancelOrder = async (id) => {
-    console.log(id);
-    try {
-      const cancel = await OrderService.cancel(id);
-      setOrders(cancel);
-      notification.success("Hủy đơn thành công");
-    } catch (error) {
-      showError(error);
-    }
-  };
+  // const handleCancelOrder = async (id) => {
+  //   console.log(id);
+  //   try {
+  //     const cancel = await OrderService.cancel(id);
+  //     setOrders(cancel);
+  //     notification.success("Hủy đơn thành công");
+  //   } catch (error) {
+  //     showError(error);
+  //   }
+  // };
 
   const getPaymentMethodLabel = (method) => {
     const payment = paymentMethod.find((item) => item.value === method);
@@ -87,10 +76,11 @@ const OrderDetail = () => {
   };
 
   const getStatusOrder = (status) => {
-    const stt = statusOrders.find((item) => item.value === status);
+    const stt = statusOrder.find((item) => item.value === status);
     return stt ? stt.label : "Phương thức không xác định";
   };
 
+  const orderStatus = orders.orderStatus || "";
   return (
     <div className="bg-gray-100">
       {isLoading ? (
@@ -103,55 +93,86 @@ const OrderDetail = () => {
           <div className="flex lg:flex-col sm:flex-col justify-between lg:space-x-4">
             <div className="container mx-auto max-lg:px-8 px-28 ">
               <Steps
+                labelPlacement="vertical"
                 current={current}
                 onChange={onChange}
                 items={[
                   {
-                    icon: (
-                      <Popover content={<span>Đơn hàng đã đặt</span>}>
-                        <CiReceipt size={30} className="items-center" />
-                      </Popover>
+                    title:
+                      orderStatus === "Processing"
+                        ? "Đơn hàng chờ xét duyệt"
+                        : "Đơn hàng đã đặt",
+                    description: (
+                      <span className="text-gray-400">
+                        {formatDateTime(orders.orderDate)}
+                      </span>
                     ),
-                  },
-                  {
                     icon: (
-                      <Popover
-                        content={
-                          <span>
-                            Đơn hàng đã thanh toán
-                            {orders.paymentMethod === "VNPay"
-                              ? `${formatVND(orders.total)}`
-                              : ""}
-                          </span>
-                        }
+                      <div
+                        className={`border-2 rounded-full p-1 ${
+                          orderStatus === "Processing"
+                            ? "text-gray-400"
+                            : "border-green-600"
+                        }`}
                       >
-                        <CiCreditCard1 size={30} className="items-center" />
-                      </Popover>
+                        <CiReceipt
+                          size={30}
+                          className={`items-center font-bold ${
+                            orderStatus === "Processing"
+                              ? "text-gray-400"
+                              : "text-green-600"
+                          }`}
+                        />
+                      </div>
                     ),
                   },
                   {
+                    title: "Đơn hàng đã thanh toán",
+                    description: (
+                      <span className="text-gray-400">
+                        {orders.amountPaid > 0
+                          ? formatVND(orders.amountPaid)
+                          : ""}
+                      </span>
+                    ),
                     icon: (
-                      <Popover
-                        content={
-                          <span>Đơn hàng gửi cho đơn vị vận chuyển</span>
-                        }
-                      >
-                        <CiDeliveryTruck size={30} className="items-center" />
-                      </Popover>
+                      <div className="border-2 border-green-600 rounded-full p-1">
+                        <CiCreditCard1
+                          size={30}
+                          className="items-center text-green-600 font-bold"
+                        />
+                      </div>
                     ),
                   },
                   {
+                    title: "Đơn hàng gửi cho đơn vị vận chuyển",
+
                     icon: (
-                      <Popover content={<span>Chờ giao hàng</span>}>
-                        <CiInboxIn size={30} className="items-center" />
-                      </Popover>
+                      <div className="border-2 border-green-600 rounded-full p-1">
+                        <CiDeliveryTruck
+                          size={30}
+                          className="items-center text-green-600 font-bold"
+                        />
+                      </div>
                     ),
                   },
                   {
+                    title: "Chờ giao hàng",
                     icon: (
-                      <Popover content={<span>Đánh giá</span>}>
-                        <CiStar size={30} className="items-center" />
-                      </Popover>
+                      <div className="border-2 rounded-full p-1">
+                        <CiInboxIn
+                          size={30}
+                          className="items-center font-bold"
+                        />
+                      </div>
+                    ),
+                  },
+                  {
+                    title: "Đánh giá",
+                    icon: (
+                      <div className="border-2 rounded-full p-1">
+                        <CiStar size={30} className="items-center font-bold" />
+                      </div>
                     ),
                   },
                 ]}
@@ -165,7 +186,7 @@ const OrderDetail = () => {
                   <div className="flex tetx-base">
                     <CiDeliveryTruck size={20} className="mx-1" />
                     <Link
-                      to={`/orders-detail/${orders.id}`}
+                      // to={`/orders-detail/${orders.id}`}
                       className="text-base mx-1"
                     >
                       Mã đơn hàng: {orders.id} |
@@ -178,33 +199,19 @@ const OrderDetail = () => {
                 className="bg-white rounded-none my-5"
               >
                 <Link
-                  to={`/orders-detail/${orders.id}`}
+                  // to={`/orders-detail/${orders.id}`}
                   className="hover:text-current"
                 >
-                  <Row>
-                    <Col
-                      xs={2}
-                      sm={4}
-                      md={6}
-                      lg={8}
-                      xl={10}
-                      className="flex-col my-auto justify-start items-center"
-                    >
+                  <div className="flex">
+                    <div className="flex-col my-auto justify-start items-center">
                       <div className="text-xl font-semibold">
                         Địa chỉ nhận hàng
                       </div>
                       <div className="text-base"> {orders.receiver}</div>
                       <div className="text-base"> {orders.deliveryAddress}</div>
-                    </Col>
-                    <Col
-                      xs={2}
-                      sm={4}
-                      md={6}
-                      lg={8}
-                      xl={10}
-                      className="justify-end items-center text-end"
-                    ></Col>
-                  </Row>
+                    </div>
+                    <div className="justify-end items-center text-end"></div>
+                  </div>
                 </Link>
               </Card>
             </div>
@@ -227,26 +234,19 @@ const OrderDetail = () => {
                 className="bg-white rounded-none my-5"
               >
                 <Link
-                  to={`/orders-detail/${orders.id}`}
+                  // to={`/orders-detail/${orders.id}`}
                   className="hover:text-current"
                 >
                   {orders.productOrderDetails.map((product) => (
-                    <Row>
-                      <Col xs={20} sm={16} md={12} lg={8} xl={4}>
+                    <div className="flex">
+                      <div>
                         <Image
                           src={toImageSrc(product.imageUrl)}
                           width={100}
                           height={150}
                         />
-                      </Col>
-                      <Col
-                        xs={2}
-                        sm={4}
-                        md={6}
-                        lg={8}
-                        xl={10}
-                        className="flex-col my-auto justify-start items-center"
-                      >
+                      </div>
+                      <div className="flex-col my-auto justify-start items-center ml-10">
                         <p className="text-lg capitalize font-semibold">
                           {product.productName}
                         </p>
@@ -256,23 +256,19 @@ const OrderDetail = () => {
                         <p className="text-base">
                           Số lượng: {product.quantity}
                         </p>
-                      </Col>
-                      <Col
-                        xs={2}
-                        sm={4}
-                        md={6}
-                        lg={8}
-                        xl={10}
-                        className="flex justify-end items-center text-end"
-                      >
-                        <p className="text-base capitalize cursor-pointer font-semibold  m-1 text-gray-500 line-through">
-                          {formatVND(product.originPrice)}
-                        </p>
-                        <p className="text-base capitalize cursor-pointer font-semibold m-1 text-orange-600">
-                          {formatVND(product.price)}
-                        </p>
-                      </Col>
-                    </Row>
+                      </div>
+                      <div className="flex justify-end items-center text-end">
+                        <div className="flex justify-end items-center text-end w-1/2">
+                          <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-gray-500 line-through">
+                            {formatVND(product.originPrice)}
+                          </p>
+
+                          <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-orange-600">
+                            {formatVND(product.price)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </Link>
                 <Divider />

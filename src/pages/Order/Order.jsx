@@ -8,7 +8,9 @@ import {
   Modal,
   notification,
   Rate,
+  Result,
   Skeleton,
+  Tabs,
   Upload,
 } from "antd";
 import React, { useEffect, useState } from "react";
@@ -23,7 +25,11 @@ import {
   toImageSrc,
 } from "../../services/commonService";
 import { Link } from "react-router-dom";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  LoadingOutlined,
+  PlusOutlined,
+  SmileOutlined,
+} from "@ant-design/icons";
 
 const breadcrumb = [
   {
@@ -46,6 +52,7 @@ const Order = () => {
   const [id, setID] = useState();
   const [isReviewSubmit, setIsReviewSubmit] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [selectedTab, setSelectedTab] = useState("6");
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -172,28 +179,6 @@ const Order = () => {
     setFileList(updatedList);
   };
 
-  // const handleChange = (productId, newFileList) => {
-  //   // Tìm xem sản phẩm đã có trong fileList chưa
-  //   const existingProduct = fileList.some(
-  //     (item) => item.productId === productId
-  //   );
-
-  //   let updatedList;
-
-  //   if (existingProduct) {
-  //     // Nếu sản phẩm đã tồn tại, cập nhật files của sản phẩm đó
-  //     updatedList = fileList.map((item) =>
-  //       item.productId === productId ? { ...item, files: newFileList } : item
-  //     );
-  //   } else {
-  //     // Nếu sản phẩm chưa có trong danh sách, thêm mới
-  //     updatedList = [...fileList, { productId, files: newFileList }];
-  //   }
-
-  //   // Cập nhật lại state
-  //   setFileList(updatedList);
-  // };
-
   const handleReceivedOrder = async (id) => {
     // console.log(id);
     try {
@@ -258,6 +243,25 @@ const Order = () => {
       </div>
     </button>
   );
+
+  const items = [
+    { key: "6", label: "Tất cả" },
+    { key: "0", label: "Đang xử lý" },
+    { key: "1", label: "Đã duyệt" },
+    { key: "2", label: "Đang chờ lấy hàng" },
+    { key: "3", label: "Đang vận chuyển" },
+    { key: "4", label: "Đã nhận" },
+    { key: "5", label: "Đã hủy" },
+  ];
+
+  const filteredOrders =
+    selectedTab === "6"
+      ? orders
+      : orders.filter((order) => order.orderStatus === parseInt(selectedTab));
+
+  const onChange = (key) => {
+    setSelectedTab(key);
+  };
 
   return (
     <>
@@ -447,110 +451,138 @@ const Order = () => {
             </div>
             <div className="flex flex-col lg:flex-row sm:flex-col justify-between lg:space-x-4">
               <div className="container mx-auto max-lg:px-8 px-20">
-                {orders.map((order) => (
-                  <Card
-                    key={order.id}
-                    title={
-                      <span className="text-lg font-semibold">
-                        {formatDateTime(order.orderDate)}
-                      </span>
-                    }
-                    extra={
-                      <div className="flex text-lg font-semibold">
-                        <span className="">Trạng thái đơn hàng:</span>
-                        <Link
-                          to={`/order-detail/${order.id}`}
-                          className="text-lg mx-1 text-blue-600"
-                        >
-                          {getStatusOrder(order.orderStatus)}
-                        </Link>
-                      </div>
-                    }
-                    className="bg-white rounded-none my-5"
-                  >
-                    <Link
-                      to={`/order-detail/${order.id}`}
-                      className="hover:text-current"
+                <div className="bg-white">
+                  <Tabs
+                    defaultActiveKey="6"
+                    items={items}
+                    onChange={onChange}
+                    centered
+                  />
+                </div>
+
+                {filteredOrders.length === 0 ? (
+                  <div className="text-center text-gray-500 my-5 bg-white">
+                    <Result
+                      icon={<SmileOutlined />}
+                      title="Không có đơn hàng nào!"
+                    />
+                  </div>
+                ) : (
+                  filteredOrders.map((order) => (
+                    <Card
+                      key={order.id}
+                      title={
+                        <span className="text-lg font-semibold">
+                          {formatDateTime(order.orderDate)}
+                        </span>
+                      }
+                      extra={
+                        <div className="flex text-lg font-semibold">
+                          <span className="">Trạng thái đơn hàng:</span>
+                          <Link
+                            to={`/order-detail/${order.id}`}
+                            className="text-lg mx-1 text-blue-600"
+                          >
+                            {getStatusOrder(order.orderStatus)}
+                          </Link>
+                        </div>
+                      }
+                      className="bg-white rounded-none my-5"
                     >
-                      <div className="flex">
-                        <Image
-                          src={toImageSrc(order.product.imageUrl)}
-                          width={100}
-                          height={150}
-                        />
-                        <div className="flex-col my-auto justify-start items-center">
-                          <p className="text-xl capitalize font-semibold">
-                            {order.product.name}
-                          </p>
-                          {/* <p className="text-lg">
+                      <Link
+                        to={`/order-detail/${order.id}`}
+                        className="hover:text-current"
+                      >
+                        <div className="flex">
+                          <div className="flex w-1/2">
+                            <div className="justify-start items-center mr-5">
+                              <Image
+                                src={toImageSrc(order.product.imageUrl)}
+                                width={100}
+                                height={150}
+                              />
+                            </div>
+
+                            <div className="flex-col my-auto justify-start items-center">
+                              <p className="text-xl capitalize font-semibold">
+                                {order.product.name}
+                              </p>
+
+                              {/* <p className="text-lg">
                             Phân loại hàng: {order.product.colorName}|{" "}
                             {order.product.sizeName}
                           </p>
                           <p className="text-lg">
                             Số lượng: {order.product.quantity}
                           </p> */}
-                        </div>
-                        <div className="flex justify-end items-center text-end">
-                          {order.product.discount > 0 && (
-                            <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-gray-500 line-through">
-                              {formatVND(order.product.price)}
-                            </p>
-                          )}
-                          <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-orange-600">
-                            {formatVND(
-                              order.product.discount > 0
-                                ? (order.product.price *
-                                    (100 - order.product.discount)) /
-                                    100
-                                : order.product.price
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end items-center text-end w-1/2">
+                            {order.product.discount > 0 && (
+                              <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-gray-500 line-through">
+                                {formatVND(order.product.price)}
+                              </p>
                             )}
-                          </p>
+                            <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-orange-600">
+                              {formatVND(
+                                order.product.discount > 0
+                                  ? (order.product.price *
+                                      (100 - order.product.discount)) /
+                                      100
+                                  : order.product.price
+                              )}
+                            </p>
+                          </div>
                         </div>
+                      </Link>
+                      <div className=""></div>
+                      <Divider />
+                      <div className="flex justify-end items-center price-card-product">
+                        <p className="text-2xl cursor-pointer text-orange-600">
+                          Thành tiền : {formatVND(order.total)}
+                        </p>
                       </div>
-                    </Link>
-                    <div className=""></div>
-                    <Divider />
-                    <div className="flex justify-end items-center price-card-product">
-                      <p className="text-2xl cursor-pointer text-orange-600">
-                        Thành tiền : {formatVND(order.total)}
-                      </p>
-                    </div>
-                    <div className="flex justify-end items-center space-x-2">
-                      <Button
-                        onClick={() => handleCancelOrder(order.id)}
-                        danger
-                        type="primary"
-                        className={`text-lg mt-5 ${
-                          [0, 1].includes(order.orderStatus) ? "" : "hidden"
-                        }`}
-                      >
-                        Hủy đơn hàng
-                      </Button>
-                      <Button
-                        type="primary"
-                        className={`text-lg mt-5 ${
-                          [0, 4, 5].includes(order.orderStatus) ? "hidden" : ""
-                        }`}
-                        onClick={() => handleReceivedOrder(order.id)}
-                      >
-                        Đã nhận hàng
-                      </Button>
-                      {!isReviewSubmit && (
+                      <div className="flex justify-end items-center space-x-2">
+                        <Button
+                          onClick={() => handleCancelOrder(order.id)}
+                          danger
+                          type="primary"
+                          className={`text-lg mt-5 ${
+                            [0, 1].includes(order.orderStatus) ? "" : "hidden"
+                          }`}
+                        >
+                          Hủy đơn hàng
+                        </Button>
                         <Button
                           type="primary"
                           className={`text-lg mt-5 ${
-                            order.orderStatus === 4 && order.reviewed === false
-                              ? ""
-                              : "hidden"
+                            [0, 4, 5].includes(order.orderStatus)
+                              ? "hidden"
+                              : ""
                           }`}
-                          onClick={() => showModal(order.id)}
+                          onClick={() => handleReceivedOrder(order.id)}
                         >
-                          Đánh giá
+                          Đã nhận hàng
                         </Button>
-                      )}
-                    </div>
-                  </Card>
-                ))}
+                        {!isReviewSubmit && (
+                          <Button
+                            type="primary"
+                            className={`text-lg mt-5 ${
+                              order.orderStatus === 4 &&
+                              order.reviewed === false
+                                ? ""
+                                : "hidden"
+                            }`}
+                            onClick={() => showModal(order.id)}
+                          >
+                            Đánh giá
+                          </Button>
+                        )}
+                      </div>
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           </div>

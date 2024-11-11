@@ -131,7 +131,7 @@ const ModelProduct = ({ open, setOpen, id }) => {
           },
         }}
       >
-        <div class="grid grid-cols-5 gap-5 my-5">
+        <div className="grid grid-cols-5 gap-5 my-5">
           <div className="col-span-3 flex flex-row">
             <div className="w-1/4">
               {product.imageUrls && product.imageUrls.length > 0
