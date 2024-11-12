@@ -52,7 +52,7 @@ const CartDetail = () => {
   const [shippingFee, setShippingFee] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [dataAddress, setDataAddress] = useState({});
-  const [payment, setPayment] = useState([]);
+  // const [payment, setPayment] = useState([]);
   const [provinces, setProvince] = useState([]);
   const [districts, setDistrict] = useState([]);
   const [wards, setWard] = useState([]);
@@ -70,14 +70,14 @@ const CartDetail = () => {
         const res = await CartService.getAllByUserId();
         const address = await UserService.getAddress();
         const result = await AddressService.getProvince();
-        const payment = await PaymentsService.getAll();
+        // const payment = await PaymentsService.getAll();
 
-        console.log("address", address);
+        // console.log("address", address);
 
         setData(res.data);
         setDataAddress(address.data);
         setProvince(result.data.data || []);
-        setPayment(payment.data);
+        // setPayment(payment.data);
       } catch (error) {
         showError(error);
       } finally {
@@ -88,7 +88,7 @@ const CartDetail = () => {
   }, []);
 
   const showModal = () => {
-    console.log("showModal", dataAddress);
+    // console.log("showModal", dataAddress);
     form.setFieldsValue(dataAddress);
     setIsModalOpen(true);
   };
@@ -142,7 +142,7 @@ const CartDetail = () => {
     setLoadingUpdate(true);
     try {
       const value = await form.validateFields();
-      console.log("handleOk", value);
+      // console.log("handleOk", value);
       await UserService.updateAddress(value);
 
       notification.success({
@@ -161,7 +161,7 @@ const CartDetail = () => {
   const [value, setValue] = useState(1);
 
   const onChange = (e) => {
-    console.log("Radio checked", e.target.value);
+    // console.log("Radio checked", e.target.value);
     setValue(e.target.value);
   };
 
@@ -286,8 +286,8 @@ const CartDetail = () => {
         newSelectedRowKeys.includes(item.id)
       );
 
-      const selectedProductIds = selectedItems.map((item) => item.productId);
-      console.log("Selected Product IDs:", selectedProductIds);
+      // const selectedProductIds = selectedItems.map((item) => item.productId);
+      // console.log("Selected Product IDs:", selectedProductIds);
 
       const approximate = selectedItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -331,7 +331,7 @@ const CartDetail = () => {
         });
         return;
       }
-      console.log(value);
+      // console.log(value);
 
       if (value) {
         const order = {
@@ -345,7 +345,7 @@ const CartDetail = () => {
           ward_Id: `${dataAddress.ward_id}`,
         };
 
-        console.log(data);
+        // console.log(data);
 
         const res = await OrderService.add(order);
 
@@ -552,36 +552,6 @@ const CartDetail = () => {
                     />
                   </ConfigProvider>
                 </div>
-                {/* <div className="my-5 p-5 bg-white shadow-md">
-                  <Row
-                    gutter={{
-                      xs: 8,
-                      sm: 16,
-                      md: 24,
-                      lg: 32,
-                    }}
-                    className="flex flex-wrap"
-                  >
-                    <Col className="gutter-row" span={12}>
-                      <div className="flex">
-                        <div className="justify-center items-center ">
-                          <p className="text-2xl">Tổng thanh toán: </p>
-                        </div>
-
-                        <div className="price-card-product text-orange-600 justify-center items-center ">
-                          <p className="text-2xl ml-5 ">100.000đ</p>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col className="gutter-row" span={12}>
-                      <div className="w-full">
-                        <button className="dark-button text-xl w-full">
-                          <span className="relative z-10">Mua hàng</span>
-                        </button>
-                      </div>
-                    </Col>
-                  </Row>
-                </div> */}
               </div>
               <div className="container mx-auto max-lg:px-8 pr-20 w-full lg:w-1/3 sm:w-full">
                 <Card className="text-base my-5 p-5 bg-white shadow-md rounded-none">
@@ -633,13 +603,16 @@ const CartDetail = () => {
                     value={value}
                     className="flex flex-col space-y-3"
                   >
-                    {payment.map((p) => (
-                      <Radio value={p.id}>
-                        <div className="flex space-x-4 items-center">
-                          <span>{p.name}</span>
-                        </div>
-                      </Radio>
-                    ))}
+                    <Radio value="1">
+                      <div className="flex space-x-4 items-center">
+                        <span>COD</span>
+                      </div>
+                    </Radio>
+                    <Radio value="2">
+                      <div className="flex space-x-4 items-center">
+                        <span>VNPay</span>
+                      </div>
+                    </Radio>
                   </Radio.Group>
                 </Card>
                 <Divider className="my-[0.1rem] border-0" />

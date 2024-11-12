@@ -1,3 +1,4 @@
+import Kommunicate from "@kommunicate/kommunicate-chatbot-plugin";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -28,14 +29,15 @@ const getCurrentUser = () => {
   return user ? JSON.parse(user) : user;
 };
 
-
-
 const setUserToken = (access_token) =>
   Cookies.set("access_token", access_token, { expires: 5 * 60 * 1000 });
 
 const logout = () => {
+  window.kommunicate.logout();
   Cookies.remove("user_data");
   Cookies.remove("access_token");
+  // Cookies.remove("_km_user_name-34144efbc2238a6239923d4db0ab623f7");
+  // Cookies.remove("_km_id-34144efbc2238a6239923d4db0ab623f7");
 };
 
 const codeResetPassword = async (email) =>

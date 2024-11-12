@@ -46,7 +46,7 @@ const OrderDetail = () => {
     const fetchOrder = async () => {
       try {
         const res = await OrderService.getDetail(id);
-        console.log(res.data);
+        // console.log(res.data);
         setOrders(res.data);
       } catch (error) {
         console.error("Error:", error);

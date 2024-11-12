@@ -15,8 +15,8 @@ const Profile = () => {
         const data = await UserService.getProfile();
         const address = await UserService.getAddress();
 
-        console.log("1", data.data);
-        console.log("2", address.data);
+        // console.log("1", data.data);
+        // console.log("2", address.data);
 
         setData(data.data);
         setAddress(address.data);

@@ -75,7 +75,9 @@ const Register = () => {
         ...items,
       };
       const res = await authService.register(data);
-      console.log(res);
+      
+      // console.log(res);
+
       notification.success({
         message: "Đăng ký tài khoản thành công",
         placement: "top",

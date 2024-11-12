@@ -18,7 +18,7 @@ const Review = ({ id, rating }) => {
     const fetchData = async () => {
       try {
         const res = await ProductService.getReview(id);
-        console.log(res.data);
+        // console.log(res.data);
         setData(res.data);
       } catch (error) {
         showError(error);

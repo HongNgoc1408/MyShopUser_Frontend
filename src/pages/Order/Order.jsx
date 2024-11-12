@@ -296,18 +296,15 @@ const Order = () => {
     <>
       <Modal
         open={isModalOpen}
-        // onOk={handleOk}
         onCancel={handleCancel}
         width={600}
         okText="Gửi đánh giá"
         okButtonProps={{
           autoFocus: true,
           htmlType: "submit",
-          // danger: true,
         }}
         confirmLoading={loading}
         cancelButtonProps={{
-          // className: "rounded-sm",
           disabled: loading,
         }}
         destroyOnClose
@@ -536,14 +533,6 @@ const Order = () => {
                               <p className="text-xl capitalize font-semibold">
                                 {order.product.name}
                               </p>
-
-                              {/* <p className="text-lg">
-                            Phân loại hàng: {order.product.colorName}|{" "}
-                            {order.product.sizeName}
-                          </p>
-                          <p className="text-lg">
-                            Số lượng: {order.product.quantity}
-                          </p> */}
                             </div>
                           </div>
 

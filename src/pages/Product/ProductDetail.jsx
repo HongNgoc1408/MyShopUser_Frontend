@@ -113,7 +113,7 @@ const ProductDetail = () => {
   };
 
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
   };
   const toggleFavorite = async () => {
     try {
@@ -153,8 +153,9 @@ const ProductDetail = () => {
   ];
 
   const onChange1 = (key) => {
-    console.log(key);
+    // console.log(key);
   };
+  
   const items1 = [
     {
       key: "1",

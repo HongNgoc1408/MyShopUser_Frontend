@@ -70,6 +70,7 @@ const RootComponent = () => {
           window.kommunicate = m;
           m._globals = kommunicateSettings;
         })(document, window.kommunicate || {});
+        setRegistered(true);
       }
     };
 
