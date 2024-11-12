@@ -33,17 +33,19 @@ const Header = ({ onSearch }) => {
   // }, [state.isAuthenticated])
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await CartService.count();
-        // console.log("OrderService", res.data);
-        setData(res.data);
-      } catch (error) {
-        showError(error);
-      }
-    };
-    fetchData();
-  }, []);
+    if (state.isAuthenticated) {
+      const fetchData = async () => {
+        try {
+          const res = await CartService.count();
+          // console.log("OrderService", res.data);
+          setData(res.data);
+        } catch (error) {
+          showError(error);
+        }
+      };
+      fetchData();
+    }
+  }, [state.isAuthenticated]);
 
   const showDrawer = () => {
     setOpen(true);

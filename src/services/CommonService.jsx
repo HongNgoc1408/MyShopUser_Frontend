@@ -12,6 +12,7 @@ export const showError = (error) => {
 
   notification.error({
     message: "Error",
+    placement: "top",
     description: errorMessage,
   });
 };
@@ -70,16 +71,6 @@ export const isEmptyObject = (obj) => {
   return JSON.stringify(obj) === "{}";
 };
 
-// export const sizes = [
-//   { value: "XS", label: "XS" },
-//   { value: "S", label: "S" },
-//   { value: "M", label: "M" },
-//   { value: "L", label: "L" },
-//   { value: "XL", label: "XL" },
-//   { value: "XXL", label: "XXL" },
-//   { value: "XXXL", label: "XXXL" },
-// ];
-
 export const paymentMethod = [
   { value: "COD", label: "Thanh toán khi nhận hàng" },
   { value: "VNPay", label: "Thanh toán ví VNPay" },
@@ -90,7 +81,6 @@ export const statusOrders = [
   { value: 1, label: "Đã duyệt" },
   { value: 2, label: "Đang chờ lấy hàng" },
   { value: 3, label: "Đang vận chuyển" },
-  // { value: "BeingDelivered", label: "Đang giao hàng" },
   { value: 4, label: "Đã nhận" },
   { value: 5, label: "Đã hủy" },
 ];
@@ -100,7 +90,6 @@ export const statusOrder = [
   { value: "Confirmed", label: "Đã duyệt" },
   { value: "AwaitingPickup", label: "Đang chờ lấy hàng" },
   { value: "Shipping", label: "Đang vận chuyển" },
-  // { value: "BeingDelivered", label: "Đang giao hàng" },
   { value: "Received", label: "Đã nhận" },
   { value: "Canceled", label: "Đã hủy" },
 ];

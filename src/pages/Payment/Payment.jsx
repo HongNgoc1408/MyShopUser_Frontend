@@ -33,11 +33,13 @@ const Payment = () => {
         await PaymentsService.VNPayCallback(params);
         notification.success({
           message: "Thành công",
+          placement: "top",
           description: "Thanh toán thành công",
         });
       } catch (error) {
         notification.error({
           message: "Thất bại",
+          placement: "top",
           description: "Thanh toán thất bại",
         });
       } finally {

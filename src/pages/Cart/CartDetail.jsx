@@ -145,7 +145,10 @@ const CartDetail = () => {
       console.log("handleOk", value);
       await UserService.updateAddress(value);
 
-      notification.success({ message: "Cập nhật địa chỉ thành công." });
+      notification.success({
+        message: "Cập nhật địa chỉ thành công.",
+        placement: "top",
+      });
       setIsModalOpen(false);
       setDataAddress(value);
     } catch (error) {
@@ -165,11 +168,14 @@ const CartDetail = () => {
   const handleDeleteProduct = async (productId) => {
     try {
       if (selectedRowKeys.length === 0) {
-        notification.warning({ message: "Vui lòng chọn sản phẩm cần xóa" });
+        notification.warning({
+          message: "Vui lòng chọn sản phẩm cần xóa",
+          placement: "top",
+        });
         return;
       }
       await CartService.remove([productId]);
-      notification.success({ message: "Xóa thành công." });
+      notification.success({ message: "Xóa thành công.", placement: "top" });
 
       setTimeout(() => {
         window.location.reload();
@@ -183,7 +189,10 @@ const CartDetail = () => {
 
   const handleDeleteSelectedProducts = async () => {
     if (selectedRowKeys.length === 0) {
-      notification.warning({ message: "Vui lòng chọn sản phẩm cần xóa" });
+      notification.warning({
+        message: "Vui lòng chọn sản phẩm cần xóa",
+        placement: "top",
+      });
       return;
     }
 
@@ -195,7 +204,10 @@ const CartDetail = () => {
       const selectedProductIds = selectedItems.map((item) => item.productId);
 
       await CartService.remove(selectedProductIds);
-      notification.success({ message: "Xóa sản phẩm thành công" });
+      notification.success({
+        message: "Xóa sản phẩm thành công",
+        placement: "top",
+      });
 
       setTimeout(() => {
         window.location.reload();
@@ -204,6 +216,7 @@ const CartDetail = () => {
     } catch (error) {
       notification.error({
         message: "Xóa sản phẩm thất bại",
+        placement: "top",
         description: error.message,
       });
     }
@@ -306,6 +319,7 @@ const CartDetail = () => {
       if (hasEmptyField) {
         notification.error({
           message: "Thông tin đơn hàng không được để trống",
+          placement: "top",
         });
         return;
       }
@@ -313,6 +327,7 @@ const CartDetail = () => {
       if (selectedRowKeys.length === 0) {
         notification.warning({
           message: "Vui lòng chọn sản phẩm muốn mua",
+          placement: "top",
         });
         return;
       }
@@ -339,17 +354,20 @@ const CartDetail = () => {
         } else {
           notification.success({
             message: "Đặt hàng thành công.",
+            placement: "top",
           });
           navigate("/order");
         }
       } else {
         notification.error({
           message: "Vui lòng chọn phương thức thanh toán",
+          placement: "top",
         });
       }
     } catch (error) {
       notification.error({
         message: "Đặt hàng thất bại",
+        placement: "top",
         description: showError(error),
       });
     }

@@ -31,7 +31,8 @@ const CardProduct = ({ product }) => {
       console.error("Error updating favorite:", error);
     }
   };
-  console.log("product", product);
+
+  // console.log("product", product);
 
   return product.enable ? (
     <Link

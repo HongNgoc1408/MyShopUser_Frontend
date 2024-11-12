@@ -222,7 +222,7 @@ const ProductDetail = () => {
       );
 
       if (!sizeInStock) {
-        notification.error({ message: "Vui lòng chọn kích thước hợp lệ." });
+        notification.error({ message: "Vui lòng chọn kích thước hợp lệ." , placement: "top"});
         return;
       }
 
@@ -235,11 +235,11 @@ const ProductDetail = () => {
       // console.log(cartItem);
       await CartService.add(cartItem);
 
-      notification.success({ message: "Thêm vào giỏ hàng thành công." });
+      notification.success({ message: "Thêm vào giỏ hàng thành công." , placement: "top"});
     } catch (error) {
       if (error.response?.status === 401) {
         notification.error({
-          message: error.response.data || "Bạn chưa đăng nhập tài khoản!",
+          message: error.response.data || "Bạn chưa đăng nhập tài khoản!", placement: "top"
         });
       } else {
         showError(error);

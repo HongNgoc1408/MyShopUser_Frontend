@@ -18,7 +18,10 @@ const Login = () => {
       const data = form.getFieldsValue();
       await authService.login(data);
       dispatch(AuthAction.LOGIN());
-      notification.success({ message: "Đăng nhập thành công" });
+      notification.success({
+        message: "Đăng nhập thành công",
+        placement: "top",
+      });
       navigate("/");
     } catch (error) {
       showError(error);

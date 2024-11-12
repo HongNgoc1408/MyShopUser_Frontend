@@ -138,6 +138,7 @@ const Order = () => {
         setOrderDetails(updatedOrder.data);
         notification.success({
           message: "Thành công",
+          placement: "top",
           description: "Đã gửi đánh giá của bạn.",
           className: "text-green-500",
         });
@@ -179,19 +180,46 @@ const Order = () => {
     setFileList(updatedList);
   };
 
+  // const handleReceivedOrder = async (id) => {
+  //   // console.log(id);
+  //   try {
+  //     await OrderService.received(id, { orderStatus: 4 });
+  //     setOrders((prevOrders) =>
+  //       prevOrders.map((order) =>
+  //         order.id === id
+  //           ? { ...order, detail: { ...order.detail, orderStatus: "Received" } }
+  //           : order
+  //       )
+  //     );
+
+  //     notification.success({
+  //       message: "Success",
+  //       description: "Đã cập nhật trạng thái đơn hàng thành 'Đã nhận hàng'.",
+  //     });
+  //   } catch (error) {
+  //     showError(error);
+  //   }
+  // };
+
   const handleReceivedOrder = async (id) => {
-    // console.log(id);
     try {
       await OrderService.received(id, { orderStatus: 4 });
+
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.id === id
-            ? { ...order, detail: { ...order.detail, orderStatus: "Received" } }
+            ? {
+                ...order,
+                orderStatus: "Received",
+                detail: { ...order.detail, orderStatus: "Received" },
+              }
             : order
         )
       );
+
       notification.success({
         message: "Success",
+        placement: "top",
         description: "Đã cập nhật trạng thái đơn hàng thành 'Đã nhận hàng'.",
       });
     } catch (error) {
@@ -213,6 +241,7 @@ const Order = () => {
       // setOrders(cancel);
       notification.success({
         message: "Success",
+        placement: "top",
         description: "Đã hủy đơn hàng thành công.",
       });
     } catch (error) {
@@ -557,9 +586,7 @@ const Order = () => {
                         <Button
                           type="primary"
                           className={`text-lg mt-5 ${
-                            [0, 4, 5].includes(order.orderStatus)
-                              ? "hidden"
-                              : ""
+                            [2, 3].includes(order.orderStatus) ? "" : "hidden"
                           }`}
                           onClick={() => handleReceivedOrder(order.id)}
                         >

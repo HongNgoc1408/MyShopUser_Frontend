@@ -28,6 +28,8 @@ const getCurrentUser = () => {
   return user ? JSON.parse(user) : user;
 };
 
+
+
 const setUserToken = (access_token) =>
   Cookies.set("access_token", access_token, { expires: 5 * 60 * 1000 });
 
