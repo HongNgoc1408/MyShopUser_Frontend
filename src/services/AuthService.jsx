@@ -36,6 +36,7 @@ const logout = () => {
   window.kommunicate.logout();
   Cookies.remove("user_data");
   Cookies.remove("access_token");
+  window.location.replace("/login");
   // Cookies.remove("_km_user_name-34144efbc2238a6239923d4db0ab623f7");
   // Cookies.remove("_km_id-34144efbc2238a6239923d4db0ab623f7");
 };

@@ -1,7 +1,7 @@
 import { Form, notification, Spin } from "antd";
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import authService from "../../services/authService";
 import AuthAction from "../../services/AuthAction";
 import { showError } from "../../services/commonService";
@@ -10,7 +10,7 @@ const Login = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const { dispatch } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleLogin = async () => {
     setLoading(true);
@@ -22,7 +22,8 @@ const Login = () => {
         message: "Đăng nhập thành công",
         placement: "top",
       });
-      navigate("/");
+
+      window.location.replace("/");
     } catch (error) {
       showError(error);
     } finally {
