@@ -1,4 +1,4 @@
-import React, { createContext,  useState } from "react";
+import React, { useState } from "react";
 import { App, ConfigProvider, Layout } from "antd";
 import Header from "../Header";
 import Footer from "../Footer";
@@ -6,7 +6,6 @@ import { Content } from "antd/es/layout/layout";
 import viVN from "antd/locale/vi_VN";
 import { useLocation } from "react-router-dom";
 
-export const FavoriteContext = createContext();
 
 const DefaultLayout = ({ children }) => {
   const location = useLocation();

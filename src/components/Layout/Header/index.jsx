@@ -1,51 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Menu,
   Dropdown,
   Avatar,
-  Badge,
   Button,
   Col,
   Modal,
   Drawer,
   Input,
+  Badge,
 } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CiMenuBurger, CiSearch, CiShoppingCart, CiUser } from "react-icons/ci";
 import AuthAction from "../../../services/AuthAction";
 import authService from "../../../services/authService";
-import { useAuth } from "../../../App";
-import CartService from "../../../services/CartService";
-import { showError } from "../../../services/commonService";
+import { CountContext, useAuth } from "../../../App";
 
 const Header = ({ onSearch }) => {
   const navigator = useNavigate();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { state, dispatch } = useAuth();
-  const [data, setData] = useState([]);
+  const { count } = useContext(CountContext);
+
   // const [username, setUsername] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+
   // useEffect(() => {
   //   const user = authService.getCurrentUser()
   //   user ? setUsername(user.name) : setUsername('')
   // }, [state.isAuthenticated])
-
-  useEffect(() => {
-    if (state.isAuthenticated) {
-      const fetchData = async () => {
-        try {
-          const res = await CartService.count();
-          // console.log("OrderService", res.data);
-          setData(res.data);
-        } catch (error) {
-          showError(error);
-        }
-      };
-      fetchData();
-    }
-  }, [state.isAuthenticated]);
 
   const showDrawer = () => {
     setOpen(true);
@@ -233,7 +218,7 @@ const Header = ({ onSearch }) => {
                 }`}
               >
                 <>
-                  <Badge count={data} offset={[0, 0]} color="red">
+                  <Badge count={count.length} offset={[0, 0]} color="red">
                     <CiShoppingCart size={30} fontWeight={800} />
                   </Badge>
                 </>

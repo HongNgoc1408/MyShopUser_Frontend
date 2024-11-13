@@ -7,13 +7,13 @@ import {
   formatVND,
   toImageSrc,
 } from "../../../services/commonService";
-import { FavoriteContext } from "../../Layout/DefaultLayout";
 import UserService from "../../../services/UserService";
 import { HeartFilled } from "@ant-design/icons";
+import { FavoriteContext } from "../../../App";
 
 const CardProduct = ({ product }) => {
   const [open, setOpen] = useState(false);
-  const { favoriteList, setFavoriteList } = useContext(FavoriteContext);
+  const { favoriteList, setFavoriteList } = useContext(FavoriteContext );
   const isFavorite = favoriteList.includes(product.id);
 
   const toggleFavorite = async () => {

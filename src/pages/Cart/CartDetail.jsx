@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -29,9 +29,9 @@ import TextArea from "antd/es/input/TextArea";
 import UserService from "../../services/UserService";
 import { CiLocationOn } from "react-icons/ci";
 import OrderService from "../../services/OrderService";
-import { useNavigate } from "react-router-dom";
-import PaymentsService from "../../services/PaymentsService";
+import { Link, useNavigate } from "react-router-dom";
 import debounce from "debounce";
+import { CountContext } from "../../App";
 
 const breadcrumb = [
   {
@@ -60,9 +60,9 @@ const CartDetail = () => {
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-
+  const [value, setValue] = useState(1);
   const navigate = useNavigate();
-
+  const { setCount } = useContext(CountContext);
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -72,7 +72,7 @@ const CartDetail = () => {
         const result = await AddressService.getProvince();
         // const payment = await PaymentsService.getAll();
 
-        // console.log("address", address);
+        console.log("res", res.data);
 
         setData(res.data);
         setDataAddress(address.data);
@@ -158,14 +158,12 @@ const CartDetail = () => {
     }
   };
 
-  const [value, setValue] = useState(1);
-
   const onChange = (e) => {
     // console.log("Radio checked", e.target.value);
     setValue(e.target.value);
   };
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = async (cartId) => {
     try {
       if (selectedRowKeys.length === 0) {
         notification.warning({
@@ -174,7 +172,8 @@ const CartDetail = () => {
         });
         return;
       }
-      await CartService.remove([productId]);
+      await CartService.remove(cartId);
+
       notification.success({ message: "Xóa thành công.", placement: "top" });
 
       setTimeout(() => {
@@ -203,15 +202,24 @@ const CartDetail = () => {
 
       const selectedProductIds = selectedItems.map((item) => item.productId);
 
-      await CartService.remove(selectedProductIds);
+      // console.log(selectedProductIds);
+
+      await CartService.removeAll(selectedProductIds);
       notification.success({
         message: "Xóa sản phẩm thành công",
         placement: "top",
       });
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 500);
+
+      const newData = data.filter(
+        (item) => !selectedRowKeys.includes(item.productId)
+      );
+      setCount(newData.map((item) => item.productId));
+      setData(newData);
+
       setSelectedRowKeys([]);
     } catch (error) {
       notification.error({
@@ -287,7 +295,7 @@ const CartDetail = () => {
       );
 
       // const selectedProductIds = selectedItems.map((item) => item.productId);
-      // console.log("Selected Product IDs:", selectedProductIds);
+      console.log("Selected Product IDs:", selectedItems);
 
       const approximate = selectedItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -392,9 +400,11 @@ const CartDetail = () => {
       title: "Tên sản phẩm",
       dataIndex: "productName",
       render: (_, record) => (
-        <span className="text-base capitalize ml-4 md:truncate md:w-96 truncate w-40">
-          {record.productName}
-        </span>
+        <Link to={`/product-details/${record.productId}`}>
+          <span className="text-base capitalize ml-4 md:truncate md:w-96 truncate w-40">
+            {record.productName}
+          </span>
+        </Link>
       ),
     },
 
@@ -482,7 +492,7 @@ const CartDetail = () => {
         <Button
           danger
           className="border-0 flex items-center"
-          onClick={() => handleDeleteProduct(record.productId)}
+          onClick={() => handleDeleteProduct(record.id)}
         >
           <DeleteOutlined />
         </Button>

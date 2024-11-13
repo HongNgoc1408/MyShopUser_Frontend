@@ -1,4 +1,3 @@
-import Kommunicate from "@kommunicate/kommunicate-chatbot-plugin";
 import axios from "axios";
 import Cookies from "js-cookie";
 

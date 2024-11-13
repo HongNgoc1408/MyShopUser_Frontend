@@ -5,8 +5,11 @@ const API_URL = process.env.REACT_APP_API_URL + "/api/cart";
 
 const count = async () =>
   await axios.get(API_URL + "/count", { headers: authHeader() });
+
+const countProductId = async () =>
+  await axios.get(API_URL + "/count-cart", { headers: authHeader() });
+
 const getAllByUserId = async () =>
-  
   await axios.get(API_URL, { headers: authHeader() });
 
 const add = async (data) =>
@@ -17,7 +20,7 @@ const update = async (id, data) =>
     headers: authHeader(),
   });
 
-const remove = async (productIds) => {
+const removeAll = async (productIds) => {
   const params = new URLSearchParams();
   productIds.forEach((id) => params.append("productId", id));
 
@@ -27,12 +30,20 @@ const remove = async (productIds) => {
   });
 };
 
+const remove = async (cartId) => {
+  return await axios.delete(API_URL + `/${cartId}`, {
+    headers: authHeader(),
+  });
+};
+
 const CartService = {
   count,
+  countProductId,
   getAllByUserId,
   add,
   update,
   remove,
+  removeAll,
 };
 
 export default CartService;

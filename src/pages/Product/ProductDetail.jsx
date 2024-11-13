@@ -11,7 +11,6 @@ import {
   Select,
 } from "antd";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { CiHeart } from "react-icons/ci";
 import { Tabs } from "antd";
 import ProductService from "../../services/ProductService";
 import {
@@ -24,9 +23,10 @@ import SizeService from "../../services/SizeService";
 import CartService from "../../services/CartService";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import Review from "../Review";
-import { HeartFilled, HeartOutlined, HeartTwoTone } from "@ant-design/icons";
-import { FavoriteContext } from "../../components/Layout/DefaultLayout";
+import { HeartOutlined } from "@ant-design/icons";
+
 import UserService from "../../services/UserService";
+import { CountContext, FavoriteContext } from "../../App";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -40,6 +40,7 @@ const ProductDetail = () => {
   const [selectedColorSize, setSelectedColorSize] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const { favoriteList, setFavoriteList } = useContext(FavoriteContext);
+  const { count, setCount } = useContext(CountContext);
   const isFavorite = favoriteList.includes(product.id);
 
   const productName =
@@ -155,7 +156,7 @@ const ProductDetail = () => {
   const onChange1 = (key) => {
     // console.log(key);
   };
-  
+
   const items1 = [
     {
       key: "1",
@@ -223,7 +224,10 @@ const ProductDetail = () => {
       );
 
       if (!sizeInStock) {
-        notification.error({ message: "Vui lòng chọn kích thước hợp lệ." , placement: "top"});
+        notification.error({
+          message: "Vui lòng chọn kích thước hợp lệ.",
+          placement: "top",
+        });
         return;
       }
 
@@ -236,11 +240,18 @@ const ProductDetail = () => {
       // console.log(cartItem);
       await CartService.add(cartItem);
 
-      notification.success({ message: "Thêm vào giỏ hàng thành công." , placement: "top"});
+      const isProductInCart = count.some((productId) => productId === id);
+      if (!isProductInCart) setCount((prev) => [...prev, id]);
+
+      notification.success({
+        message: "Thêm vào giỏ hàng thành công.",
+        placement: "top",
+      });
     } catch (error) {
       if (error.response?.status === 401) {
         notification.error({
-          message: error.response.data || "Bạn chưa đăng nhập tài khoản!", placement: "top"
+          message: error.response.data || "Bạn chưa đăng nhập tài khoản!",
+          placement: "top",
         });
       } else {
         showError(error);
