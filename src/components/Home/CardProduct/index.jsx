@@ -13,7 +13,7 @@ import { FavoriteContext } from "../../../App";
 
 const CardProduct = ({ product }) => {
   const [open, setOpen] = useState(false);
-  const { favoriteList, setFavoriteList } = useContext(FavoriteContext );
+  const { favoriteList, setFavoriteList } = useContext(FavoriteContext);
   const isFavorite = favoriteList.includes(product.id);
 
   const toggleFavorite = async () => {

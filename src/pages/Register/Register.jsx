@@ -75,7 +75,7 @@ const Register = () => {
         ...items,
       };
       const res = await authService.register(data);
-      
+
       // console.log(res);
 
       notification.success({
@@ -272,13 +272,14 @@ const Register = () => {
               >
                 <div className="relative">
                   <span
-                    className="z-10 absolute top-4 right-8"
+                    className="z-10 absolute top-6 right-5"
                     onClick={() => setIsShowPassword(!isShowPassword)}
                   >
                     {isShowPassword ? <FaEye /> : <FaEyeSlash />}
                   </span>
 
                   <input
+                    autocomplete="new-password"
                     type={isShowPassword ? "text" : "password"}
                     placeholder="Password"
                     className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"
@@ -306,13 +307,14 @@ const Register = () => {
               >
                 <div className="relative">
                   <span
-                    className="z-10 absolute top-4 right-8"
+                    className="z-10 absolute top-6 right-5"
                     onClick={() => setIsShowPassword(!isShowPassword)}
                   >
                     {isShowPassword ? <FaEye /> : <FaEyeSlash />}
                   </span>
 
                   <input
+                    autocomplete="new-password"
                     type={isShowPassword ? "text" : "password"}
                     placeholder="Xác nhận mật khẩu"
                     className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"

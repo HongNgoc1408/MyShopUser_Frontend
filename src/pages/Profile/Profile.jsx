@@ -1,25 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import UserService from "../../services/UserService";
-import { Avatar, Card } from "antd";
-import { showError } from "../../services/commonService";
+import { Avatar, Card, Modal, notification, Upload } from "antd";
+import { showError, toImageLink } from "../../services/commonService";
 import { Button, Form, Input } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { AvatarContext } from "../../App";
 
 const Profile = () => {
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [address, setAddress] = useState([]);
+  const { setAvatar } = useContext(AvatarContext);
+  const [avt, setAvt] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await UserService.getProfile();
         const address = await UserService.getAddress();
+        const avatar = await UserService.getAvatar();
 
         // console.log("1", data.data);
         // console.log("2", address.data);
+        // console.log("3", avatar.data.imageURL);
 
         setData(data.data);
         setAddress(address.data);
+        setAvt(avatar.data.imageURL);
       } catch (error) {
         showError(error);
       }
@@ -27,36 +36,59 @@ const Profile = () => {
     fetchData();
   }, []);
 
+  const handleFileChange = ({ fileList: newFileList }) =>
+    setFileList(newFileList);
+
+  const handleUpdateClick = () => {
+    setIsModalOpen(true);
+    setFileList([]);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+    setFileList([]);
+  };
+
+  const handleAvatarUpdate = async () => {
+    if (fileList.length === 0) {
+      notification.error({
+        message: "Vui lòng chọn ảnh.",
+        placement: "top",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("avatar", fileList[0].originFileObj);
+
+    try {
+      const res = await UserService.updateAvatar(formData);
+
+      notification.success({
+        message: "Cập nhật ảnh đại diện thành công.",
+        placement: "top",
+      });
+
+      setAvt(res.data.imageURL);
+      setAvatar(res.data.imageURL);
+      setIsModalOpen(false);
+    } catch (error) {
+      showError(error);
+    }
+  };
+
   return (
     <>
       <div className="container mx-auto max-lg:px-8 px-20 my-10 w-full">
         <div className="flex space-x-5">
-          {/* <ConfigProvider
-            theme={{
-              components: {
-                Card: {
-                  headerHeight: "50px",
-                  headerFontSize: "20px",
-                },
-              },
-              token: {
-                fontSize: "16px",
-                padding: 5,
-              },
-            }}
-          > */}
           <Card style={{ width: "30%" }} title="Thông tin cá nhân">
             <Form layout="vertical" form={form}>
               <div className="flex items-center justify-center">
-                <Avatar
-                  src="https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/b94eafde-25f5-41ff-a6c4-63786bf80377/5602cc0f-4caf-460b-8b30-84eb53ad6527.png"
-                  size={175}
-                  fontWeight={800}
-                />
+                <Avatar src={toImageLink(avt)} size={175} fontWeight={800} />
               </div>
 
               <Form.Item label="Email">
-                <Input value={data.email} disabled />
+                <Input value={data.email} readOnly />
               </Form.Item>
               <Form.Item label="Họ và tên">
                 <Input defaultValue={data.fullname} value={data.fullname} />
@@ -68,7 +100,47 @@ const Profile = () => {
                 />
               </Form.Item>
               <Form.Item>
-                <Button type="primary">Cập nhật</Button>
+                <Button type="primary" onClick={handleUpdateClick}>
+                  Cập nhật
+                </Button>
+
+                <Modal
+                  width={200}
+                  centered
+                  title="Cập nhật ảnh"
+                  open={isModalOpen}
+                  onCancel={handleModalCancel}
+                  onOk={handleAvatarUpdate}
+                >
+                  <Form.Item
+                    className="mx-auto"
+                    name="imageUrl"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Vui lòng chọn ảnh.",
+                      },
+                    ]}
+                  >
+                    <Upload
+                      name="file"
+                      beforeUpload={() => false}
+                      listType="picture-circle"
+                      fileList={fileList}
+                      accept="image/png, image/gif, image/jpeg, image/svg"
+                      maxCount={1}
+                      onChange={handleFileChange}
+                      showUploadList={{ showPreviewIcon: false }}
+                    >
+                      {fileList.length >= 1 ? null : (
+                        <button type="button">
+                          <UploadOutlined />
+                          <div>Chọn ảnh</div>
+                        </button>
+                      )}
+                    </Upload>
+                  </Form.Item>
+                </Modal>
               </Form.Item>
             </Form>
           </Card>
@@ -118,7 +190,6 @@ const Profile = () => {
               </Form.Item>
             </Form>
           </Card>
-          {/* </ConfigProvider> */}
         </div>
       </div>
     </>

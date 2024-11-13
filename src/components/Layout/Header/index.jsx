@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Menu,
   Dropdown,
@@ -14,7 +14,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CiMenuBurger, CiSearch, CiShoppingCart, CiUser } from "react-icons/ci";
 import AuthAction from "../../../services/AuthAction";
 import authService from "../../../services/authService";
-import { CountContext, useAuth } from "../../../App";
+import { AvatarContext, CountContext, useAuth } from "../../../App";
+import { toImageLink } from "../../../services/commonService";
 
 const Header = ({ onSearch }) => {
   const navigator = useNavigate();
@@ -22,9 +23,9 @@ const Header = ({ onSearch }) => {
   const location = useLocation();
   const { state, dispatch } = useAuth();
   const { count } = useContext(CountContext);
-
-  // const [username, setUsername] = useState('')
+  const { avatar } = useContext(AvatarContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [username, setUsername] = useState('')
   const [searchValue, setSearchValue] = useState("");
 
   // useEffect(() => {
@@ -189,7 +190,7 @@ const Header = ({ onSearch }) => {
                       className="flex text-base p-2 cursor-pointer"
                     >
                       <Avatar
-                        src="https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/b94eafde-25f5-41ff-a6c4-63786bf80377/5602cc0f-4caf-460b-8b30-84eb53ad6527.png"
+                        src={toImageLink(avatar)}
                         size={30}
                         fontWeight={800}
                       />
