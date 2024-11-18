@@ -82,6 +82,8 @@ const Header = ({ onSearch }) => {
       </Menu.Item>
     </Menu>
   );
+
+  
   const auth = (
     <Menu>
       <Menu.Item key="1">
@@ -92,6 +94,7 @@ const Header = ({ onSearch }) => {
       </Menu.Item>
     </Menu>
   );
+
   return (
     <>
       <Modal
@@ -186,14 +189,18 @@ const Header = ({ onSearch }) => {
                 <>
                   <Dropdown overlay={menu} placement="bottomRight">
                     <Link
-                      href="/"
+                      to={"/"}
                       className="flex text-base p-2 cursor-pointer"
                     >
-                      <Avatar
-                        src={toImageLink(avatar)}
-                        size={30}
-                        fontWeight={800}
-                      />
+                      {avatar ? (
+                        <Avatar
+                          src={toImageLink(avatar)}
+                          size={30}
+                          fontWeight={800}
+                        />
+                      ) : (
+                        <Avatar src="avatar.png" size={30} fontWeight={800} />
+                      )}
                     </Link>
                   </Dropdown>
                 </>

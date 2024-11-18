@@ -613,12 +613,12 @@ const CartDetail = () => {
                     value={value}
                     className="flex flex-col space-y-3"
                   >
-                    <Radio value="1">
+                    <Radio value="1" required>
                       <div className="flex space-x-4 items-center">
                         <span>COD</span>
                       </div>
                     </Radio>
-                    <Radio value="2">
+                    <Radio value="2" required>
                       <div className="flex space-x-4 items-center">
                         <span>VNPay</span>
                       </div>

@@ -91,7 +91,7 @@ const Profile = () => {
                 <Input value={data.email} readOnly />
               </Form.Item>
               <Form.Item label="Họ và tên">
-                <Input defaultValue={data.fullname} value={data.fullname} />
+                <Input defaultValue={data.fullName} value={data.fullName} />
               </Form.Item>
               <Form.Item label="Số điện thoại">
                 <Input

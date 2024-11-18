@@ -13,6 +13,7 @@ import Order from "../pages/Order/Order";
 import OrderDetail from "../pages/Order/OrderDetail";
 import Payment from "../pages/Payment";
 import Favorites from "../pages/Favorite/Favorites";
+import BuyingGuide from "../pages/BuyingGuide";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -23,6 +24,7 @@ export const publicRoutes = [
   { path: "/reset-password", component: ResetPassword },
   { path: "/shop", component: Shop },
   { path: "/product-details/:id", component: ProductDetail },
+  { path: "/buyingGuide/:id", component: BuyingGuide },
 ];
 
 export const privateRoutes = [

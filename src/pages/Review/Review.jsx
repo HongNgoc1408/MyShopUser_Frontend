@@ -123,53 +123,59 @@ const Review = ({ id, rating }) => {
       </div>
 
       {filteredItems && filteredItems.length > 0 ? (
-        filteredItems.map((review, index) => (
-          <React.Fragment key={index}>
-            <div className="flex bg-gray-100">
-              <div className="justify-center items-center">
-                <Avatar
-                  src={<img src="/User_review.jpg" alt="avatar" />}
-                  size={64}
-                  icon={<UserOutlined />}
-                />
+        filteredItems.map((review, index) => {
+          if (!review.enable) return null;
+          return (
+            <React.Fragment key={index}>
+              <div className="flex bg-gray-100">
+                <div className="justify-center items-center">
+                  <Avatar
+                    src={<img src="/User_review.jpg" alt="avatar" />}
+                    size={64}
+                    icon={<UserOutlined />}
+                  />
+                </div>
+                <div className="pl-4">
+                  <div className="text-base font-semibold">
+                    {review.username}
+                  </div>
+                  <div className="flex items-center">
+                    <Rate disabled value={review.star} className="text-base" />
+                    <span className="mx-1">{review.star} Sao</span>
+                  </div>
+                  <div className="flex my-1 text-gray-600 text-base">
+                    {formatDateTime(review.createdAt)} | Phân loại hàng:{" "}
+                    {review.colorName} | {review.sizeName}
+                  </div>
+                  <div className="my-1 text-lg">
+                    {review.description || "Không có nội dung đánh giá."}
+                  </div>
+                  <div className="flex space-x-2 my-1">
+                    {review.imagesUrls && review.imagesUrls.length > 0 ? (
+                      review.imagesUrls.map((image, imgIndex) => (
+                        <img
+                          key={imgIndex}
+                          src={toImageLink(image)}
+                          alt={`review-img-${imgIndex}`}
+                          className="w-16 h-20 object-cover"
+                        />
+                      ))
+                    ) : (
+                      <span className="text-gray-400">Không có hình ảnh</span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="pl-4">
-                <div className="text-base font-semibold">{review.username}</div>
-                <div className="flex items-center">
-                  <Rate disabled value={review.star} className="text-base" />
-                  <span className="mx-1">{review.star} Sao</span>
-                </div>
-                <div className="flex my-1 text-gray-600 text-base">
-                  {formatDateTime(review.createdAt)} | Phân loại hàng:{" "}
-                  {review.colorName} | {review.sizeName}
-                </div>
-                <div className="my-1 text-lg">
-                  {review.description || "Không có nội dung đánh giá."}
-                </div>
-                <div className="flex space-x-2 my-1">
-                  {review.imagesUrls && review.imagesUrls.length > 0 ? (
-                    review.imagesUrls.map((image, imgIndex) => (
-                      <img
-                        key={imgIndex}
-                        src={toImageLink(image)}
-                        alt={`review-img-${imgIndex}`}
-                        className="w-16 h-20 object-cover"
-                      />
-                    ))
-                  ) : (
-                    <span className="text-gray-400">Không có hình ảnh</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <Divider />
-          </React.Fragment>
-        ))
+              <Divider />
+            </React.Fragment>
+          );
+        })
       ) : (
         <div className="text-center text-gray-500 my-5 bg-white">
           <Result icon={<SmileOutlined />} title="Không có đánh giá nào!" />
         </div>
       )}
+
       <Pagination
         align="center"
         defaultCurrent={data.page}

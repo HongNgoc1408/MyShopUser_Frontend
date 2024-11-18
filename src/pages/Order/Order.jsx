@@ -59,6 +59,8 @@ const Order = () => {
       try {
         const res = await OrderService.getAll();
 
+        // console.log(res);
+
         setOrders(res.data.items);
       } catch (error) {
         console.error("Error:", error);
@@ -77,7 +79,9 @@ const Order = () => {
     setIsModalOpen(true);
     try {
       const res = await OrderService.getDetail(orderId);
-      console.log(res.data);
+
+      // console.log(res.data);
+
       setDataReview(res.data.productOrderDetails);
       form.resetFields();
       form.setFieldsValue({

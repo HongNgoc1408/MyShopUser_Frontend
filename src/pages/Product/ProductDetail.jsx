@@ -27,6 +27,7 @@ import { HeartOutlined } from "@ant-design/icons";
 
 import UserService from "../../services/UserService";
 import { CountContext, FavoriteContext } from "../../App";
+import BuyingGuide from "../BuyingGuide";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -162,32 +163,82 @@ const ProductDetail = () => {
       key: "1",
       label: (
         <>
-          <span className="uppercase">Mô tả sản phẩm</span>
+          <span className="uppercase text-lg">Mô tả sản phẩm</span>
         </>
       ),
       children: (
-        <span className="text-base">
-          {product.description ? (
-            product.description.split("-").map((item, index) => (
-              <span key={index}>
-                {item.trim()}
-                {index < product.description.split("-").length - 1 && <br />}
-                {index < product.description.split("-").length - 1 && (
-                  <span>- </span>
+        <>
+          <div className="text-lg">
+            <div className="mb-5">
+              <div className="font-bold mb-5">* THÔNG TIN SẢN PHẨM</div>
+              <div>
+                {product.description ? (
+                  product.description
+                    .split(".")
+                    .map((item) => item.trim())
+                    .filter((item) => item)
+                    .map((item, index) => (
+                      <div key={index} className="flex items-start mb-2">
+                        <span className="mr-2">-</span>
+                        <span>{item}</span>
+                      </div>
+                    ))
+                ) : (
+                  <span>Chưa có thông tin sản phẩm</span>
                 )}
-              </span>
-            ))
-          ) : (
-            <span>Chưa có mô tả sản phẩm</span>
-          )}
-        </span>
+              </div>
+            </div>
+            <div className="mb-5">
+              <div className="font-bold mb-5">
+                * HƯỚNG DẪN CHỌN SIZE CHO BẠN
+              </div>
+              <div>
+                {product.guideSize ? (
+                  product.guideSize
+                    .split(".")
+                    .map((item) => item.trim())
+                    .filter((item) => item)
+                    .map((item, index) => (
+                      <div key={index} className="flex items-start mb-2">
+                        <span className="mr-2">-</span>
+                        <span>{item}</span>
+                      </div>
+                    ))
+                ) : (
+                  <span>Chưa có hướng dẫn chọn size sản phẩm</span>
+                )}
+              </div>
+            </div>
+            <div className="mb-5">
+              <div className="font-bold mb-5">
+                * HƯỚNG DẪN BẢO QUẢN VÀ SỬ DỤNG
+              </div>
+              <div>
+                {product.care ? (
+                  product.care
+                    .split(".")
+                    .map((item) => item.trim())
+                    .filter((item) => item)
+                    .map((item, index) => (
+                      <div key={index} className="flex items-start mb-2">
+                        <span className="mr-2">-</span>
+                        <span>{item}</span>
+                      </div>
+                    ))
+                ) : (
+                  <span>Chưa có hướng dẫn bảo quản sản phẩm</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
       ),
     },
     {
       key: "2",
       label: (
         <>
-          <span className="uppercase">Đánh giá sản phẩm</span>
+          <span className="uppercase text-lg">Đánh giá sản phẩm</span>
         </>
       ),
       children: (
@@ -200,19 +251,14 @@ const ProductDetail = () => {
       key: "3",
       label: (
         <>
-          <span className="uppercase">Hướng dẫn mua hàng</span>
+          <span className="uppercase text-lg">Hướng dẫn mua hàng</span>
         </>
       ),
-      children: "Hướng dẫn mua hàng",
-    },
-    {
-      key: "4",
-      label: (
+      children: (
         <>
-          <span className="uppercase">Hướng dẫn chọn size</span>
+          <BuyingGuide />
         </>
       ),
-      children: "Hướng dẫn chọn size",
     },
   ];
 
