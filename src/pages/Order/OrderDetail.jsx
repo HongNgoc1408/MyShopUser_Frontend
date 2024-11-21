@@ -242,8 +242,9 @@ const OrderDetail = () => {
                       <div>
                         <Image
                           src={toImageSrc(product.imageUrl)}
-                          width={100}
-                          height={150}
+                          style={{ width: "100px", height: " 150px" }}
+                          // width={100}
+                          // height={150}
                         />
                       </div>
                       <div className="flex-col my-auto justify-start items-center ml-10">

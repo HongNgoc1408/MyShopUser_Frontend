@@ -63,27 +63,29 @@ const Header = ({ onSearch }) => {
   const toggleMenu = () => {
     setCollapsed(!collapsed);
   };
-
-  const menu = (
-    <Menu>
-      <Menu.Item key="1">
-        <Link to={"/profile"}>Thông tin</Link>
-      </Menu.Item>
-      <Menu.Item key="2">
-        <Link to={"/favorite"}>Yêu thích</Link>
-      </Menu.Item>
-      <Menu.Item key="3">
-        <Link to={"/order"}>Đơn đặt hàng</Link>
-      </Menu.Item>
-      <Menu.Item key="4">
+  const items = [
+    {
+      key: "1",
+      label: <Link to={"/profile"}>Thông tin</Link>,
+    },
+    {
+      key: "2",
+      label: <Link to={"/favorite"}>Yêu thích</Link>,
+    },
+    {
+      key: "3",
+      label: <Link to={"/order"}>Đơn đặt hàng</Link>,
+    },
+    {
+      key: "4",
+      label: (
         <div onClick={showModal} className="cursor-pointer">
           Đăng xuất
         </div>
-      </Menu.Item>
-    </Menu>
-  );
+      ),
+    },
+  ];
 
-  
   const auth = (
     <Menu>
       <Menu.Item key="1">
@@ -187,7 +189,7 @@ const Header = ({ onSearch }) => {
 
               {state.isAuthenticated ? (
                 <>
-                  <Dropdown overlay={menu} placement="bottomRight">
+                  <Dropdown menu={{ items }} placement="bottomRight">
                     <Link
                       to={"/"}
                       className="flex text-base p-2 cursor-pointer"

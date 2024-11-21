@@ -11,10 +11,10 @@ const getDetail = async (id) =>
 const add = async (data) =>
   await axios.post(API_URL + "/create", data, { headers: authHeader() });
 
-const update = async (id, data) =>
-  await axios.put(API_URL + `/update/${id}`, data, {
-    headers: authHeader(),
-  });
+// const update = async (id, data) =>
+//   await axios.put(API_URL + `/update/${id}`, data, {
+//     headers: authHeader(),
+//   });
 
 const received = async (id, data) =>
   await axios.put(API_URL + `/received/${id}`, data, { headers: authHeader() });
@@ -39,7 +39,7 @@ const OrderService = {
   getAll,
   getDetail,
   add,
-  update,
+  // update,
   received,
   cancel,
   review,

@@ -9,7 +9,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 const Brand = () => {
   const carouselRef = useRef(null);
   const [brands, setBrands] = useState([]);
-  const [slidesToShow, setSlidesToShow] = useState(null);
+  const [slidesToShow, setSlidesToShow] = useState(2);
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -26,16 +26,30 @@ const Brand = () => {
 
   const updateSlidesToShow = () => {
     const width = window.innerWidth;
+    let slides = 2; // Default value
+
     if (width >= 1536) {
-      setSlidesToShow(6);
+      slides = 6;
     } else if (width >= 1024) {
-      setSlidesToShow(4);
+      slides = 4;
     } else if (width >= 768) {
-      setSlidesToShow(3);
-    } else {
-      setSlidesToShow(2);
+      slides = 3;
     }
+
+    setSlidesToShow(slides);
   };
+  // const updateSlidesToShow = () => {
+  //   const width = window.innerWidth;
+  //   if (width >= 1536) {
+  //     setSlidesToShow(6);
+  //   } else if (width >= 1024) {
+  //     setSlidesToShow(4);
+  //   } else if (width >= 768) {
+  //     setSlidesToShow(3);
+  //   } else {
+  //     setSlidesToShow(2);
+  //   }
+  // };
 
   useEffect(() => {
     updateSlidesToShow();
@@ -70,15 +84,19 @@ const Brand = () => {
 
         <Carousel
           ref={carouselRef}
-          slidesToShow={slidesToShow}
+          slidesToShow={slidesToShow || 2}
           infinite={false}
         >
           {brands.map((brand) => (
             <Link key={brand.id}>
               <Image
                 preview={false}
-                width={180}
-                height={180}
+                style={{
+                  width: "180px",
+                  height: "180px",
+                }}
+                // width={180}
+                // height={180}
                 src={toImageSrc(brand.imageUrl)}
                 alt={brand.name}
               />

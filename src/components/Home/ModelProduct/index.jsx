@@ -251,8 +251,12 @@ const ModelProduct = ({ open, setOpen, id }) => {
                     >
                       <Image
                         preview={false}
-                        height={30}
-                        width={30}
+                        style={{
+                          height: "30px",
+                          width: "30px",
+                        }}
+                        // height={30}
+                        // width={30}
                         src={toImageSrc(colorSize.imageUrl)}
                         alt={`color-${index}`}
                         className={`rounded-full ${

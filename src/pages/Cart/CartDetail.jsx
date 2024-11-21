@@ -8,6 +8,7 @@ import {
   Image,
   Input,
   InputNumber,
+  message,
   Modal,
   notification,
   Radio,
@@ -72,7 +73,7 @@ const CartDetail = () => {
         const result = await AddressService.getProvince();
         // const payment = await PaymentsService.getAll();
 
-        console.log("res", res.data);
+        // console.log("res", res.data);
 
         setData(res.data);
         setDataAddress(address.data);
@@ -295,7 +296,7 @@ const CartDetail = () => {
       );
 
       // const selectedProductIds = selectedItems.map((item) => item.productId);
-      console.log("Selected Product IDs:", selectedItems);
+      // console.log("Selected Product IDs:", selectedItems);
 
       const approximate = selectedItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -360,17 +361,11 @@ const CartDetail = () => {
         if (order.paymentMethodId !== 1) {
           window.location.replace(res.data);
         } else {
-          notification.success({
-            message: "Đặt hàng thành công.",
-            placement: "top",
-          });
+          message.success("Đặt hàng thành công.");
           navigate("/order");
         }
       } else {
-        notification.error({
-          message: "Vui lòng chọn phương thức thanh toán",
-          placement: "top",
-        });
+        message.error("Vui lòng chọn phương thức thanh toán");
       }
     } catch (error) {
       notification.error({

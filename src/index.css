@@ -7,7 +7,7 @@
 ::before,
 ::after {
   box-sizing: border-box; 
-  border-width: 0; 
+  border-width: 0;
   border-style: solid; 
   border-color: theme('borderColor.DEFAULT', currentColor); 
   font-family: serif;

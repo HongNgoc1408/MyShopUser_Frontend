@@ -94,10 +94,10 @@ const Footer = () => {
                 />
                 <button
                   type="submit"
-                  value={"Submit"}
+                  // value={"Submit"}
                   className="bg-black text-white bg-dark-button rounded-none mb-10"
                 >
-                  <button className="relative z-10">Submit</button>
+                  <span className="relative z-10">Submit</span>
                 </button>
               </form>
             </div>

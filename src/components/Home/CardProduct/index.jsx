@@ -56,6 +56,7 @@ const CardProduct = ({ product }) => {
                     preview={false}
                     src={product.imageUrl ? toImageSrc(product.imageUrl) : ""}
                     alt={product.name || "Product Image"}
+                    className=""
                     style={{
                       width: "100%",
                       height: "100%",
@@ -68,10 +69,10 @@ const CardProduct = ({ product }) => {
                 <div className="absolute bottom-3 inset-0 flex items-end justify-center">
                   <button
                     className="w-10/12 light-button opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
-                    onClick={(e) => {
-                      // e.preventDefault();
-                      // setOpen(true);
-                    }}
+                    // onClick={(e) => {
+                    //   e.preventDefault();
+                    //   setOpen(true);
+                    // }}
                   >
                     Xem chi tiết sản phẩm
                   </button>
@@ -96,8 +97,12 @@ const CardProduct = ({ product }) => {
                     ? product.colorSizes.map((item, index) => (
                         <div className="m-1 justify-center" key={index}>
                           <Image
-                            height={30}
-                            width={30}
+                            style={{
+                              width: "30px",
+                              height: "30px",
+                            }}
+                            // height={30}
+                            // width={30}
                             preview={false}
                             src={toImageSrc(item.imageUrl)}
                             alt={`color-${index}`}

@@ -207,7 +207,7 @@ const Order = () => {
 
   const handleReceivedOrder = async (id) => {
     try {
-      await OrderService.received(id, { orderStatus: 4 });
+      await OrderService.received(id, { orderStatus: 3 });
 
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
@@ -281,10 +281,10 @@ const Order = () => {
     { key: "6", label: "Tất cả" },
     { key: "0", label: "Đang xử lý" },
     { key: "1", label: "Đã duyệt" },
-    { key: "2", label: "Đang chờ lấy hàng" },
-    { key: "3", label: "Đang vận chuyển" },
-    { key: "4", label: "Đã nhận" },
-    { key: "5", label: "Đã hủy" },
+    // { key: "2", label: "Đang chờ lấy hàng" },
+    { key: "2", label: "Đang vận chuyển" },
+    { key: "3", label: "Đã nhận" },
+    { key: "4", label: "Đã hủy" },
   ];
 
   const filteredOrders =
@@ -528,8 +528,9 @@ const Order = () => {
                             <div className="justify-start items-center mr-5">
                               <Image
                                 src={toImageSrc(order.product.imageUrl)}
-                                width={100}
-                                height={150}
+                                style={{ width: "100px", height: " 150px" }}
+                                // width={100}
+                                // height={150}
                               />
                             </div>
 
@@ -579,7 +580,7 @@ const Order = () => {
                         <Button
                           type="primary"
                           className={`text-lg mt-5 ${
-                            [2, 3].includes(order.orderStatus) ? "" : "hidden"
+                            [2].includes(order.orderStatus) ? "" : "hidden"
                           }`}
                           onClick={() => handleReceivedOrder(order.id)}
                         >
@@ -589,7 +590,7 @@ const Order = () => {
                           <Button
                             type="primary"
                             className={`text-lg mt-5 ${
-                              order.orderStatus === 4 &&
+                              order.orderStatus === 3 &&
                               order.reviewed === false
                                 ? ""
                                 : "hidden"

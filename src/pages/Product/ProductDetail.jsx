@@ -441,8 +441,9 @@ const ProductDetail = () => {
                     >
                       <Image
                         preview={false}
-                        height={30}
-                        width={30}
+                        style={{ width: "30px", height: "30px" }}
+                        // height={30}
+                        // width={30}
                         src={toImageSrc(colorSize.imageUrl)}
                         alt={`color-${index}`}
                         className={`rounded-full ${
@@ -456,7 +457,14 @@ const ProductDetail = () => {
                 </div>
 
                 <div>
-                  <Form layout="horizontal" className="grid grid-cols-2 gap-2">
+                  <Form
+                    layout="horizontal"
+                    className="grid grid-cols-2 gap-2"
+                    initialValues={{
+                      [`size-${selectedColorSize.colorName}`]: selectedSize,
+                      [`inStock-${selectedColorSize.colorName}`]: quantity,
+                    }}
+                  >
                     <Form.Item
                       className="m-2"
                       name={`size-${selectedColorSize.colorName}`}
@@ -471,7 +479,7 @@ const ProductDetail = () => {
                         required
                         placeholder="Chọn kích thước"
                         className="w-full"
-                        defaultValue={selectedSize}
+                        // defaultValue={selectedSize}
                         onChange={handleSizeChange}
                       >
                         {selectedColorSize.sizeInStocks.map(
@@ -501,7 +509,7 @@ const ProductDetail = () => {
                         value={quantity}
                         onChange={(value) => setQuantity(value)}
                         min={1}
-                        defaultValue={1}
+                        // defaultValue={1}
                         className="w-full"
                       />
                     </Form.Item>
@@ -513,11 +521,11 @@ const ProductDetail = () => {
             <div className="w-full text-left my-4">
               <button
                 onClick={addToCart}
-                loading={isAddCart}
+                // loading={isAddCart}
                 disabled={isAddCart}
                 className="dark-button text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6"
               >
-                <span className="relative z-10">Thêm vào giỏ hàng</span>
+                {isAddCart ? "Đang thêm vào giỏ..." : "Thêm vào giỏ hàng"}
               </button>
             </div>
             <div className="w-full text-left my-4">
