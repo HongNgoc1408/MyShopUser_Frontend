@@ -12,6 +12,9 @@ const updateAddress = async (data) =>
 const getProfile = async () =>
   await axios.get(API_URL + "/profile", { headers: authHeader() });
 
+const updateProfile = async (data) => {
+  await axios.put(API_URL + "/profile", data, { headers: authHeader() });
+};
 
 const getAvatar = async () =>
   await axios.get(API_URL + "/avatar", { headers: authHeader() });
@@ -48,10 +51,11 @@ const deleteFavoriteProduct = async (productId) =>
 
 const UserService = {
   getAddress,
+  updateAddress,
   getProfile,
+  updateProfile,
   getAvatar,
   updateAvatar,
-  updateAddress,
   getFavorite,
   getFavoriteProduct,
   addFavorite,

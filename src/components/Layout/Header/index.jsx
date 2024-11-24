@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Menu,
   Dropdown,
@@ -16,6 +16,7 @@ import AuthAction from "../../../services/AuthAction";
 import authService from "../../../services/authService";
 import { AvatarContext, CountContext, useAuth } from "../../../App";
 import { toImageLink } from "../../../services/commonService";
+import UserService from "../../../services/UserService";
 
 const Header = ({ onSearch }) => {
   const navigator = useNavigate();
@@ -25,13 +26,7 @@ const Header = ({ onSearch }) => {
   const { count } = useContext(CountContext);
   const { avatar } = useContext(AvatarContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [username, setUsername] = useState('')
   const [searchValue, setSearchValue] = useState("");
-
-  // useEffect(() => {
-  //   const user = authService.getCurrentUser()
-  //   user ? setUsername(user.name) : setUsername('')
-  // }, [state.isAuthenticated])
 
   const showDrawer = () => {
     setOpen(true);
@@ -131,7 +126,7 @@ const Header = ({ onSearch }) => {
               collapsed ? "hidden" : "flex"
             } flex-grow basis-full items-cente r lg:flex lg:basis-auto`}
           >
-            <Col className="flex flex-col lg:flex-row text-base p-2 list-style-none me-auto ps-0">
+            <Col className="flex flex-col lg:flex-row text-base p-2 list-style-none me-auto ps-0 mx-auto">
               <Link
                 to={"/"}
                 className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
@@ -149,33 +144,41 @@ const Header = ({ onSearch }) => {
               >
                 Sản phẩm
               </Link>
-
+              {/* 
               <Link
-                to={"/blog"}
+                to={"/"}
                 className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
                   location.pathname === "/blog" ? "text-orange-500" : ""
                 }`}
               >
                 Bài viết
-              </Link>
+              </Link> */}
 
               <Link
-                to={"/about"}
+                to={"/guide"}
                 className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
                   location.pathname === "/about" ? "text-orange-500" : ""
                 }`}
               >
-                Về chúng tôi
+                Hướng dẫn
               </Link>
 
-              <Link
-                to={"/contact"}
+              {/* <Link
+                to={"/"}
                 className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
                   location.pathname === "/contact" ? "text-orange-500" : ""
                 }`}
               >
                 Liên lạc
               </Link>
+              <Link
+                to={"/"}
+                className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
+                  location.pathname === "/contact" ? "text-orange-500" : ""
+                }`}
+              >
+                Tuyển dụng
+              </Link> */}
             </Col>
           </div>
           <Col span={4} offset={2}>
@@ -194,14 +197,14 @@ const Header = ({ onSearch }) => {
                       to={"/"}
                       className="flex text-base p-2 cursor-pointer"
                     >
-                      {avatar ? (
+                      {!avatar ? (
+                        <Avatar src="avatar.png" size={30} fontWeight={800} />
+                      ) : (
                         <Avatar
                           src={toImageLink(avatar)}
                           size={30}
                           fontWeight={800}
                         />
-                      ) : (
-                        <Avatar src="avatar.png" size={30} fontWeight={800} />
                       )}
                     </Link>
                   </Dropdown>

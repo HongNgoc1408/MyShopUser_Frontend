@@ -37,9 +37,10 @@ function App() {
 
           setFavoriteList(res.data);
           setCount(product.data);
-          setAvatar(avatar.data.imageURL);
+          setAvatar(avatar.data?.imageURL);
         } catch (error) {
           console.error("Error", error);
+          setAvatar(null);
         }
       };
 

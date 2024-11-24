@@ -46,12 +46,11 @@ const AllProduct = ({ keySearch }) => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      
       try {
         const res = await ProductService.getFilterProducts({
           page,
           pageSize,
-          keySearch,
+          Key: keySearch,
           brandIds: selectedBrandIds,
           categoryIds: selectedCategoryIds,
           sorter: selectedSorter,
@@ -60,11 +59,19 @@ const AllProduct = ({ keySearch }) => {
           maxPrice,
         });
         // console.log("res", res.data.items);
+
         setProducts(res.data.items);
         setTotalItems(res.data.totalItems);
+        // if (res.data && res.data.items.length > 0) {
+        //   setProducts(res.data.items);
+        //   setTotalItems(res.data.totalItems);
+        // } else {
+        //   setProducts([]);
+        //   setTotalItems(0);
+        // }
       } catch (error) {
         console.error("Error:", error);
-      } 
+      }
     };
 
     fetchProducts();
@@ -131,6 +138,7 @@ const AllProduct = ({ keySearch }) => {
       setDiscount(false);
     } else setDiscount(true);
   };
+
   return (
     <div className="container mx-auto max-lg:px-8 px-20">
       <div className="my-5">

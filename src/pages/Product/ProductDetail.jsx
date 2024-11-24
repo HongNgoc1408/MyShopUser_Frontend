@@ -10,7 +10,7 @@ import {
   Rate,
   Select,
 } from "antd";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Tabs } from "antd";
 import ProductService from "../../services/ProductService";
 import {
@@ -30,6 +30,7 @@ import { CountContext, FavoriteContext } from "../../App";
 import BuyingGuide from "../BuyingGuide";
 
 const ProductDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const carouselRef = useRef(null);
   const location = useLocation();
@@ -299,6 +300,7 @@ const ProductDetail = () => {
           message: error.response.data || "Bạn chưa đăng nhập tài khoản!",
           placement: "top",
         });
+        navigate("/login");
       } else {
         showError(error);
         // notification.error({

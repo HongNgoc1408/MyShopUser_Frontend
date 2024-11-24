@@ -35,7 +35,7 @@ const ResetPassword = () => {
         message: "Gửi OTP thành công",
         placement: "top",
       });
-      setTimer(60);
+      setTimer(300);
       setIsCodeSent(true);
     } catch (error) {
       showError(error);
@@ -73,8 +73,8 @@ const ResetPassword = () => {
         token: code,
         ...items,
       };
-      const res = await authService.resetPassword(data);
-      console.log(res);
+      await authService.resetPassword(data);
+      // console.log(res);
       notification.success({
         message: "Đổi mật khẩu thành công.",
         placement: "top",
@@ -98,7 +98,7 @@ const ResetPassword = () => {
               onFinish={handleSendCode}
               className="max-w-[555px] h-auto bg-white m-auto px-14 py-10 rounded-md"
             >
-              <h3 className="title text-center">Đổi mật khẩu</h3>
+              <h3 className="title text-center">Quên mật khẩu</h3>
               <div className="w-full flex flex-col">
                 <Form.Item
                   name="email"
@@ -160,13 +160,23 @@ const ResetPassword = () => {
                   <Input.OTP size="large" />
                 </Form.Item>
               </div>
-
+              <div className="text-base flex text-center items-center justify-center">
+                <p>OPT hết hạn trong </p>
+                {timer > 0 ? (
+                  <p className="text-red-600 ml-1">
+                    {Math.floor(timer / 60)} phút {timer % 60} giây
+                  </p>
+                ) : (
+                  <p>Mã đã hết hạn</p>
+                )}
+              </div>
               <div className="w-full flex flex-col my-4">
                 <button
                   type="primary"
                   htmlType="submit"
                   size="large"
                   className="bg-dark-button text-base disabled:bg-gray-400 disabled:cursor-no-drop"
+                  disabled={timer === 0}
                 >
                   <span className="relative z-10">
                     {loadingConfirmCode ? <Spin /> : "Tiếp theo"}

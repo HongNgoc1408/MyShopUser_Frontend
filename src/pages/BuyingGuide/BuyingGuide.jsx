@@ -15,28 +15,31 @@ const BuyingGuide = () => {
     <div className="bg-white text-lg p-10">
       <div className="font-bold mb-5 uppercase">* Hướng dẫn mua hàng</div>
       <div className="text-lg space-y-2">
-        <p>
+        <div>
           Chỉ cần ngồi ở nhà bạn cũng có thể dễ dàng mua hàng chỉ với vài thao
           tác đơn giản sau:
-        </p>
+        </div>
         <>
-          <div className="font-bold text-xl">Bước 1: Đăng ký tài khoản:</div>
+          <div className="font-bold text-xl">
+            Bước 1: Đăng ký tài khoản:
+            <br />
+          </div>
           <div>Bấm chọn “Đăng ký” để đăng ký tài khoản MS</div>
-          <div>
+          <div className="border-2 border-red-600">
             <Image src={b1} preview={false} />
           </div>
-          <p>
+          <div>
             Sau đó bạn nhập số điện thoại và mã OTP sẽ được gửi về điện thoại
             của bạn.
             <br />
             Sau khi nhập mã OTP, bạn nhập đủ thông tin ở các mục bên dưới là bạn
             đã đăng ký thành công. Bạn nhớ lưu lại mật khẩu để đăng nhập cho lần
             sau.
-          </p>
-          <div>
+          </div>
+          <div className="border-2 border-red-600">
             <Image src={b1_1} preview={false} />
           </div>
-          <div>
+          <div className="border-2 border-red-600">
             <Image src={b1_2} preview={false} />
           </div>
         </>
@@ -47,21 +50,23 @@ const BuyingGuide = () => {
           <div>
             Cách 1: Ở "Trang chủ" mục "Thời trang": Để chọn sản phẩm cần mua.
             <br />
-            <div>
+            <div className="border-2 border-red-600">
               <Image src={b2_2} preview={false} />
             </div>
             Cách 2: Bấm vào "Sản phẩm" để chuyển đến trang sản phẩm: Để chọn sản
             phẩm cần mua.
             <br />
-            <div>
+            <div className="border-2 border-red-600">
               <Image src={b2_3} preview={false} />
             </div>
             Cách 3: Sử dụng ô "Tìm kiếm" ở biểu tượng kính lúp, gõ tên sản phẩm
             muốn mua. Ví dụ: “áo sơ mi nữ”. Website sẽ cho bạn những sản phẩm
             chính xác nhất với thông tin bạn tìm kiếm.
             <br />
-            <div>
+            <div className="border-2 border-red-600">
               <Image src={b2} preview={false} />
+            </div>
+            <div className="border-2 border-red-600">
               <Image src={b2_1} preview={false} />
             </div>
             Khi đã chọn được sản phẩm muốn mua, bạn bấm vào sản phẩm để xem
@@ -75,7 +80,7 @@ const BuyingGuide = () => {
           <div>
             Để mua sản phẩm, bạn chọn các thông tin sau: màu + size + số lượng
             sản phẩm cần đặt <br />
-            <div>
+            <div className="border-2 border-red-600">
               <Image src={b3} preview={false} />
             </div>
             Sau đó chọn "Thêm vào giỏ hàng"
@@ -85,7 +90,7 @@ const BuyingGuide = () => {
           <div className="font-bold text-xl">Bước 4: Đặt hàng:</div>
           <div>
             Nhập địa chỉ và thông tin nhận hàng. <br />
-            <div>
+            <div className="border-2 border-red-600">
               <Image src={b4} preview={false} />
             </div>
             Chọn sản phẩm tỏng giỏ hàng
@@ -102,7 +107,7 @@ const BuyingGuide = () => {
             sẽ nhận được hàng trong vòng 6 - 7 ngày kể từ ngày đặt hàng. Trường
             hợp phát sinh những vấn đề khách quan, đơn hàng có thể sẽ đến trễ
             hơn so với dự kiến. <br />
-            <div>
+            <div className="border-2 border-red-600">
               <Image src={b5} preview={false} />
             </div>
           </div>

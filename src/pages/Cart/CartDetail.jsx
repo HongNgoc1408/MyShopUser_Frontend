@@ -64,6 +64,8 @@ const CartDetail = () => {
   const [value, setValue] = useState(1);
   const navigate = useNavigate();
   const { setCount } = useContext(CountContext);
+
+  
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);

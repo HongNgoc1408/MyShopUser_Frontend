@@ -1,19 +1,56 @@
 import React, { useContext, useEffect, useState } from "react";
 import UserService from "../../services/UserService";
-import { Avatar, Card, Modal, notification, Upload } from "antd";
+import {
+  Avatar,
+  Card,
+  message,
+  Modal,
+  notification,
+  Select,
+  Upload,
+} from "antd";
 import { showError, toImageLink } from "../../services/commonService";
 import { Button, Form, Input } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { AvatarContext } from "../../App";
+import TextArea from "antd/es/input/TextArea";
+import AddressService from "../../services/AddressService";
 
 const Profile = () => {
   const [form] = Form.useForm();
+  const { setAvatar } = useContext(AvatarContext);
+
   const [data, setData] = useState([]);
   const [address, setAddress] = useState([]);
-  const { setAvatar } = useContext(AvatarContext);
   const [avt, setAvt] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [fileList, setFileList] = useState([]);
+
+  const [provinces, setProvince] = useState([]);
+  const [districts, setDistrict] = useState([]);
+  const [wards, setWard] = useState([]);
+
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleOpenAvatarModal = () => {
+    setIsAvatarModalOpen(true);
+    setFileList([]);
+  };
+
+  const handleOpenProfileModal = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const handleOpenAddressModal = () => {
+    setIsAddressModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,6 +58,7 @@ const Profile = () => {
         const data = await UserService.getProfile();
         const address = await UserService.getAddress();
         const avatar = await UserService.getAvatar();
+        const result = await AddressService.getProvince();
 
         // console.log("1", data.data);
         // console.log("2", address.data);
@@ -29,6 +67,7 @@ const Profile = () => {
         setData(data.data);
         setAddress(address.data);
         setAvt(avatar.data.imageURL);
+        setProvince(result.data.data || []);
       } catch (error) {
         showError(error);
       }
@@ -36,17 +75,81 @@ const Profile = () => {
     fetchData();
   }, []);
 
+  const handleProvinceChange = async (value, option) => {
+    // console.log("handleProvinceChange", value);
+    setSelectedProvince(value);
+    try {
+      const res = await AddressService.getDistrictsProvince(value);
+      setDistrict(res.data.data ?? []);
+      setWard([]);
+
+      form.setFieldsValue({
+        province_id: value,
+        province_name: option.label,
+      });
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const handleDistrictChange = async (value, option) => {
+    // console.log("handleDistrictChange", value);
+    setSelectedDistrict(value);
+    try {
+      const res = await AddressService.getWardsProvince(value);
+      setWard(res.data.data ?? []);
+
+      form.setFieldsValue({
+        district_id: value,
+        district_name: option.label,
+      });
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const handleWardChange = (value, option) => {
+    // console.log("handleWardChange", value);
+    form.setFieldsValue({
+      ward_id: value,
+      ward_name: option.label,
+    });
+  };
+
+  const handleUpdateAddress = async () => {
+    setLoading(true);
+    try {
+      const values = await form.validateFields();
+      // console.log(values);
+      await UserService.updateAddress(values);
+
+      notification.success({ message: "Cập nhật địa chỉ thành công." });
+      setIsAddressModalOpen(false);
+      setAddress(values);
+    } catch (error) {
+      showError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFileChange = ({ fileList: newFileList }) =>
     setFileList(newFileList);
 
-  const handleUpdateClick = () => {
-    setIsModalOpen(true);
-    setFileList([]);
-  };
-
-  const handleModalCancel = () => {
-    setIsModalOpen(false);
-    setFileList([]);
+  const handleUpdateProfile = async () => {
+    setLoading(true);
+    try {
+      const values = await form.validateFields();
+      console.log("Updated Values:", values);
+      await UserService.updateProfile(values);
+      message.success("Cập nhật thông tin cá nhân thành công.");
+      setIsProfileModalOpen(false);
+      setData({ ...data, ...values });
+    } catch (error) {
+      showError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAvatarUpdate = async () => {
@@ -71,7 +174,7 @@ const Profile = () => {
 
       setAvt(res.data.imageURL);
       setAvatar(res.data.imageURL);
-      setIsModalOpen(false);
+      setIsAvatarModalOpen(false);
     } catch (error) {
       showError(error);
     }
@@ -99,49 +202,106 @@ const Profile = () => {
                   value={data.phoneNumber}
                 />
               </Form.Item>
-              <Form.Item>
-                <Button type="primary" onClick={handleUpdateClick}>
-                  Cập nhật
-                </Button>
+              <div className="flex space-x-2">
+                <Form.Item>
+                  <Button type="primary" onClick={handleOpenAvatarModal}>
+                    Cập nhật ảnh
+                  </Button>
 
-                <Modal
-                  width={200}
-                  centered
-                  title="Cập nhật ảnh"
-                  open={isModalOpen}
-                  onCancel={handleModalCancel}
-                  onOk={handleAvatarUpdate}
-                >
-                  <Form.Item
-                    className="mx-auto"
-                    name="imageUrl"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng chọn ảnh.",
-                      },
-                    ]}
+                  <Modal
+                    loading={loading}
+                    width={200}
+                    centered
+                    title="Cập nhật ảnh"
+                    open={isAvatarModalOpen}
+                    onCancel={() => setIsAvatarModalOpen(false)}
+                    onOk={handleAvatarUpdate}
                   >
-                    <Upload
-                      name="file"
-                      beforeUpload={() => false}
-                      listType="picture-circle"
-                      fileList={fileList}
-                      accept="image/png, image/gif, image/jpeg, image/svg"
-                      maxCount={1}
-                      onChange={handleFileChange}
-                      showUploadList={{ showPreviewIcon: false }}
+                    <Form.Item
+                      className="mx-auto"
+                      name="imageUrl"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng chọn ảnh.",
+                        },
+                      ]}
                     >
-                      {fileList.length >= 1 ? null : (
-                        <button type="button">
-                          <UploadOutlined />
-                          <div>Chọn ảnh</div>
-                        </button>
-                      )}
-                    </Upload>
-                  </Form.Item>
-                </Modal>
-              </Form.Item>
+                      <Upload
+                        name="file"
+                        beforeUpload={() => false}
+                        listType="picture-circle"
+                        fileList={fileList}
+                        accept="image/png, image/gif, image/jpeg, image/svg"
+                        maxCount={1}
+                        onChange={handleFileChange}
+                        showUploadList={{ showPreviewIcon: false }}
+                      >
+                        {fileList.length >= 1 ? null : (
+                          <button type="button">
+                            <UploadOutlined />
+                            <div>Chọn ảnh</div>
+                          </button>
+                        )}
+                      </Upload>
+                    </Form.Item>
+                  </Modal>
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" onClick={handleOpenProfileModal}>
+                    Cập nhật thông tin cá nhân
+                  </Button>
+                  <Modal
+                    loading={loading}
+                    width={500}
+                    centered
+                    title="Cập nhật thông tin"
+                    open={isProfileModalOpen}
+                    onCancel={() => setIsProfileModalOpen(false)}
+                    onOk={handleUpdateProfile}
+                  >
+                    <Form
+                      form={form}
+                      layout="vertical"
+                      onFinish={handleUpdateProfile}
+                      initialValues={{
+                        fullName: data.fullName || "",
+                        phoneNumber: data.phoneNumber || "",
+                      }}
+                    >
+                      <Form.Item
+                        label="Họ và tên"
+                        name="fullName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng nhập họ và tên",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Nhập họ và tên" />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Số điện thoại"
+                        name="phoneNumber"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng nhập số điện thoại",
+                          },
+                          {
+                            pattern: /^[0-9]{10}$/,
+                            message: "Số điện thoại không hợp lệ.",
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Nhập số điện thoại" />
+                      </Form.Item>
+                    </Form>
+                  </Modal>
+                </Form.Item>
+              </div>
             </Form>
           </Card>
           <Card style={{ width: "70%" }} title="Thông tin giao hàng">
@@ -186,7 +346,119 @@ const Profile = () => {
                 </Form.Item>
               </div>
               <Form.Item>
-                <Button type="primary">Cập nhật</Button>
+                <Button type="primary" onClick={handleOpenAddressModal}>
+                  Cập nhật địa chỉ giao hàng
+                </Button>
+                <Modal
+                  title="Địa chỉ giao hàng"
+                  open={isAddressModalOpen}
+                  onOk={handleUpdateAddress}
+                  onCancel={() => setIsAddressModalOpen(false)}
+                  loading={loading}
+                >
+                  <Form form={form} layout="vertical">
+                    <Form.Item
+                      name="name"
+                      label="Họ và tên"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Họ và tên không được để trống",
+                        },
+                      ]}
+                    >
+                      <Input
+                        style={{ fontFamily: "serif" }}
+                        className="text-sm"
+                        placeholder="Nhập họ và tên"
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="phoneNumber"
+                      label="Số điện thoại"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Số điện thoại không được để trống",
+                        },
+                      ]}
+                    >
+                      <Input
+                        style={{ fontFamily: "serif" }}
+                        className="text-sm"
+                        placeholder="Nhập số điện thoại"
+                      />
+                    </Form.Item>
+                    <Form.Item name="province_id" hidden>
+                      <Input type="hidden" />
+                    </Form.Item>
+                    <Form.Item
+                      name="province_name"
+                      label="Tỉnh/Thành phố"
+                      rules={[{ required: true }]}
+                    >
+                      <Select
+                        showSearch
+                        onChange={handleProvinceChange}
+                        value={selectedProvince}
+                        options={provinces.map((item) => ({
+                          value: item.ProvinceID,
+                          label: item.ProvinceName,
+                        }))}
+                      />
+                    </Form.Item>
+                    <Form.Item name="district_id" hidden>
+                      <Input type="hidden" />
+                    </Form.Item>
+                    <Form.Item
+                      name="district_name"
+                      label="Quận/Huyện"
+                      rules={[{ required: true }]}
+                    >
+                      <Select
+                        showSearch
+                        onChange={handleDistrictChange}
+                        value={selectedDistrict}
+                        options={districts.map((item) => ({
+                          value: item.DistrictID,
+                          label: item.DistrictName,
+                        }))}
+                      />
+                    </Form.Item>
+                    <Form.Item name="ward_id" hidden>
+                      <Input type="hidden" />
+                    </Form.Item>
+                    <Form.Item
+                      name="ward_name"
+                      label="Phường/Xã"
+                      rules={[{ required: true }]}
+                    >
+                      <Select
+                        showSearch
+                        onChange={handleWardChange}
+                        options={wards.map((item) => ({
+                          value: item.WardCode,
+                          label: item.WardName,
+                        }))}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name="detail"
+                      label="Địa chỉ cụ thể"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Địa chỉ không được để trống",
+                        },
+                      ]}
+                    >
+                      <TextArea
+                        style={{ fontFamily: "serif" }}
+                        className="text-sm"
+                      />
+                    </Form.Item>
+                  </Form>
+                </Modal>
               </Form.Item>
             </Form>
           </Card>

@@ -10,15 +10,18 @@ import {
   Rate,
   Result,
   Skeleton,
+  Statistic,
   Tabs,
   Upload,
 } from "antd";
+
 import React, { useEffect, useState } from "react";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import OrderService from "../../services/OrderService";
 import {
   formatDateTime,
   formatVND,
+  getPaymentDeadline,
   showError,
   statusOrders,
   toImageLink,
@@ -30,6 +33,7 @@ import {
   PlusOutlined,
   SmileOutlined,
 } from "@ant-design/icons";
+const { Countdown } = Statistic;
 
 const breadcrumb = [
   {
@@ -59,7 +63,7 @@ const Order = () => {
       try {
         const res = await OrderService.getAll();
 
-        // console.log(res);
+        console.log(res.data.items);
 
         setOrders(res.data.items);
       } catch (error) {
@@ -72,6 +76,27 @@ const Order = () => {
 
     fetchOrder();
   }, []);
+
+  const handleReturnPayment = async (params) => {
+    try {
+      window.location.replace(params);
+      // await PaymentsService.VNPayCallback(params);
+      notification.success({
+        message: "Thành công",
+        placement: "top",
+        description: "Thanh toán thành công",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Thất bại",
+        placement: "top",
+        description: "Thanh toán thất bại",
+      });
+    }
+    // finally {
+    //   navigate("/order");
+    // }
+  };
 
   const showModal = async (orderId) => {
     // console.log(orderId);
@@ -183,27 +208,6 @@ const Order = () => {
     }
     setFileList(updatedList);
   };
-
-  // const handleReceivedOrder = async (id) => {
-  //   // console.log(id);
-  //   try {
-  //     await OrderService.received(id, { orderStatus: 4 });
-  //     setOrders((prevOrders) =>
-  //       prevOrders.map((order) =>
-  //         order.id === id
-  //           ? { ...order, detail: { ...order.detail, orderStatus: "Received" } }
-  //           : order
-  //       )
-  //     );
-
-  //     notification.success({
-  //       message: "Success",
-  //       description: "Đã cập nhật trạng thái đơn hàng thành 'Đã nhận hàng'.",
-  //     });
-  //   } catch (error) {
-  //     showError(error);
-  //   }
-  // };
 
   const handleReceivedOrder = async (id) => {
     try {
@@ -600,6 +604,24 @@ const Order = () => {
                             Đánh giá
                           </Button>
                         )}
+
+                        <Button
+                          type="primary"
+                          onClick={() => handleReturnPayment(order.payBackUrl)}
+                          className={`text-lg mt-5 ${
+                            order.payBackUrl ? "" : "hidden"
+                          }`}
+                        >
+                          Thanh toán lại
+                        </Button>
+                        <Countdown
+                          // title="Thời gian còn lại"
+                          className={`text-lg mt-5 ${
+                            order.payBackUrl ? "" : "hidden"
+                          }`}
+                          value={getPaymentDeadline(order.orderDate)}
+                          onFinish={onFinish}
+                        />
                       </div>
                     </Card>
                   ))

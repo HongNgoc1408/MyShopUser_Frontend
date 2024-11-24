@@ -88,7 +88,7 @@ const Login = () => {
                 <input
                   autocomplete="current-password"
                   type={isShowPassword ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder="Mật khẩu"
                   className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"
                 />
               </div>
@@ -97,8 +97,8 @@ const Login = () => {
 
           <div className="w-full flex items-center justify-between">
             <div className="w-full flex items-center">
-              <input type="checkbox" className="w-4 h-4 mr-2" />
-              <p className="text-base">Remember me</p>
+              <input type="checkbox" className="w-4 h-4 mr-2" checked="true" />
+              <p className="text-base">Ghi nhớ mật khẩu</p>
             </div>
             <div>
               <Link

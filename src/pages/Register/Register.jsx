@@ -20,10 +20,9 @@ const Register = () => {
     let interval;
     if (timer > 0) {
       interval = setInterval(() => {
-        setTimer((preTimer) => preTimer - 1);
+        setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
     }
-
     return () => clearInterval(interval);
   }, [timer]);
 
@@ -36,7 +35,7 @@ const Register = () => {
         message: "Gửi OTP thành công",
         placement: "top",
       });
-      setTimer(60);
+      setTimer(300);
       setIsCodeSent(true);
     } catch (error) {
       showError(error);
@@ -74,7 +73,8 @@ const Register = () => {
         token: code,
         ...items,
       };
-      const res = await authService.register(data);
+
+      await authService.register(data);
 
       // console.log(res);
 
@@ -128,7 +128,6 @@ const Register = () => {
               <div className="w-full flex flex-col my-4">
                 <button
                   type="primary"
-                  htmlType="submit"
                   size="large"
                   disabled={loadingSendEMail}
                   className="bg-dark-button text-base disabled:bg-gray-400 disabled:cursor-no-drop"
@@ -208,6 +207,16 @@ const Register = () => {
                   <Input.OTP size="large" />
                 </Form.Item>
               </div>
+              <div className="text-base flex text-center items-center justify-center">
+                <p>OPT hết hạn trong </p>
+                {timer > 0 ? (
+                  <p className="text-red-600 ml-1">
+                    {Math.floor(timer / 60)} phút {timer % 60} giây
+                  </p>
+                ) : (
+                  <p>Mã đã hết hạn</p>
+                )}
+              </div>
 
               <div className="w-full flex flex-col my-4">
                 <button
@@ -215,6 +224,7 @@ const Register = () => {
                   htmlType="submit"
                   size="large"
                   className="bg-dark-button text-base disabled:bg-gray-400 disabled:cursor-no-drop"
+                  disabled={timer === 0}
                 >
                   <span className="relative z-10">
                     {loadingConfirmCode ? <Spin /> : "Tiếp theo"}

@@ -91,3 +91,6 @@ export const statusOrder = [
   { value: "Received", label: "Đã nhận" },
   { value: "Canceled", label: "Đã hủy" },
 ];
+
+export const getPaymentDeadline = (date) =>
+  new Date(date).getTime() + 1000 * 60 * 15;

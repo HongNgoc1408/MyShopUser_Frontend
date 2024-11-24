@@ -24,7 +24,7 @@ export const publicRoutes = [
   { path: "/reset-password", component: ResetPassword },
   { path: "/shop", component: Shop },
   { path: "/product-details/:id", component: ProductDetail },
-  { path: "/buyingGuide/:id", component: BuyingGuide },
+  { path: "/guide", component: BuyingGuide },
 ];
 
 export const privateRoutes = [
