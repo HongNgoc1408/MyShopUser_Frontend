@@ -27,25 +27,63 @@ const Payment = () => {
     }
   }, [searchParams]);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       await PaymentsService.VNPayCallback(params);
+  //       notification.success({
+  //         message: "Thành công",
+  //         placement: "top",
+  //         description: "Thanh toán thành công",
+  //       });
+  //     } catch (error) {
+  //       notification.error({
+  //         message: "Thất bại",
+  //         placement: "top",
+  //         description: "Thanh toán thất bại",
+  //       });
+  //     } finally {
+  //       navigate("/order");
+  //     }
+  //   };
+  //   if (params) {
+  //     fetchData();
+  //   }
+  // }, [params, notification, navigate]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await PaymentsService.VNPayCallback(params);
-        notification.success({
-          message: "Thành công",
-          placement: "top",
-          description: "Thanh toán thành công",
-        });
+        const response = await PaymentsService.VNPayCallback(params);
+
+        if (
+          params.vnp_ResponseCode === "00" &&
+          params.vnp_TransactionStatus === "00"
+        ) {
+          notification.success({
+            message: "Thành công",
+            placement: "top",
+            description: "Thanh toán thành công",
+          });
+        } else {
+          notification.error({
+            message: "Thất bại",
+            placement: "top",
+            description:
+              "Thanh toán không thành công. Vui lòng kiểm tra lại hoặc thử lại sau.",
+          });
+        }
       } catch (error) {
         notification.error({
-          message: "Thất bại",
+          message: "Lỗi",
           placement: "top",
-          description: "Thanh toán thất bại",
+          description: "Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại.",
         });
       } finally {
         navigate("/order");
       }
     };
+
     if (params) {
       fetchData();
     }

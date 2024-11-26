@@ -140,7 +140,7 @@ const Profile = () => {
     setLoading(true);
     try {
       const values = await form.validateFields();
-      console.log("Updated Values:", values);
+      // console.log("Updated Values:", values);
       await UserService.updateProfile(values);
       message.success("Cập nhật thông tin cá nhân thành công.");
       setIsProfileModalOpen(false);
@@ -356,7 +356,11 @@ const Profile = () => {
                   onCancel={() => setIsAddressModalOpen(false)}
                   loading={loading}
                 >
-                  <Form form={form} layout="vertical">
+                  <Form
+                    form={form}
+                    layout="vertical"
+                    initialValues={{ ...address }}
+                  >
                     <Form.Item
                       name="name"
                       label="Họ và tên"
@@ -399,6 +403,7 @@ const Profile = () => {
                     >
                       <Select
                         showSearch
+                        optionFilterProp="label"
                         onChange={handleProvinceChange}
                         value={selectedProvince}
                         options={provinces.map((item) => ({
@@ -417,6 +422,7 @@ const Profile = () => {
                     >
                       <Select
                         showSearch
+                        optionFilterProp="label"
                         onChange={handleDistrictChange}
                         value={selectedDistrict}
                         options={districts.map((item) => ({
@@ -435,6 +441,7 @@ const Profile = () => {
                     >
                       <Select
                         showSearch
+                        optionFilterProp="label"
                         onChange={handleWardChange}
                         options={wards.map((item) => ({
                           value: item.WardCode,

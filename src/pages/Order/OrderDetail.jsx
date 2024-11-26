@@ -81,6 +81,7 @@ const OrderDetail = () => {
   };
 
   const orderStatus = orders.orderStatus || "";
+
   return (
     <div className="bg-gray-100">
       {isLoading ? (

@@ -55,7 +55,7 @@ const Order = () => {
   const [dataReview, setDataReview] = useState([]);
   const [id, setID] = useState();
   const [isReviewSubmit, setIsReviewSubmit] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(null);
+  // const [orderDetails, setOrderDetails] = useState(null);
   const [selectedTab, setSelectedTab] = useState("6");
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const Order = () => {
       try {
         const res = await OrderService.getAll();
 
-        console.log(res.data.items);
+        // console.log(res.data.items);
 
         setOrders(res.data.items);
       } catch (error) {
@@ -80,12 +80,6 @@ const Order = () => {
   const handleReturnPayment = async (params) => {
     try {
       window.location.replace(params);
-      // await PaymentsService.VNPayCallback(params);
-      notification.success({
-        message: "Thành công",
-        placement: "top",
-        description: "Thanh toán thành công",
-      });
     } catch (error) {
       notification.error({
         message: "Thất bại",
@@ -93,9 +87,7 @@ const Order = () => {
         description: "Thanh toán thất bại",
       });
     }
-    // finally {
-    //   navigate("/order");
-    // }
+   
   };
 
   const showModal = async (orderId) => {
@@ -164,7 +156,8 @@ const Order = () => {
 
         await OrderService.review(id, formData);
         const updatedOrder = await OrderService.getDetail(id);
-        setOrderDetails(updatedOrder.data);
+        // setOrderDetails(updatedOrder.data);
+
         notification.success({
           message: "Thành công",
           placement: "top",

@@ -139,7 +139,7 @@ const CardProduct = ({ product }) => {
                   <div>
                     <Rate
                       disabled
-                      defaultValue={product.rating > 0 ? product.rating : "5"}
+                      defaultValue={product.rating > 0 ? product.rating : "0"}
                       className="text-sm"
                     />
                   </div>

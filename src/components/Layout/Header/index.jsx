@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Menu,
   Dropdown,
@@ -16,7 +16,6 @@ import AuthAction from "../../../services/AuthAction";
 import authService from "../../../services/authService";
 import { AvatarContext, CountContext, useAuth } from "../../../App";
 import { toImageLink } from "../../../services/commonService";
-import UserService from "../../../services/UserService";
 
 const Header = ({ onSearch }) => {
   const navigator = useNavigate();

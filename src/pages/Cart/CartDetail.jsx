@@ -65,7 +65,6 @@ const CartDetail = () => {
   const navigate = useNavigate();
   const { setCount } = useContext(CountContext);
 
-  
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -682,6 +681,7 @@ const CartDetail = () => {
                   >
                     <Select
                       showSearch
+                      optionFilterProp="label"
                       onChange={handleProvinceChange}
                       value={selectedProvince}
                       options={provinces.map((item) => ({
@@ -700,6 +700,7 @@ const CartDetail = () => {
                   >
                     <Select
                       showSearch
+                      optionFilterProp="label"
                       onChange={handleDistrictChange}
                       value={selectedDistrict}
                       options={districts.map((item) => ({
@@ -718,6 +719,7 @@ const CartDetail = () => {
                   >
                     <Select
                       showSearch
+                      optionFilterProp="label"
                       onChange={handleWardChange}
                       options={wards.map((item) => ({
                         value: item.WardCode,

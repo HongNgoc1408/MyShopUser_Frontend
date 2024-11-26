@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
-  Flex,
   InputNumber,
   Pagination,
   Rate,
@@ -20,13 +19,14 @@ import { FaAngleDown } from "react-icons/fa";
 const AllProduct = ({ keySearch }) => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(8);
   const [totalItems, setTotalItems] = useState(0);
   const [brands, setBrands] = useState([]);
   const [categorys, setCategorys] = useState([]);
   const [selectedBrandIds, setSelectedBrandIds] = useState([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
-  const [selectedSorter, setSelectedSorter] = useState(null);
+  const [selectedSorter, setSelectedSorter] = useState(0);
+  const [selectedRating, setSelectedRating] = useState(null);
   const [discount, setDiscount] = useState(false);
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
@@ -39,6 +39,7 @@ const AllProduct = ({ keySearch }) => {
   const handleShowAllCategorys = () => {
     setShowAllCategorys(true);
   };
+
   const handlePageChange = (newPage, newPageSize) => {
     setPage(newPage);
     setPageSize(newPageSize);
@@ -54,21 +55,16 @@ const AllProduct = ({ keySearch }) => {
           brandIds: selectedBrandIds,
           categoryIds: selectedCategoryIds,
           sorter: selectedSorter,
+          rating: selectedRating,
           discount,
           minPrice,
           maxPrice,
         });
+
         // console.log("res", res.data.items);
 
         setProducts(res.data.items);
         setTotalItems(res.data.totalItems);
-        // if (res.data && res.data.items.length > 0) {
-        //   setProducts(res.data.items);
-        //   setTotalItems(res.data.totalItems);
-        // } else {
-        //   setProducts([]);
-        //   setTotalItems(0);
-        // }
       } catch (error) {
         console.error("Error:", error);
       }
@@ -81,6 +77,7 @@ const AllProduct = ({ keySearch }) => {
     keySearch,
     selectedBrandIds,
     selectedCategoryIds,
+    selectedRating,
     selectedSorter,
     discount,
     minPrice,
@@ -127,6 +124,10 @@ const AllProduct = ({ keySearch }) => {
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId]
     );
+  };
+
+  const handleRatingChange = (rating) => {
+    setSelectedRating((prev) => (prev === rating ? null : rating));
   };
 
   const handleSorterChange = (value) => {
@@ -249,25 +250,50 @@ const AllProduct = ({ keySearch }) => {
                     Đánh giá
                   </div>
                   <div className="flex flex-col border-b-2 pb-5">
-                    <Flex gap="middle">
-                      <Rate defaultValue={5} disabled />
-                    </Flex>
-                    <Flex gap="middle">
-                      <Rate defaultValue={4} disabled />
+                    <Checkbox
+                      key={5}
+                      checked={selectedRating === 5}
+                      onChange={() => handleRatingChange(5)}
+                      className="text-lg"
+                    >
+                      <Rate value={5} disabled />
+                    </Checkbox>
+                    <Checkbox
+                      key={4}
+                      checked={selectedRating === 4}
+                      onChange={() => handleRatingChange(4)}
+                      className="text-lg"
+                    >
+                      <Rate value={5} disabled />
                       <span>trở lên</span>
-                    </Flex>
-                    <Flex gap="middle">
-                      <Rate defaultValue={3} disabled />
+                    </Checkbox>{" "}
+                    <Checkbox
+                      key={3}
+                      checked={selectedRating === 3}
+                      onChange={() => handleRatingChange(3)}
+                      className="text-lg"
+                    >
+                      <Rate value={3} disabled />
                       <span>trở lên</span>
-                    </Flex>
-                    <Flex gap="middle">
-                      <Rate defaultValue={2} disabled />
+                    </Checkbox>{" "}
+                    <Checkbox
+                      key={2}
+                      checked={selectedRating === 2}
+                      onChange={() => handleRatingChange(2)}
+                      className="text-lg"
+                    >
+                      <Rate value={2} disabled />
                       <span>trở lên</span>
-                    </Flex>
-                    <Flex gap="middle">
-                      <Rate defaultValue={1} disabled />
+                    </Checkbox>{" "}
+                    <Checkbox
+                      key={1}
+                      checked={selectedRating === 1}
+                      onChange={() => handleRatingChange(1)}
+                      className="text-lg"
+                    >
+                      <Rate value={1} disabled />
                       <span>trở lên</span>
-                    </Flex>
+                    </Checkbox>
                   </div>
                 </div>
                 <div className="py-5 mx-auto justify-center items-center">
@@ -276,8 +302,11 @@ const AllProduct = ({ keySearch }) => {
                     onClick={() => {
                       setSelectedBrandIds([]);
                       setSelectedCategoryIds([]);
+                      setSelectedRating([]);
                       setMinPrice(null);
                       setMaxPrice(null);
+                      setDiscount(false);
+                      setSelectedSorter(null);
                     }}
                   >
                     <p className="relative z-10">Xóa tất cả</p>
@@ -293,11 +322,8 @@ const AllProduct = ({ keySearch }) => {
                   <p>Sắp xếp theo </p>
                 </div>
                 <div className="mr-2">
-                  <Button
-                    onClick={() => handleDiscountChange(true)}
-                    className="border-2"
-                  >
-                    Giảm giá
+                  <Button onClick={handleDiscountChange} className="border-2">
+                    {discount ? "Giảm giá: Có" : "Giảm giá: Không"}
                   </Button>
                 </div>
                 <div className="mr-2">
@@ -306,12 +332,11 @@ const AllProduct = ({ keySearch }) => {
                     style={{ width: 150 }}
                     allowClear
                     onChange={handleSorterChange}
-                    placeholder="Giá"
                   >
-                    <Select.Option value="0">Mới nhất</Select.Option>
-                    <Select.Option value="1">Cao đến Thấp</Select.Option>
-                    <Select.Option value="2">Thấp đến Cao</Select.Option>
-                    <Select.Option value="3">Bán chạy</Select.Option>
+                    <Select.Option value={0}>Bán chạy</Select.Option>
+                    <Select.Option value={1}>Thấp đến Cao</Select.Option>
+                    <Select.Option value={2}>Cao đến Thấp</Select.Option>
+                    <Select.Option value={3}>Mới nhất</Select.Option>
                   </Select>
                 </div>
               </div>
@@ -351,6 +376,7 @@ const AllProduct = ({ keySearch }) => {
             <div>
               <Pagination
                 align="center"
+                showSizeChanger
                 current={page}
                 pageSize={pageSize}
                 total={totalItems}
