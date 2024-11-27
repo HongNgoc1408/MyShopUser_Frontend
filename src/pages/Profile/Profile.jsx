@@ -15,6 +15,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { AvatarContext } from "../../App";
 import TextArea from "antd/es/input/TextArea";
 import AddressService from "../../services/AddressService";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const [form] = Form.useForm();
@@ -203,6 +204,8 @@ const Profile = () => {
                 />
               </Form.Item>
               <div className="flex space-x-2">
+                {/* <Button type="primary">Đổi mật khẩu</Button> */}
+
                 <Form.Item>
                   <Button type="primary" onClick={handleOpenAvatarModal}>
                     Cập nhật ảnh
@@ -384,6 +387,11 @@ const Profile = () => {
                         {
                           required: true,
                           message: "Số điện thoại không được để trống",
+                        },
+                        {
+                          pattern: /^\+?\d{9,15}$/,
+                          message:
+                            "Số điện thoại không hợp lệ! (VD: +84123456789)",
                         },
                       ]}
                     >

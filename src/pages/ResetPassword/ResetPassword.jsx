@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { showError } from "../../services/commonService";
 import authService from "../../services/authService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { LeftOutlined, MailOutlined } from "@ant-design/icons";
 const ResetPassword = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [form] = Form.useForm();
@@ -14,6 +15,7 @@ const ResetPassword = () => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isConfirmCode, setIsConfirmCode] = useState(false);
   const navigate = useNavigate();
+  const [otpEmail, setOTPEmail] = useState([]);
 
   useEffect(() => {
     let interval;
@@ -37,6 +39,7 @@ const ResetPassword = () => {
       });
       setTimer(300);
       setIsCodeSent(true);
+      setOTPEmail(form.getFieldsValue("email").email);
     } catch (error) {
       showError(error);
     } finally {
@@ -98,6 +101,12 @@ const ResetPassword = () => {
               onFinish={handleSendCode}
               className="max-w-[555px] h-auto bg-white m-auto px-14 py-10 rounded-md"
             >
+              <Link to={"/login"} onClick={() => setIsCodeSent(false)}>
+                <p className="flex text-lg">
+                  <LeftOutlined />
+                  <p>Trở về</p>
+                </p>
+              </Link>
               <h3 className="title text-center">Quên mật khẩu</h3>
               <div className="w-full flex flex-col">
                 <Form.Item
@@ -145,8 +154,21 @@ const ResetPassword = () => {
               onFinish={handleConfirmCode}
               className="max-w-[555px] h-auto bg-white m-auto mt-32 px-14 py-10 rounded-md"
             >
-              <h3 className="title text-center">Nhập OTP</h3>
-              <div className="w-full flex items-center justify-center">
+              <Link to={"/reset-password"} onClick={() => setIsCodeSent(false)}>
+                <p className="flex text-lg">
+                  <LeftOutlined />
+                  <p>Trở về</p>
+                </p>
+              </Link>
+              <h3 className="title text-center">Nhập mã xác thực</h3>
+              <div className="text-base text-center items-center justify-center">
+                <p>Mã xác thực sẽ được gửi qua Email đến</p>
+                <p>
+                  <MailOutlined className="mr-2 text-orange-600" />
+                  {otpEmail}
+                </p>
+              </div>
+              <div className="w-full flex items-center justify-center mt-8">
                 <Form.Item
                   name="token"
                   hasFeedback
@@ -161,11 +183,13 @@ const ResetPassword = () => {
                 </Form.Item>
               </div>
               <div className="text-base flex text-center items-center justify-center">
-                <p>OPT hết hạn trong </p>
                 {timer > 0 ? (
-                  <p className="text-red-600 ml-1">
-                    {Math.floor(timer / 60)} phút {timer % 60} giây
-                  </p>
+                  <>
+                    <p>Mã xác thực hết hạn trong </p>
+                    <p className="text-red-600 ml-1">
+                      {Math.floor(timer / 60)} phút {timer % 60} giây
+                    </p>
+                  </>
                 ) : (
                   <p>Mã đã hết hạn</p>
                 )}

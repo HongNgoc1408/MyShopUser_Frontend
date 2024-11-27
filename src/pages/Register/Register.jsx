@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { showError } from "../../services/commonService";
 import authService from "../../services/authService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { LeftOutlined, MailOutlined } from "@ant-design/icons";
 
 const Register = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
@@ -12,6 +13,7 @@ const Register = () => {
   const [loadingConfirmCode, setLoadingConfirmCode] = useState(false);
   const [loadingRegister, setLoadingRegister] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [otpEmail, setOTPEmail] = useState([]);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isConfirmCode, setIsConfirmCode] = useState(false);
   const navigate = useNavigate();
@@ -30,13 +32,14 @@ const Register = () => {
     setLoadingSendEMail(true);
     try {
       await authService.sendCodeRegister(form.getFieldsValue("email"));
-      // console.log(res)
+
       notification.success({
         message: "Gửi OTP thành công",
         placement: "top",
       });
       setTimer(300);
       setIsCodeSent(true);
+      setOTPEmail(form.getFieldsValue("email").email);
     } catch (error) {
       showError(error);
     } finally {
@@ -97,6 +100,9 @@ const Register = () => {
           <>
             <Form
               form={form}
+              initialValues={{
+                email: "",
+              }}
               onFinish={handleSendCode}
               className="max-w-[555px] h-auto bg-white m-auto px-14 py-10 rounded-md"
             >
@@ -173,14 +179,14 @@ const Register = () => {
               </div>
 
               <div className="w-full flex items-center justify-center">
-                <p className="text-base cursor-pointer">
-                  Do you already have an account?
-                  <a
-                    href="/login"
+                <p className="text-base cursor-pointer flex">
+                  <p className="mr-1">Bạn đã có tài khoản chưa? </p>
+                  <Link
+                    to={"/login"}
                     className="text-base font-medium cursor-pointer hover:underline hover:underline-offset-2"
                   >
-                    Login
-                  </a>
+                    Đăng nhập
+                  </Link>
                 </p>
               </div>
             </Form>
@@ -189,11 +195,27 @@ const Register = () => {
           <>
             <Form
               form={form}
+              initialValues={{
+                email: "",
+              }}
               onFinish={handleConfirmCode}
-              className="max-w-[555px] h-auto bg-white m-auto mt-32 px-14 py-10 rounded-md"
+              className="max-w-[555px] h-auto bg-white m-auto px-14 py-10 rounded-md"
             >
-              <h3 className="title text-center">Nhập OTP</h3>
-              <div className="w-full flex items-center justify-center">
+              <Link to={"/register"} onClick={() => setIsCodeSent(false)}>
+                <p className="flex text-lg">
+                  <LeftOutlined />
+                  <p>Trở về</p>
+                </p>
+              </Link>
+              <h3 className="title text-center">Nhập mã xác thực</h3>
+              <div className="text-base text-center items-center justify-center">
+                <p>Mã xác thực sẽ được gửi qua Email đến</p>
+                <p>
+                  <MailOutlined className="mr-2 text-orange-600" />
+                  {otpEmail}
+                </p>
+              </div>
+              <div className="w-full flex items-center justify-center mt-8">
                 <Form.Item
                   name="token"
                   hasFeedback
@@ -208,11 +230,13 @@ const Register = () => {
                 </Form.Item>
               </div>
               <div className="text-base flex text-center items-center justify-center">
-                <p>OPT hết hạn trong </p>
                 {timer > 0 ? (
-                  <p className="text-red-600 ml-1">
-                    {Math.floor(timer / 60)} phút {timer % 60} giây
-                  </p>
+                  <>
+                    <p>Mã xác thực hết hạn trong </p>
+                    <p className="text-red-600 ml-1">
+                      {Math.floor(timer / 60)} phút {timer % 60} giây
+                    </p>
+                  </>
                 ) : (
                   <p>Mã đã hết hạn</p>
                 )}
@@ -221,7 +245,6 @@ const Register = () => {
               <div className="w-full flex flex-col my-4">
                 <button
                   type="primary"
-                  htmlType="submit"
                   size="large"
                   className="bg-dark-button text-base disabled:bg-gray-400 disabled:cursor-no-drop"
                   disabled={timer === 0}
@@ -236,8 +259,14 @@ const Register = () => {
         ) : (
           <Form
             form={form}
+            initialValues={{
+              fullName: "",
+              phoneNumber: "",
+              password: "",
+              confirm: "",
+            }}
             onFinish={handleRegister}
-            className="max-w-[555px] h-auto bg-white m-auto mt-32 px-14 py-10 rounded-md"
+            className="max-w-[555px] h-auto bg-white m-auto px-14 py-10 rounded-md"
           >
             <h3 className="title text-center">Thông tin đăng ký</h3>
             <div className="w-full flex flex-col">
@@ -262,6 +291,10 @@ const Register = () => {
                   {
                     required: true,
                     message: "Vui lòng nhập số điện thoại!",
+                  },
+                  {
+                    pattern: /^\+?\d{9,15}$/,
+                    message: "Số điện thoại không hợp lệ! (VD: +84123456789)",
                   },
                 ]}
               >
@@ -289,14 +322,13 @@ const Register = () => {
                   </span>
 
                   <input
-                    autocomplete="new-password"
+                    autoComplete="new-password"
                     type={isShowPassword ? "text" : "password"}
                     placeholder="Password"
                     className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"
                   />
                 </div>
               </Form.Item>
-
               <Form.Item
                 name="confirm"
                 dependencies={["password"]}
@@ -324,7 +356,7 @@ const Register = () => {
                   </span>
 
                   <input
-                    autocomplete="new-password"
+                    autoComplete="new-password"
                     type={isShowPassword ? "text" : "password"}
                     placeholder="Xác nhận mật khẩu"
                     className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"

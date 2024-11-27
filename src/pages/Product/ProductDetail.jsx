@@ -66,6 +66,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const res = await ProductService.getById(id);
+
         const productData = res.data;
         // console.log(res.data);
 
@@ -84,7 +85,12 @@ const ProductDetail = () => {
                 return sizeStock;
               })
             );
-            return { ...colorSize, sizeInStocks: updatedSizeInStocks };
+            const filteredSizeInStocks = updatedSizeInStocks.filter(
+              (sizeStock) => sizeStock.inStock > 0
+            );
+
+            return { ...colorSize, sizeInStocks: filteredSizeInStocks };
+            // return { ...colorSize, sizeInStocks: updatedSizeInStocks };
           })
         );
 
@@ -92,6 +98,7 @@ const ProductDetail = () => {
         setColorSizes(updatedColorSizes);
         setSelectedColorSize(updatedColorSizes[0]);
 
+        // console.log(updatedColorSizes[0]);
         if (updatedColorSizes[0]?.sizeInStocks.length > 0) {
           setSelectedSize(updatedColorSizes[0].sizeInStocks[0].sizeName);
         }
@@ -105,7 +112,14 @@ const ProductDetail = () => {
 
   const handleColorChange = (colorSize) => {
     setSelectedColorSize(colorSize);
+    // console.log(colorSize);
+    if (colorSize.sizeInStocks.length > 0) {
+      setSelectedSize(colorSize.sizeInStocks[0].sizeName);
+    } else {
+      setSelectedSize(null);
+    }
   };
+
   const handleSizeChange = (value) => {
     setSelectedSize(value);
   };
@@ -175,12 +189,12 @@ const ProductDetail = () => {
               <div>
                 {product.description ? (
                   product.description
-                    .split(".")
+                    .split("\n")
                     .map((item) => item.trim())
                     .filter((item) => item)
                     .map((item, index) => (
                       <div key={index} className="flex items-start mb-2">
-                        <span className="mr-2">-</span>
+                        {/* <span className="mr-2">-</span> */}
                         <span>{item}</span>
                       </div>
                     ))
@@ -196,12 +210,12 @@ const ProductDetail = () => {
               <div>
                 {product.guideSize ? (
                   product.guideSize
-                    .split(".")
+                    .split("\n")
                     .map((item) => item.trim())
                     .filter((item) => item)
                     .map((item, index) => (
                       <div key={index} className="flex items-start mb-2">
-                        <span className="mr-2">-</span>
+                        {/* <span className="mr-2">-</span> */}
                         <span>{item}</span>
                       </div>
                     ))
@@ -217,12 +231,12 @@ const ProductDetail = () => {
               <div>
                 {product.care ? (
                   product.care
-                    .split(".")
+                    .split("\n")
                     .map((item) => item.trim())
                     .filter((item) => item)
                     .map((item, index) => (
                       <div key={index} className="flex items-start mb-2">
-                        <span className="mr-2">-</span>
+                        {/* <span className="mr-2">-</span> */}
                         <span>{item}</span>
                       </div>
                     ))
@@ -414,31 +428,40 @@ const ProductDetail = () => {
                 className="mx-1 my-auto p-auto text-xl"
               />
               <p className="mx-1 text-xl my-auto p-auto">Còn lại:</p>
-              <p className="mx-1 text-xl  my-auto p-auto">
+              <p className="mx-1 text-xl my-auto p-auto text-orange-600 flex">
                 {selectedColorSize &&
                   selectedSize &&
                   selectedColorSize.sizeInStocks.find(
                     (sizeStock) => sizeStock.sizeName === selectedSize
                   )?.inStock}
 
-                {selectedSize ? ` |` : ""}
+                <p className="text-black">{selectedSize ? ` | ` : ""}</p>
               </p>
 
-              <p className="mx-1 my-auto p-auto text-xl">
-                Đã bán: {product.sold > 0 ? product.sold : "0"}
+              <p className="mx-1 my-auto p-auto text-xl flex">
+                Đã bán:
+                <p className="text-orange-600 ml-2">
+                  {product.sold > 0 ? product.sold : "0"}
+                </p>
               </p>
             </div>
             {selectedColorSize && (
               <>
                 <div className="flex">
                   <p className="mr-1 text-lg">Màu sắc:</p>
-                  <p className="text-lg mr-1">{selectedColorSize.colorName}</p>
+                  <p className="text-lg mr-1 font-semibold">
+                    {selectedColorSize.colorName}
+                  </p>
                 </div>
                 <div className="flex flex-nowrap">
                   {colorSizes.map((colorSize, index) => (
                     <div
                       key={index}
-                      className="m-1 cursor-pointer"
+                      className={`m-1 pt-1 px-1 cursor-pointer rounded-3xl ${
+                        selectedColorSize.colorName === colorSize.colorName
+                          ? "border-2 border-red-500"
+                          : ""
+                      }`}
                       onClick={() => handleColorChange(colorSize)}
                     >
                       <Image
@@ -448,11 +471,7 @@ const ProductDetail = () => {
                         // width={30}
                         src={toImageSrc(colorSize.imageUrl)}
                         alt={`color-${index}`}
-                        className={`rounded-full ${
-                          selectedColorSize.colorName === colorSize.colorName
-                            ? "border-2 border-blue-500"
-                            : ""
-                        }`}
+                        className="rounded-full"
                       />
                     </div>
                   ))}
@@ -463,8 +482,9 @@ const ProductDetail = () => {
                     layout="horizontal"
                     className="grid grid-cols-2 gap-2"
                     initialValues={{
-                      [`size-${selectedColorSize.colorName}`]: selectedSize,
-                      [`inStock-${selectedColorSize.colorName}`]: quantity,
+                      [`size-${selectedColorSize.colorName}`]:
+                        selectedSize || 0,
+                      [`inStock-${selectedColorSize.colorName}`]: quantity || 1,
                     }}
                   >
                     <Form.Item
@@ -478,22 +498,24 @@ const ProductDetail = () => {
                       ]}
                     >
                       <Select
+                        showSearch
+                        optionFilterProp="label"
                         required
                         placeholder="Chọn kích thước"
                         className="w-full"
-                        // defaultValue={selectedSize}
                         onChange={handleSizeChange}
                       >
-                        {selectedColorSize.sizeInStocks.map(
-                          (sizeStock, sizeIndex) => (
+                        {selectedColorSize.sizeInStocks
+                          .filter((sizeStock) => sizeStock.inStock > 0)
+                          .map((sizeStock, sizeIndex) => (
                             <Select.Option
                               key={sizeIndex}
                               value={sizeStock.sizeName}
+                              label={sizeStock.sizeName}
                             >
                               {sizeStock.sizeName}
                             </Select.Option>
-                          )
-                        )}
+                          ))}
                       </Select>
                     </Form.Item>
                     <Form.Item
@@ -511,7 +533,6 @@ const ProductDetail = () => {
                         value={quantity}
                         onChange={(value) => setQuantity(value)}
                         min={1}
-                        // defaultValue={1}
                         className="w-full"
                       />
                     </Form.Item>
@@ -530,11 +551,11 @@ const ProductDetail = () => {
                 {isAddCart ? "Đang thêm vào giỏ..." : "Thêm vào giỏ hàng"}
               </button>
             </div>
-            <div className="w-full text-left my-4">
-              <button className="light-button border-2 text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6">
+            {/* <div className="w-full text-left my-4">
+              <button className=" light-button border-2 text-base flex justify-center items-center gap-2 w-full py-5 px-4 font-bold rounded-md lg:m-0 md:px-6">
                 <span className="relative z-10">Mua ngay</span>
               </button>
-            </div>
+            </div> */}
             <div className="">
               <Collapse
                 className="text-base"

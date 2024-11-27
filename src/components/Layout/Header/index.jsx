@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import {
-  Menu,
   Dropdown,
   Avatar,
   Button,
@@ -80,16 +79,10 @@ const Header = ({ onSearch }) => {
     },
   ];
 
-  const auth = (
-    <Menu>
-      <Menu.Item key="1">
-        <Link to="/login">Đăng nhập</Link>
-      </Menu.Item>
-      <Menu.Item key="2">
-        <Link to="/register">Đăng ký</Link>
-      </Menu.Item>
-    </Menu>
-  );
+  const auth = [
+    { key: "1", label: <Link to="/login">Đăng nhập</Link> },
+    { key: "2", label: <Link to="/register">Đăng ký</Link> },
+  ];
 
   return (
     <>
@@ -103,7 +96,7 @@ const Header = ({ onSearch }) => {
       >
         <p>Bạn có chắc chắn muốn đăng xuất?</p>
       </Modal>
-      <nav className="flex w-full items-center justify-between bg-zinc-50 py-2 shadow-md sticky top-0 z-50 ">
+      <nav className="flex w-full items-center justify-between bg-zinc-50 py-2 shadow-md sticky top-0 z-50">
         <div className="flex w-full flex-wrap items-center justify-between px-3">
           <Button
             className="lg:hidden text-black/50 "
@@ -210,7 +203,7 @@ const Header = ({ onSearch }) => {
                 </>
               ) : (
                 <>
-                  <Dropdown overlay={auth} placement="bottomRight">
+                  <Dropdown menu={{ items : auth }} placement="bottomRight">
                     <Link
                       to={"/"}
                       className="flex text-base p-2 cursor-pointer"
@@ -242,11 +235,13 @@ const Header = ({ onSearch }) => {
 
       <Drawer onClose={onClose} open={open} placement="top" height={150}>
         <Input.Search
-          placeholder="Tìm kiếm"
+          placeholder="Tìm kiếm theo tên sản phẩm"
           size="large"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onSearch={handleSearch}
+          allowClear
+          onClear={() => setSearchValue("")}
         />
       </Drawer>
     </>

@@ -31,20 +31,19 @@ const Login = () => {
     }
   };
   const [isShowPassword, setIsShowPassword] = useState(false);
+
   return (
     <>
       <section className="py-12 xl:px-20 px-4">
         <Form
           form={form}
+          initialValues={{
+            username: "",
+            password: "",
+          }}
           onFinish={handleLogin}
           className="max-w-[555px] h-auto bg-white m-auto px-14 py-10 rounded-md"
         >
-          {/* <div className="hidden md:flex w-full items-center justify-center">
-            <Link to="/">
-              <img src="/logo.png" alt="logo" />
-            </Link>
-          </div> */}
-
           <h3 className="title text-center">Đăng nhập</h3>
           <div className="w-full flex flex-col">
             <Form.Item
@@ -62,7 +61,7 @@ const Login = () => {
               ]}
             >
               <input
-                autocomplete="email"
+                autoComplete="email"
                 type="email"
                 placeholder="Email"
                 className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"
@@ -86,7 +85,7 @@ const Login = () => {
                 </span>
 
                 <input
-                  autocomplete="current-password"
+                  autoComplete="new-password"
                   type={isShowPassword ? "text" : "password"}
                   placeholder="Mật khẩu"
                   className="w-full text-base text-black py-2 my-2 bg-transparent border-b border-black outline-none focus:outline-none"
@@ -97,7 +96,12 @@ const Login = () => {
 
           <div className="w-full flex items-center justify-between">
             <div className="w-full flex items-center">
-              <input type="checkbox" className="w-4 h-4 mr-2" checked="true" />
+              <input
+                type="checkbox"
+                className="w-4 h-4 mr-2"
+                checked
+                readOnly
+              />
               <p className="text-base">Ghi nhớ mật khẩu</p>
             </div>
             <div>
@@ -111,7 +115,13 @@ const Login = () => {
           </div>
 
           <div className="w-full flex flex-col my-4">
-            <button className="bg-dark-button text-base disabled:bg-gray-400 disabled:cursor-no-drop">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`bg-dark-button text-base py-2 rounded-md ${
+                loading ? "bg-gray-400 cursor-not-allowed" : ""
+              }`}
+            >
               <span className="relative z-10">
                 {loading ? <Spin /> : "Đăng nhập"}
               </span>

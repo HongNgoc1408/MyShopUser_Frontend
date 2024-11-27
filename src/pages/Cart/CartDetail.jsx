@@ -663,6 +663,11 @@ const CartDetail = () => {
                         required: true,
                         message: "Số điện thoại không được để trống",
                       },
+                      {
+                        pattern: /^\+?\d{9,15}$/,
+                        message:
+                          "Số điện thoại không hợp lệ! (VD: +84123456789)",
+                      },
                     ]}
                   >
                     <Input
