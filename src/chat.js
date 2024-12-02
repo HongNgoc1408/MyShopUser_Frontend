@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-const Chat = () => {
+const KommunicateChat = () => {
   const [registed, setRegistered] = useState(false);
 
   useEffect(() => {
@@ -9,10 +9,12 @@ const Chat = () => {
       if (!registed) {
         const user = Cookies.get("user_data");
         let userData;
+
         if (user) {
           userData = JSON.parse(user);
         }
 
+        // console.log(userData);
         if (userData) {
           // Kommunicate.init("34144efbc2238a6239923d4db0ab623f7", {
           //   automaticChatOpenOnNavigation: true,
@@ -68,4 +70,4 @@ const Chat = () => {
   return <></>;
 };
 
-export default Chat;
+export default KommunicateChat;

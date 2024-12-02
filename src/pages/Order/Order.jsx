@@ -87,7 +87,6 @@ const Order = () => {
         description: "Thanh toán thất bại",
       });
     }
-   
   };
 
   const showModal = async (orderId) => {
@@ -120,7 +119,7 @@ const Order = () => {
     setFileList([]);
   };
 
-  const onFinish = async ({ review }) => {
+  const onFinish = async ({ review = [] }) => {
     if (id) {
       try {
         // console.log(review)

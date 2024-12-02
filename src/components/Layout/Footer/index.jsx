@@ -15,9 +15,13 @@ const Footer = () => {
             <Link to={"/"}>
               <img src={logo} alt="" className="w-1/4" />
             </Link>
-            <p className="my-8 text-Black/75">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua
+            <p className="my-8 text-Black/75 cursor-pointer">
+              Địa chỉ cửa hàng: Hẻm 132 Đường 3/2 Phường Hưng Lợi Quận Ninh Kiều
+              Thành Phố Cần Thơ
+              <br />
+              Hotline: 0946633248
+              <br />
+              Email: lengoc14082002@gmail.com
             </p>
             <div className="flex items-center gap-6">
               <FaFacebookF className="w-5 h-5 cursor-pointer hover:text-orange-500" />

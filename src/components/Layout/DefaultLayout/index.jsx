@@ -6,7 +6,6 @@ import { Content } from "antd/es/layout/layout";
 import viVN from "antd/locale/vi_VN";
 import { useLocation } from "react-router-dom";
 
-
 const DefaultLayout = ({ children }) => {
   const location = useLocation();
   const [keySearch, setKeySearch] = useState("");

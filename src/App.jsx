@@ -13,7 +13,7 @@ import NotFound from "./pages/NotFound/NotFound";
 import UserService from "./services/UserService";
 
 import CartService from "./services/CartService";
-import Chat from "./chat";
+import KommunicateChat from "./chat";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -54,7 +54,7 @@ function App() {
         <AvatarContext.Provider value={{ avatar, setAvatar }}>
           <CountContext.Provider value={{ count, setCount }}>
             <FavoriteContext.Provider value={{ favoriteList, setFavoriteList }}>
-              <Chat />
+              <KommunicateChat />
               <Router>
                 <Routes>
                   {generatePublicRoutes(state.isAuthenticated)}

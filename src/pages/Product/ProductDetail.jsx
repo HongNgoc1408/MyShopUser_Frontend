@@ -85,12 +85,13 @@ const ProductDetail = () => {
                 return sizeStock;
               })
             );
-            const filteredSizeInStocks = updatedSizeInStocks.filter(
-              (sizeStock) => sizeStock.inStock > 0
-            );
 
-            return { ...colorSize, sizeInStocks: filteredSizeInStocks };
-            // return { ...colorSize, sizeInStocks: updatedSizeInStocks };
+            // const filteredSizeInStocks = updatedSizeInStocks.filter(
+            //   (sizeStock) => sizeStock.inStock > 0
+            // );
+
+            // return { ...colorSize, sizeInStocks: filteredSizeInStocks };
+            return { ...colorSize, sizeInStocks: updatedSizeInStocks };
           })
         );
 
@@ -113,11 +114,11 @@ const ProductDetail = () => {
   const handleColorChange = (colorSize) => {
     setSelectedColorSize(colorSize);
     // console.log(colorSize);
-    if (colorSize.sizeInStocks.length > 0) {
-      setSelectedSize(colorSize.sizeInStocks[0].sizeName);
-    } else {
-      setSelectedSize(null);
-    }
+    // if (colorSize.sizeInStocks.length > 0) {
+    //   setSelectedSize(colorSize.sizeInStocks[0].sizeName);
+    // } else {
+    //   setSelectedSize(null);
+    // }
   };
 
   const handleSizeChange = (value) => {
@@ -184,8 +185,8 @@ const ProductDetail = () => {
       children: (
         <>
           <div className="text-lg">
-            <div className="mb-5">
-              <div className="font-bold mb-5">* THÔNG TIN SẢN PHẨM</div>
+            <div className="mb-4">
+              <div className="font-bold mb-4">* THÔNG TIN SẢN PHẨM</div>
               <div>
                 {product.description ? (
                   product.description
@@ -193,8 +194,7 @@ const ProductDetail = () => {
                     .map((item) => item.trim())
                     .filter((item) => item)
                     .map((item, index) => (
-                      <div key={index} className="flex items-start mb-2">
-                        {/* <span className="mr-2">-</span> */}
+                      <div key={index} className="flex items-start mb-1">
                         <span>{item}</span>
                       </div>
                     ))
@@ -203,8 +203,8 @@ const ProductDetail = () => {
                 )}
               </div>
             </div>
-            <div className="mb-5">
-              <div className="font-bold mb-5">
+            <div className="mb-4">
+              <div className="font-bold mb-4">
                 * HƯỚNG DẪN CHỌN SIZE CHO BẠN
               </div>
               <div>
@@ -214,8 +214,7 @@ const ProductDetail = () => {
                     .map((item) => item.trim())
                     .filter((item) => item)
                     .map((item, index) => (
-                      <div key={index} className="flex items-start mb-2">
-                        {/* <span className="mr-2">-</span> */}
+                      <div key={index} className="flex items-start mb-1">
                         <span>{item}</span>
                       </div>
                     ))
@@ -224,8 +223,8 @@ const ProductDetail = () => {
                 )}
               </div>
             </div>
-            <div className="mb-5">
-              <div className="font-bold mb-5">
+            <div className="mb-4">
+              <div className="font-bold mb-4">
                 * HƯỚNG DẪN BẢO QUẢN VÀ SỬ DỤNG
               </div>
               <div>
@@ -235,8 +234,7 @@ const ProductDetail = () => {
                     .map((item) => item.trim())
                     .filter((item) => item)
                     .map((item, index) => (
-                      <div key={index} className="flex items-start mb-2">
-                        {/* <span className="mr-2">-</span> */}
+                      <div key={index} className="flex items-start mb-1">
                         <span>{item}</span>
                       </div>
                     ))
@@ -435,14 +433,14 @@ const ProductDetail = () => {
                     (sizeStock) => sizeStock.sizeName === selectedSize
                   )?.inStock}
 
-                <p className="text-black">{selectedSize ? ` | ` : ""}</p>
+                <span className="text-black">{selectedSize ? ` | ` : ""}</span>
               </p>
 
               <p className="mx-1 my-auto p-auto text-xl flex">
                 Đã bán:
-                <p className="text-orange-600 ml-2">
+                <span className="text-orange-600 ml-2">
                   {product.sold > 0 ? product.sold : "0"}
-                </p>
+                </span>
               </p>
             </div>
             {selectedColorSize && (
@@ -482,8 +480,7 @@ const ProductDetail = () => {
                     layout="horizontal"
                     className="grid grid-cols-2 gap-2"
                     initialValues={{
-                      [`size-${selectedColorSize.colorName}`]:
-                        selectedSize || 0,
+                      [`size-${selectedColorSize.colorName}`]: selectedSize,
                       [`inStock-${selectedColorSize.colorName}`]: quantity || 1,
                     }}
                   >

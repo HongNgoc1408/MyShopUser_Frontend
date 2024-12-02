@@ -131,10 +131,19 @@ const Header = ({ onSearch }) => {
               <Link
                 to={"/shop"}
                 className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
-                  location.pathname === "/product" ? "text-orange-500" : ""
+                  location.pathname === "/shop" ? "text-orange-500" : ""
                 }`}
               >
                 Sản phẩm
+              </Link>
+
+              <Link
+                to={"/guide"}
+                className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
+                  location.pathname === "/guide" ? "text-orange-500" : ""
+                }`}
+              >
+                Hướng dẫn
               </Link>
               {/* 
               <Link
@@ -145,15 +154,6 @@ const Header = ({ onSearch }) => {
               >
                 Bài viết
               </Link> */}
-
-              <Link
-                to={"/guide"}
-                className={`flex text-lg p-2 cursor-pointer hover:text-orange-500 ${
-                  location.pathname === "/about" ? "text-orange-500" : ""
-                }`}
-              >
-                Hướng dẫn
-              </Link>
 
               {/* <Link
                 to={"/"}
@@ -176,7 +176,7 @@ const Header = ({ onSearch }) => {
           <Col span={4} offset={2}>
             <div className="flex items-center">
               <Link
-                className="flex text-base p-2 cursor-pointer"
+                className="flex text-base p-2 cursor-pointer hover:text-orange-600"
                 onClick={showDrawer}
               >
                 <CiSearch size={30} fontWeight={800} />
@@ -203,10 +203,10 @@ const Header = ({ onSearch }) => {
                 </>
               ) : (
                 <>
-                  <Dropdown menu={{ items : auth }} placement="bottomRight">
+                  <Dropdown menu={{ items: auth }} placement="bottomRight">
                     <Link
                       to={"/"}
-                      className="flex text-base p-2 cursor-pointer"
+                      className="flex text-base p-2 cursor-pointer hover:text-orange-600"
                     >
                       <CiUser size={30} fontWeight={800} />
                     </Link>
@@ -216,10 +216,10 @@ const Header = ({ onSearch }) => {
 
               <Link
                 to={"/cart"}
-                className={`flex text-base p-2 cursor-pointer ${
+                className={`flex text-base p-2 cursor-pointer hover:text-orange-600 ${
                   location.pathname === "/cart"
-                    ? "text-orange-300"
-                    : "text-sky-700"
+                    ? "text-orange-600"
+                    : "text-blue-600"
                 }`}
               >
                 <>
@@ -243,6 +243,7 @@ const Header = ({ onSearch }) => {
           allowClear
           onClear={() => setSearchValue("")}
         />
+        
       </Drawer>
     </>
   );

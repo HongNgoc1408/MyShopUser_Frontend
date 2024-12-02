@@ -15,11 +15,13 @@ import CategoryService from "../../../services/CategoryService";
 import BrandService from "../../../services/BrandService";
 import { CiFilter } from "react-icons/ci";
 import { FaAngleDown } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
 
 const AllProduct = ({ keySearch }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [page, setPage] = useState(searchParams.get("page") ?? 1);
+  const [pageSize, setPageSize] = useState();
   const [totalItems, setTotalItems] = useState(0);
   const [brands, setBrands] = useState([]);
   const [categorys, setCategorys] = useState([]);
@@ -48,23 +50,49 @@ const AllProduct = ({ keySearch }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await ProductService.getFilterProducts({
-          page,
-          pageSize,
-          Key: keySearch,
-          brandIds: selectedBrandIds,
-          categoryIds: selectedCategoryIds,
-          sorter: selectedSorter,
-          rating: selectedRating,
-          discount,
-          minPrice,
-          maxPrice,
-        });
+        console.log(keySearch);
 
-        // console.log("res", res.data.items);
+        if (keySearch) {
+          const search = await ProductService.getSearchProducts({
+            Key: keySearch,
+          });
 
-        setProducts(res.data.items);
-        setTotalItems(res.data.totalItems);
+          const res = await ProductService.getFilterProducts({
+            page,
+            pageSize,
+            Key: "",
+            brandIds: selectedBrandIds,
+            categoryIds: selectedCategoryIds,
+            sorter: selectedSorter,
+            rating: selectedRating,
+            discount,
+            minPrice,
+            maxPrice,
+          });
+
+          const product = res.data.items.filter((product) =>
+            search.data.some((searchProduct) => searchProduct.id === product.id)
+          );
+
+          setProducts(product);
+          setTotalItems(product.length);
+        } else {
+          const res = await ProductService.getFilterProducts({
+            page,
+            pageSize,
+            Key: keySearch,
+            brandIds: selectedBrandIds,
+            categoryIds: selectedCategoryIds,
+            sorter: selectedSorter,
+            rating: selectedRating,
+            discount,
+            minPrice,
+            maxPrice,
+          });
+          setProducts(res.data.items);
+
+          setTotalItems(res.data.totalItems);
+        }
       } catch (error) {
         console.error("Error:", error);
       }
@@ -217,6 +245,7 @@ const AllProduct = ({ keySearch }) => {
                   </div>
                   <div className="flex border-b-2 pb-5">
                     <InputNumber
+                      value={minPrice}
                       placeholder="TỪ"
                       formatter={(value) =>
                         value
@@ -231,6 +260,7 @@ const AllProduct = ({ keySearch }) => {
                     />
                     <span className="mx-1"> _ </span>
                     <InputNumber
+                      value={maxPrice}
                       formatter={(value) =>
                         value
                           ? `₫ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -306,7 +336,7 @@ const AllProduct = ({ keySearch }) => {
                       setMinPrice(null);
                       setMaxPrice(null);
                       setDiscount(false);
-                      setSelectedSorter(null);
+                      setSelectedSorter(0);
                     }}
                   >
                     <p className="relative z-10">Xóa tất cả</p>
@@ -374,13 +404,26 @@ const AllProduct = ({ keySearch }) => {
             </>
 
             <div>
-              <Pagination
+              {/* <Pagination
                 align="center"
                 showSizeChanger
                 current={page}
                 pageSize={pageSize}
                 total={totalItems}
                 onChange={handlePageChange}
+              /> */}
+              <Pagination
+                align="center"
+                hideOnSinglePage
+                showSizeChanger
+                defaultCurrent={page}
+                defaultPageSize={pageSize}
+                total={totalItems}
+                onChange={(newPage, newPageSize) => {
+                  setPage(newPage);
+                  setPageSize(newPageSize);
+                  setSearchParams(`page=${newPage}`);
+                }}
               />
             </div>
           </div>

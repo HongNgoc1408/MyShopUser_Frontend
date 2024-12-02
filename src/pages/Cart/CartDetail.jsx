@@ -33,6 +33,7 @@ import OrderService from "../../services/OrderService";
 import { Link, useNavigate } from "react-router-dom";
 import debounce from "debounce";
 import { CountContext } from "../../App";
+import PaymentsService from "../../services/PaymentsService";
 
 const breadcrumb = [
   {
@@ -53,7 +54,7 @@ const CartDetail = () => {
   const [shippingFee, setShippingFee] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [dataAddress, setDataAddress] = useState({});
-  // const [payment, setPayment] = useState([]);
+  const [payment, setPayment] = useState([]);
   const [provinces, setProvince] = useState([]);
   const [districts, setDistrict] = useState([]);
   const [wards, setWard] = useState([]);
@@ -72,14 +73,14 @@ const CartDetail = () => {
         const res = await CartService.getAllByUserId();
         const address = await UserService.getAddress();
         const result = await AddressService.getProvince();
-        // const payment = await PaymentsService.getAll();
+        const payment = await PaymentsService.getAll();
 
-        // console.log("res", res.data);
+        console.log("res", payment.data);
 
         setData(res.data);
         setDataAddress(address.data);
         setProvince(result.data.data || []);
-        // setPayment(payment.data);
+        setPayment(payment.data);
       } catch (error) {
         showError(error);
       } finally {
@@ -151,6 +152,7 @@ const CartDetail = () => {
         message: "Cập nhật địa chỉ thành công.",
         placement: "top",
       });
+
       setIsModalOpen(false);
       setDataAddress(value);
     } catch (error) {
@@ -359,6 +361,8 @@ const CartDetail = () => {
 
         const res = await OrderService.add(order);
 
+        console.log(order);
+
         if (order.paymentMethodId !== 1) {
           window.location.replace(res.data);
         } else {
@@ -438,7 +442,9 @@ const CartDetail = () => {
       render: (_, record) => (
         <>
           <span className="price-card-product text-gray-500 line-through">
-            {formatVND(record.originPrice)}
+            {record.originPrice !== record.price
+              ? formatVND(record.originPrice)
+              : ""}
           </span>
           <span className="price-card-product">{formatVND(record.price)}</span>
         </>
@@ -507,8 +513,8 @@ const CartDetail = () => {
               <BreadcrumbLink breadcrumb={breadcrumb} />
             </div>
 
-            <div className="flex flex-col lg:flex-row sm:flex-col justify-between lg:space-x-4">
-              <div className="container mx-auto max-lg:px-8 pl-20 pr-10 w-full lg:w-2/3 sm:w-full">
+            <div className="flex md:flex-col lg:flex-row sm:flex-col justify-between lg:space-x-4">
+              <div className="container mx-auto max-lg:px-8 pl-20 pr-10 w-full lg:w-2/3 md:w-full sm:w-full">
                 <div className="my-5 p-5 bg-white shadow-md text-base">
                   <Steps initial={0} current={currentStep}>
                     <Steps.Step
@@ -559,7 +565,7 @@ const CartDetail = () => {
                   </ConfigProvider>
                 </div>
               </div>
-              <div className="container mx-auto max-lg:px-8 pr-20 w-full lg:w-1/3 sm:w-full">
+              <div className="container mx-auto max-lg:px-8 pr-20 w-full lg:w-1/3 md:w-full sm:w-full ">
                 <Card className="text-base my-5 p-5 bg-white shadow-md rounded-none">
                   <div className="space-x-2">
                     <div className="flex-col flex">
@@ -609,16 +615,17 @@ const CartDetail = () => {
                     value={value}
                     className="flex flex-col space-y-3"
                   >
-                    <Radio value="1" required>
-                      <div className="flex space-x-4 items-center">
-                        <span>COD</span>
-                      </div>
-                    </Radio>
-                    <Radio value="2" required>
-                      <div className="flex space-x-4 items-center">
-                        <span>VNPay</span>
-                      </div>
-                    </Radio>
+                    {payment.map((paymentOption) => (
+                      <Radio
+                        key={paymentOption.id}
+                        value={paymentOption.id}
+                        required
+                      >
+                        <div className="flex space-x-4 items-center">
+                          <span>{paymentOption.name}</span>
+                        </div>
+                      </Radio>
+                    ))}
                   </Radio.Group>
                 </Card>
                 <Divider className="my-[0.1rem] border-0" />
