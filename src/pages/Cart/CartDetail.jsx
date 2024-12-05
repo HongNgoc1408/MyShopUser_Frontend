@@ -16,6 +16,7 @@ import {
   Skeleton,
   Steps,
   Table,
+  Tooltip,
 } from "antd";
 import CartService from "../../services/CartService";
 import {
@@ -314,7 +315,7 @@ const CartDetail = () => {
     if (approximate < 200000) {
       setShippingFee(30000);
       setCurrentStep(1);
-    } else if (approximate >= 200000 && approximate < 500000) {
+    } else if (approximate >= 200000 && approximate <= 500000) {
       setShippingFee(20000);
       setCurrentStep(2);
     } else {
@@ -361,7 +362,7 @@ const CartDetail = () => {
 
         const res = await OrderService.add(order);
 
-        console.log(order);
+        // console.log(order);
 
         if (order.paymentMethodId !== 1) {
           window.location.replace(res.data);
@@ -388,8 +389,8 @@ const CartDetail = () => {
       render: (imageUrl, record) => (
         <div className="flex items-center">
           <Image
-            width={100}
-            height={120}
+            width={50}
+            height={70}
             src={toImageLink(imageUrl)}
             alt={record.productName}
           />
@@ -400,11 +401,16 @@ const CartDetail = () => {
       title: "Tên sản phẩm",
       dataIndex: "productName",
       render: (_, record) => (
-        <Link to={`/product-details/${record.productId}`}>
-          <span className="text-base capitalize ml-4 md:truncate md:w-96 truncate w-40">
-            {record.productName}
-          </span>
-        </Link>
+        <div className="text-base capitalize md:truncate md:w-24 sm:w-96">
+          <Link to={`/product-details/${record.productId}`}>
+            {/* <span className="text-base capitalize md:truncate md:w-96 truncate w-40"> */}
+            <Tooltip title={record.productName}>
+              <span>{record.productName}</span>
+            </Tooltip>
+
+            {/* </span> */}
+          </Link>
+        </div>
       ),
     },
 
@@ -412,7 +418,7 @@ const CartDetail = () => {
       title: "Màu sắc",
       dataIndex: "colorName",
       render: (_, record) => (
-        <span className="text-base ml-4 md:truncate md:w-96 truncate w-40">
+        <span className="text-base md:truncate md:w-96 truncate w-40">
           {record.colorName}
         </span>
       ),
@@ -441,12 +447,13 @@ const CartDetail = () => {
       align: "center",
       render: (_, record) => (
         <>
-          <span className="price-card-product text-gray-500 line-through">
+          <div className="price-card-product text-gray-500 line-through">
             {record.originPrice !== record.price
               ? formatVND(record.originPrice)
               : ""}
-          </span>
-          <span className="price-card-product">{formatVND(record.price)}</span>
+          </div>
+
+          <div className="price-card-product">{formatVND(record.price)}</div>
         </>
       ),
     },
@@ -493,7 +500,7 @@ const CartDetail = () => {
       render: (text, record) => (
         <Button
           danger
-          className="border-0 flex items-center"
+          className="flex items-center"
           onClick={() => handleDeleteProduct(record.id)}
         >
           <DeleteOutlined />
@@ -526,10 +533,7 @@ const CartDetail = () => {
                       className="text-base"
                       title={formatVND(20000)}
                       description={
-                        "từ " +
-                        formatVND(200000) +
-                        "đến dưới " +
-                        formatVND(500000)
+                        "từ " + formatVND(200000) + " đến " + formatVND(500000)
                       }
                     />
                     <Steps.Step
@@ -622,7 +626,7 @@ const CartDetail = () => {
                         required
                       >
                         <div className="flex space-x-4 items-center">
-                          <span>{paymentOption.name}</span>
+                          <span>Thanh toán {paymentOption.name}</span>
                         </div>
                       </Radio>
                     ))}

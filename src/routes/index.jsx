@@ -14,6 +14,7 @@ import OrderDetail from "../pages/Order/OrderDetail";
 import Payment from "../pages/Payment";
 import Favorites from "../pages/Favorite/Favorites";
 import BuyingGuide from "../pages/BuyingGuide";
+import ImageSearch from "../pages/ImageSearch";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -25,6 +26,7 @@ export const publicRoutes = [
   { path: "/shop", component: Shop },
   { path: "/product-details/:id", component: ProductDetail },
   { path: "/guide", component: BuyingGuide },
+  { path: "/image", component: ImageSearch },
 ];
 
 export const privateRoutes = [

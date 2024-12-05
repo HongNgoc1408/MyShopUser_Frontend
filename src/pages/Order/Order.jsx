@@ -12,6 +12,7 @@ import {
   Skeleton,
   Statistic,
   Tabs,
+  Tag,
   Upload,
 } from "antd";
 
@@ -63,7 +64,7 @@ const Order = () => {
       try {
         const res = await OrderService.getAll();
 
-        // console.log(res.data.items);
+        console.log(res.data.items);
 
         setOrders(res.data.items);
       } catch (error) {
@@ -119,7 +120,8 @@ const Order = () => {
     setFileList([]);
   };
 
-  const onFinish = async ({ review = [] }) => {
+  const onFinish = async ({ review }) => {
+
     if (id) {
       try {
         // console.log(review)
@@ -154,7 +156,7 @@ const Order = () => {
         });
 
         await OrderService.review(id, formData);
-        const updatedOrder = await OrderService.getDetail(id);
+        await OrderService.getDetail(id);
         // setOrderDetails(updatedOrder.data);
 
         notification.success({
@@ -210,7 +212,7 @@ const Order = () => {
           order.id === id
             ? {
                 ...order,
-                orderStatus: "Received",
+                orderStatus: 3,
                 detail: { ...order.detail, orderStatus: "Received" },
               }
             : order
@@ -498,20 +500,39 @@ const Order = () => {
                     <Card
                       key={order.id}
                       title={
-                        <span className="text-lg font-semibold">
-                          {formatDateTime(order.orderDate)}
-                        </span>
+                        <>
+                          <div className="text-lg font-semibold pt-2">
+                            Mã đơn: {order.id}
+                          </div>
+                          <div className="text-lg font-semibold pb-2">
+                            Ngày đặt: {formatDateTime(order.orderDate)}
+                          </div>
+                          <div className="text-lg font-semibold">
+                            {order.shippingCode
+                              ? `Mã vận đơn: ${order.shippingCode}`
+                              : ""}
+                          </div>
+                          <div className="text-lg font-semibold">
+                            {order.expected_delivery_time
+                              ? `Ngày giao hàng dự kiến: ${formatDateTime(
+                                  order.expected_delivery_time
+                                )}`
+                              : ""}
+                          </div>
+                        </>
                       }
                       extra={
-                        <div className="flex text-lg font-semibold">
-                          <span className="">Trạng thái đơn hàng:</span>
-                          <Link
-                            to={`/order-detail/${order.id}`}
-                            className="text-lg mx-1 text-blue-600"
-                          >
-                            {getStatusOrder(order.orderStatus)}
-                          </Link>
-                        </div>
+                        <>
+                          <div className="flex text-lg font-semibold">
+                            <span className="">Trạng thái đơn hàng:</span>
+                            <Link
+                              to={`/order-detail/${order.id}`}
+                              className="text-lg mx-1 text-blue-600"
+                            >
+                              {getStatusOrder(order.orderStatus)}
+                            </Link>
+                          </div>
+                        </>
                       }
                       className="bg-white rounded-none my-5"
                     >

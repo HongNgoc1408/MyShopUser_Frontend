@@ -14,6 +14,7 @@ import UserService from "./services/UserService";
 
 import CartService from "./services/CartService";
 import KommunicateChat from "./chat";
+import ScrollToTop from "./components/ScrollToStop";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -55,6 +56,7 @@ function App() {
           <CountContext.Provider value={{ count, setCount }}>
             <FavoriteContext.Provider value={{ favoriteList, setFavoriteList }}>
               <KommunicateChat />
+              <ScrollToTop />
               <Router>
                 <Routes>
                   {generatePublicRoutes(state.isAuthenticated)}

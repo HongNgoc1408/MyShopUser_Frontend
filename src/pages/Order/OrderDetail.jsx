@@ -1,4 +1,4 @@
-import { Card, Divider, Image, Skeleton, Steps } from "antd";
+import { Card, Divider, Image, Skeleton, Steps, Tag } from "antd";
 import React, { useEffect, useState } from "react";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import OrderService from "../../services/OrderService";
@@ -16,6 +16,7 @@ import {
   CiDeliveryTruck,
   CiInboxIn,
   CiReceipt,
+  CiSquareRemove,
   CiStar,
 } from "react-icons/ci";
 
@@ -38,15 +39,16 @@ const OrderDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [current, setCurrent] = useState(0);
+
   const onChange = (value) => {
-    // console.log("onChange:", value);
     setCurrent(value);
   };
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         const res = await OrderService.getDetail(id);
-        // console.log(res.data);
+        console.log(res.data);
         setOrders(res.data);
       } catch (error) {
         console.error("Error:", error);
@@ -82,6 +84,208 @@ const OrderDetail = () => {
 
   const orderStatus = orders.orderStatus || "";
 
+  const items = [
+    {
+      title:
+        orders.amountPaid > 0 ? (
+          <div className="text-nowrap">Đơn hàng đã thanh toán</div>
+        ) : (
+          <div className="text-nowrap">Đơn hàng chưa thanh toán</div>
+        ),
+
+      description: (
+        <span className="text-gray-600">
+          {orders.amountPaid > 0
+            ? formatVND(orders.amountPaid)
+            : orders.paymentMethod}
+        </span>
+      ),
+      icon: (
+        <div
+          className={`border-2 rounded-full p-1 ${
+            orders.amountPaid > 0
+              ? "border-green-600"
+              : orders.orderStatus === "Canceled"
+              ? "border-red-600"
+              : orders.orderStatus === "Received" || orders.reviewed
+              ? "border-green-600"
+              : "border-gray-600"
+          }`}
+        >
+          <CiCreditCard1
+            size={30}
+            className={`items-center font-bold ${
+              orders.amountPaid > 0
+                ? "text-green-600"
+                : orders.orderStatus === "Canceled"
+                ? "text-red-600"
+                : orders.orderStatus === "Received" || orders.reviewed
+                ? "text-green-600"
+                : "text-gray-600"
+            }`}
+          />
+        </div>
+      ),
+    },
+    {
+      title:
+        orderStatus === "Processing" ? (
+          <div className="text-nowrap">Đơn hàng đang xử lý</div>
+        ) : (
+          <div className="text-nowrap">Đơn hàng đã duyệt</div>
+        ),
+      description: (
+        <span className="text-gray-600">
+          {`Ngày đặt: ${formatDateTime(orders.orderDate)}`}
+        </span>
+      ),
+      icon: (
+        <div
+          className={`border-2 rounded-full p-1 ${
+            orderStatus === "Processing"
+              ? "border-gray-600"
+              : orders.orderStatus === "Canceled"
+              ? "border-red-600"
+              : "border-green-600"
+          }`}
+        >
+          <CiReceipt
+            size={30}
+            className={`items-center font-bold ${
+              orderStatus === "Processing"
+                ? "text-gray-600"
+                : orders.orderStatus === "Canceled"
+                ? "text-red-600"
+                : "text-green-600"
+            }`}
+          />
+        </div>
+      ),
+    },
+    {
+      title:
+        orderStatus === "Shipping" || orderStatus === "Received" ? (
+          <div className="text-nowrap">Đơn hàng đang vận chuyển</div>
+        ) : (
+          <div className="text-nowrap">Đơn hàng chờ vận chuyển</div>
+        ),
+      description: (
+        <span className="text-gray-600">
+          {orders.shippingCode ? `Mã vận đơn: ${orders.shippingCode}` : ""}
+        </span>
+      ),
+      icon: (
+        <div
+          className={`border-2 rounded-full p-1 ${
+            orderStatus === "Shipping" || orderStatus === "Received"
+              ? "border-green-600"
+              : orders.orderStatus === "Canceled"
+              ? "border-red-600"
+              : "border-gray-600"
+          }`}
+        >
+          <CiDeliveryTruck
+            size={30}
+            className={`items-center font-bold ${
+              orderStatus === "Shipping" || orderStatus === "Received"
+                ? "text-green-600"
+                : orders.orderStatus === "Canceled"
+                ? "text-red-600"
+                : "text-gray-600"
+            }`}
+          />
+        </div>
+      ),
+    },
+    {
+      title:
+        orderStatus === "Received" ? (
+          <div className="text-nowrap">Đơn hàng đã nhận</div>
+        ) : (
+          <div className="text-nowrap">Đơn hàng chưa nhận</div>
+        ),
+      description: (
+        <span className="text-gray-600">
+          {orders.receivedDate !== "0001-01-01T00:00:00"
+            ? `Ngày nhận: ${formatDateTime(orders.receivedDate)}`
+            : ""}
+        </span>
+      ),
+      icon: (
+        <div
+          className={`border-2 rounded-full p-1 ${
+            orderStatus === "Received"
+              ? "border-green-600"
+              : orders.orderStatus === "Canceled"
+              ? "border-red-600"
+              : "border-gray-600"
+          }`}
+        >
+          <CiInboxIn
+            size={30}
+            className={`items-center font-bold ${
+              orderStatus === "Received"
+                ? "text-green-600"
+                : orders.orderStatus === "Canceled"
+                ? "text-red-600"
+                : "text-gray-600"
+            }`}
+          />
+        </div>
+      ),
+    },
+    {
+      title: orders.reviewed ? (
+        <div className="text-nowrap">Đã đánh giá</div>
+      ) : (
+        <div className="text-nowrap">Chưa đánh giá</div>
+      ),
+      icon: (
+        <div
+          className={`border-2 rounded-full p-1 ${
+            orders.reviewed
+              ? "border-green-600"
+              : orders.orderStatus === "Canceled"
+              ? "border-red-600"
+              : "border-gray-600"
+          }`}
+        >
+          <CiStar
+            size={30}
+            className={`items-center font-bold ${
+              orders.reviewed
+                ? "text-green-600"
+                : orders.orderStatus === "Canceled"
+                ? "text-red-600"
+                : "text-gray-600"
+            }`}
+          />
+        </div>
+      ),
+    },
+    {
+      title: <div className="text-nowrap">Đã hủy</div>,
+      icon: (
+        <div
+          className={`border-2 rounded-full p-1 ${
+            orders.orderStatus === "Canceled"
+              ? "border-green-600"
+              : "border-gray-600"
+          }`}
+        >
+          <CiSquareRemove
+            size={30}
+            className={`items-center font-bold ${
+              orders.orderStatus === "Canceled"
+                ? "text-green-600"
+                : "text-gray-600"
+            }`}
+          />
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="bg-gray-100">
       {isLoading ? (
@@ -95,104 +299,51 @@ const OrderDetail = () => {
             <div className="container mx-auto max-lg:px-8 px-28 ">
               <Steps
                 labelPlacement="vertical"
-                current={current}
+                items={items}
+                current={
+                  orders.reviewed
+                    ? 5
+                    : orders.orderStatus === "Received"
+                    ? 3
+                    : orders.orderStatus === "Shipping"
+                    ? 3
+                    : orders.orderStatus === "Confirmed"
+                    ? 1
+                    : orders.orderStatus === "Processing"
+                    ? 0
+                    : orders.orderStatus === "Cancel"
+                    ? 5
+                    : 0
+                }
                 onChange={onChange}
-                items={[
-                  {
-                    title:
-                      orderStatus === "Processing"
-                        ? "Đơn hàng chờ xét duyệt"
-                        : "Đơn hàng đã đặt",
-                    description: (
-                      <span className="text-gray-400">
-                        {formatDateTime(orders.orderDate)}
-                      </span>
-                    ),
-                    icon: (
-                      <div
-                        className={`border-2 rounded-full p-1 ${
-                          orderStatus === "Processing"
-                            ? "text-gray-400"
-                            : "border-green-600"
-                        }`}
-                      >
-                        <CiReceipt
-                          size={30}
-                          className={`items-center font-bold ${
-                            orderStatus === "Processing"
-                              ? "text-gray-400"
-                              : "text-green-600"
-                          }`}
-                        />
-                      </div>
-                    ),
-                  },
-                  {
-                    title: "Đơn hàng đã thanh toán",
-                    description: (
-                      <span className="text-gray-400">
-                        {orders.amountPaid > 0
-                          ? formatVND(orders.amountPaid)
-                          : ""}
-                      </span>
-                    ),
-                    icon: (
-                      <div className="border-2 border-green-600 rounded-full p-1">
-                        <CiCreditCard1
-                          size={30}
-                          className="items-center text-green-600 font-bold"
-                        />
-                      </div>
-                    ),
-                  },
-                  {
-                    title: "Đơn hàng gửi cho đơn vị vận chuyển",
-
-                    icon: (
-                      <div className="border-2 border-green-600 rounded-full p-1">
-                        <CiDeliveryTruck
-                          size={30}
-                          className="items-center text-green-600 font-bold"
-                        />
-                      </div>
-                    ),
-                  },
-                  {
-                    title: "Chờ giao hàng",
-                    icon: (
-                      <div className="border-2 rounded-full p-1">
-                        <CiInboxIn
-                          size={30}
-                          className="items-center font-bold"
-                        />
-                      </div>
-                    ),
-                  },
-                  {
-                    title: "Đánh giá",
-                    icon: (
-                      <div className="border-2 rounded-full p-1">
-                        <CiStar size={30} className="items-center font-bold" />
-                      </div>
-                    ),
-                  },
-                ]}
               />
             </div>
             <div className="container mx-auto max-lg:px-8 px-20">
               <Card
                 key={orders.id}
-                title={formatDateTime(orders.orderDate)}
+                title={
+                  <>
+                    <p className="text-lg pt-2">
+                      Ngày đặt: {formatDateTime(orders.orderDate)}
+                    </p>
+
+                    <p className="text-lg pb-2">
+                      {orders.receivedDate !== "0001-01-01T00:00:00"
+                        ? `Ngày nhận hàng: ${formatDateTime(
+                            orders.receivedDate
+                          )}`
+                        : ""}
+                    </p>
+                  </>
+                }
                 extra={
                   <div className="flex tetx-base">
-                    <CiDeliveryTruck size={20} className="mx-1" />
-                    <Link
-                      // to={`/orders-detail/${orders.id}`}
-                      className="text-base mx-1"
-                    >
+                    <CiDeliveryTruck size={25} className="mx-1" />
+                    <Link className="text-lg mx-1">
                       Mã đơn hàng: {orders.id} |
                     </Link>
-                    <p className="text-base mx-1">
+
+                    <p className="text-lg mx-1 text-blue-600">
                       {orders ? getStatusOrder(orders.orderStatus) : "Không rõ"}
                     </p>
                   </div>
@@ -205,11 +356,11 @@ const OrderDetail = () => {
                 >
                   <div className="flex">
                     <div className="flex-col my-auto justify-start items-center">
-                      <div className="text-xl font-semibold">
+                      <div className="text-xl font-semibold mb-2">
                         Địa chỉ nhận hàng
                       </div>
-                      <div className="text-base"> {orders.receiver}</div>
-                      <div className="text-base"> {orders.deliveryAddress}</div>
+                      <div className="text-lg"> {orders.receiver}</div>
+                      <div className="text-lg"> {orders.deliveryAddress}</div>
                     </div>
                     <div className="justify-end items-center text-end"></div>
                   </div>
@@ -238,28 +389,23 @@ const OrderDetail = () => {
                   // to={`/orders-detail/${orders.id}`}
                   className="hover:text-current"
                 >
-                  {orders.productOrderDetails.map((product) => (
-                    <div className="flex">
-                      <div>
+                  {orders.productOrderDetails.map((product, index) => (
+                    <div className="flex py-4 border-b" key={index}>
+                      <div className="w-1/4">
                         <Image
                           src={toImageSrc(product.imageUrl)}
                           style={{ width: "100px", height: " 150px" }}
-                          // width={100}
-                          // height={150}
                         />
                       </div>
-                      <div className="flex-col my-auto justify-start items-center ml-10">
-                        <p className="text-lg capitalize font-semibold">
+                      <div className="w-2/4 flex-col my-auto">
+                        <p className="text-xl capitalize font-semibold">
                           {product.productName}
                         </p>
-                        <p className="text-base">
-                          Phân loại hàng: {product.colorName},{product.sizeName}
-                        </p>
-                        <p className="text-base">
-                          Số lượng: {product.quantity}
-                        </p>
+                        <p className="text-lg">Màu sắc: {product.colorName}</p>
+                        <p className="text-lg">Kích cỡ: {product.sizeName}</p>
+                        <p className="text-lg">Số lượng: {product.quantity}</p>
                       </div>
-                      <div className="flex justify-end items-center text-end">
+                      <div className="w-1/4 text-right flex justify-end items-center">
                         <div className="flex justify-end items-center text-end w-1/2">
                           <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-gray-500 line-through">
                             {formatVND(product.originPrice)}
@@ -288,13 +434,17 @@ const OrderDetail = () => {
                   </div>
                   <div className="w-1/4 flex-col justify-end items-end text-right">
                     <div className="flex justify-end items-center text-xl">
-                      <p>{orders ? formatVND(orders.total) : "0 ₫"}</p>
+                      <p className="font-semibold text-orange-600">
+                        {orders ? formatVND(orders.total) : "0 ₫"}
+                      </p>
                     </div>
                     <div className="flex justify-end items-center text-xl">
-                      <p>{orders ? formatVND(orders.shippingCost) : "0 ₫"}</p>
+                      <p className="font-semibold text-orange-600">
+                        {orders ? formatVND(orders.shippingCost) : "0 ₫"}
+                      </p>
                     </div>
                     <div className="flex justify-end items-center text-xl">
-                      <p>
+                      <p className="font-semibold text-orange-600">
                         {orders
                           ? getPaymentMethodLabel(orders.paymentMethod)
                           : "Không rõ"}

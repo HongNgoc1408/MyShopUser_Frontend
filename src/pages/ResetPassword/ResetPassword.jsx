@@ -104,7 +104,7 @@ const ResetPassword = () => {
               <Link to={"/login"} onClick={() => setIsCodeSent(false)}>
                 <p className="flex text-lg">
                   <LeftOutlined />
-                  <p>Trở về</p>
+                  <span>Trở về</span>
                 </p>
               </Link>
               <h3 className="title text-center">Quên mật khẩu</h3>
