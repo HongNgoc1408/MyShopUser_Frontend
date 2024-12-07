@@ -5,18 +5,6 @@ const API_URL =
 
 const TOKEN_API = "23fbd696-8b95-11ef-8e53-0a00184fe694";
 
-// const API_URL = "https://provinces.open-api.vn/api";
-
-// const getProvince = async () => await axios.get(API_URL);
-
-// const getProvince = async () => await axios.get(API_URL + "/p" , );
-
-// const getDistrictsProvice = async (provinceCode) =>
-//   await axios.get(`${API_URL}/p/${provinceCode}?depth=2`);
-
-// const getWardsProvice = async (districtCode) =>
-//   await axios.get(`${API_URL}/d/${districtCode}?depth=2`);
-
 const getProvince = async () =>
   await axios.get(API_URL + "/province", { headers: { Token: TOKEN_API } });
 

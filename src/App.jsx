@@ -56,8 +56,8 @@ function App() {
           <CountContext.Provider value={{ count, setCount }}>
             <FavoriteContext.Provider value={{ favoriteList, setFavoriteList }}>
               <KommunicateChat />
-              <ScrollToTop />
               <Router>
+                <ScrollToTop />
                 <Routes>
                   {generatePublicRoutes(state.isAuthenticated)}
                   {generatePrivateRoutes(state.isAuthenticated)}

@@ -146,7 +146,7 @@ const Register = () => {
 
               <Divider plain>Hoặc</Divider>
 
-              <div className="w-full flex items-center justify-center">
+              {/* <div className="w-full flex items-center justify-center">
                 <div className="w-full flex flex-col ml-0 m-4 items-center justify-center">
                   <button className="px-12 py-2 border-2 text-base disabled:bg-gray-400 disabled:cursor-no-drop hover:bg-gray-100">
                     <span className="flex">
@@ -155,7 +155,7 @@ const Register = () => {
                         alt="Facebook logo"
                         className="w-6 h-6 mr-2"
                       />
-                      {/* <FaFacebook size={30} color="blue" /> */}
+                     
                       <p className="my-auto mx-2">Facebook</p>
                     </span>
                   </button>
@@ -168,12 +168,12 @@ const Register = () => {
                         alt="Google logo"
                         className="w-6 h-6"
                       />
-                      {/* <FaGoogle size={30} color="red" /> */}
+                   
                       <p className="my-auto mx-2">Google</p>
                     </span>
                   </button>
                 </div>
-              </div>
+              </div> */}
               <div className="w-full flex items-center justify-center relative py-2">
                 <div className="w-full h-[1px] bg-black"></div>
               </div>

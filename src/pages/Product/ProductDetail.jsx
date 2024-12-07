@@ -13,12 +13,7 @@ import {
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Tabs } from "antd";
 import ProductService from "../../services/ProductService";
-import {
-  formatDis,
-  formatVND,
-  showError,
-  toImageSrc,
-} from "../../services/commonService";
+import { formatDis, formatVND, toImageSrc } from "../../services/commonService";
 import SizeService from "../../services/SizeService";
 import CartService from "../../services/CartService";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
@@ -34,6 +29,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const carouselRef = useRef(null);
   const location = useLocation();
+
   const queryParams = new URLSearchParams(location.search);
   const [isAddCart, setIsAddCart] = useState(false);
   const [product, setProduct] = useState([]);
@@ -63,6 +59,10 @@ const ProductDetail = () => {
   ];
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await ProductService.getById(id);
@@ -86,11 +86,6 @@ const ProductDetail = () => {
               })
             );
 
-            // const filteredSizeInStocks = updatedSizeInStocks.filter(
-            //   (sizeStock) => sizeStock.inStock > 0
-            // );
-
-            // return { ...colorSize, sizeInStocks: filteredSizeInStocks };
             return { ...colorSize, sizeInStocks: updatedSizeInStocks };
           })
         );
@@ -99,7 +94,6 @@ const ProductDetail = () => {
         setColorSizes(updatedColorSizes);
         setSelectedColorSize(updatedColorSizes[0]);
 
-        // console.log(updatedColorSizes[0]);
         if (updatedColorSizes[0]?.sizeInStocks.length > 0) {
           setSelectedSize(updatedColorSizes[0].sizeInStocks[0].sizeName);
         }
@@ -277,6 +271,7 @@ const ProductDetail = () => {
 
   const addToCart = async () => {
     setIsAddCart(true);
+
     try {
       const sizeInStock = selectedColorSize.sizeInStocks.find(
         (sizeStock) => sizeStock.sizeName === selectedSize
@@ -285,6 +280,15 @@ const ProductDetail = () => {
       if (!sizeInStock) {
         notification.error({
           message: "Vui lòng chọn kích thước hợp lệ.",
+          placement: "top",
+        });
+        return;
+      }
+      // console.log(quantity > sizeInStock.inStock);
+
+      if (!(quantity <= sizeInStock.inStock)) {
+        notification.error({
+          message: "Số lượng vượt quá tồn kho",
           placement: "top",
         });
         return;
@@ -314,17 +318,17 @@ const ProductDetail = () => {
         });
         navigate("/login");
       } else {
-        showError(error);
-        // notification.error({
-        //   message: "Có lỗi xảy ra, vui lòng thử lại sau.",
-        //   error,
-        // });
+        notification.error({
+          message:
+            error.response.data || "Có lỗi xảy ra, vui lòng thử lại sau.",
+          placement: "top",
+        });
       }
     } finally {
       setIsAddCart(false);
     }
   };
-
+  // console.log(selectedColorSize);
   return (
     <div className="container mx-auto max-lg:px-8 px-24">
       <div className="my-5">
@@ -443,6 +447,7 @@ const ProductDetail = () => {
                 </span>
               </p>
             </div>
+
             {selectedColorSize && (
               <>
                 <div className="flex">
@@ -481,7 +486,7 @@ const ProductDetail = () => {
                     className="grid grid-cols-2 gap-2"
                     initialValues={{
                       [`size-${selectedColorSize.colorName}`]: selectedSize,
-                      [`inStock-${selectedColorSize.colorName}`]: quantity || 1,
+                      [`inStock-${selectedColorSize.colorName}`]: quantity,
                     }}
                   >
                     <Form.Item
@@ -526,7 +531,10 @@ const ProductDetail = () => {
                       ]}
                     >
                       <InputNumber
-                        max={selectedColorSize.inStock}
+                        defaultValue={1}
+                        max={selectedColorSize.sizeInStocks.map(
+                          (sizeStock) => sizeStock.inStock
+                        )}
                         value={quantity}
                         onChange={(value) => setQuantity(value)}
                         min={1}
@@ -556,7 +564,7 @@ const ProductDetail = () => {
             <div className="">
               <Collapse
                 className="text-base"
-                defaultActiveKey={["1"]}
+                defaultActiveKey={["1", "2"]}
                 onChange={onChange}
                 expandIconPosition="end"
                 items={items}

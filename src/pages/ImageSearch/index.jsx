@@ -38,13 +38,13 @@ const ImageSearch = () => {
   };
   const handleSearch = async (image) => {
     const imagePixels = await convertImageToPixels(image); // Convert image to pixel data
-    console.log(imagePixels); // Log the pixel array to verify the format
+    // console.log(imagePixels); // Log the pixel array to verify the format
 
     // const data = { imagePixels }; // Send imagePixels as an object with an array
     try {
       // console.log("data", data);
       const response = await ImageService.search(imagePixels); // Send request to API
-      console.log(response);
+      // console.log(response);
       setResults(response.data); // Set results after receiving response
     } catch (error) {
       console.error(error);

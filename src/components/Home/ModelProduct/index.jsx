@@ -88,7 +88,7 @@ const ModelProduct = ({ open, setOpen, id }) => {
     carouselRef.current.goTo(index);
   };
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
   };
 
   const items = [

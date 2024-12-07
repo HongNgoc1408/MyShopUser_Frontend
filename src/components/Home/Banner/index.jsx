@@ -18,22 +18,22 @@ const Banner = ({
       <Carousel autoplay ref={carouselRef} infinite={false}>
         <div>
           <Link>
-            <img src={banner1} alt="banner1" className="w-full max-h-[500px]" />
+            <img src={banner1} alt="banner1" className="w-full max-h-[400px]" />
           </Link>
         </div>
         <div>
           <Link>
-            <img src={banner2} alt="banner2" className="w-full max-h-[500px]" />
+            <img src={banner2} alt="banner2" className="w-full max-h-[400px]" />
           </Link>
         </div>
         <div>
           <Link>
-            <img src={banner3} alt="banner3" className="w-full max-h-[500px]" />
+            <img src={banner3} alt="banner3" className="w-full max-h-[400px]" />
           </Link>
         </div>
         <div>
           <Link>
-            <img src={banner4} alt="banner4" className="w-full max-h-[500px]" />
+            <img src={banner4} alt="banner4" className="w-full max-h-[400px]" />
           </Link>
         </div>
       </Carousel>

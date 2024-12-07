@@ -50,7 +50,7 @@ const AllProduct = ({ keySearch }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log(keySearch);
+        // console.log(keySearch);
 
         if (keySearch) {
           const search = await ProductService.getSearchProducts({
@@ -245,6 +245,7 @@ const AllProduct = ({ keySearch }) => {
                   </div>
                   <div className="flex border-b-2 pb-5">
                     <InputNumber
+                      min={0}
                       value={minPrice}
                       placeholder="TỪ"
                       formatter={(value) =>
@@ -260,6 +261,7 @@ const AllProduct = ({ keySearch }) => {
                     />
                     <span className="mx-1"> _ </span>
                     <InputNumber
+                      min={0}
                       value={maxPrice}
                       formatter={(value) =>
                         value
@@ -294,8 +296,7 @@ const AllProduct = ({ keySearch }) => {
                       onChange={() => handleRatingChange(4)}
                       className="text-lg"
                     >
-                      <Rate value={5} disabled />
-                      <span>trở lên</span>
+                      <Rate value={4} disabled />
                     </Checkbox>{" "}
                     <Checkbox
                       key={3}
@@ -304,7 +305,6 @@ const AllProduct = ({ keySearch }) => {
                       className="text-lg"
                     >
                       <Rate value={3} disabled />
-                      <span>trở lên</span>
                     </Checkbox>{" "}
                     <Checkbox
                       key={2}
@@ -313,7 +313,6 @@ const AllProduct = ({ keySearch }) => {
                       className="text-lg"
                     >
                       <Rate value={2} disabled />
-                      <span>trở lên</span>
                     </Checkbox>{" "}
                     <Checkbox
                       key={1}
@@ -322,7 +321,6 @@ const AllProduct = ({ keySearch }) => {
                       className="text-lg"
                     >
                       <Rate value={1} disabled />
-                      <span>trở lên</span>
                     </Checkbox>
                   </div>
                 </div>

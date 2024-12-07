@@ -1,4 +1,4 @@
-import { Card, Divider, Image, Skeleton, Steps, Tag } from "antd";
+import { Card, Divider, Image, Skeleton, Steps } from "antd";
 import React, { useEffect, useState } from "react";
 import BreadcrumbLink from "../../components/BreadcrumbLink";
 import OrderService from "../../services/OrderService";
@@ -38,17 +38,17 @@ const OrderDetail = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
-  const [current, setCurrent] = useState(0);
+  // const [current, setCurrent] = useState(0);
 
   const onChange = (value) => {
-    setCurrent(value);
+    // setCurrent(value);
   };
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         const res = await OrderService.getDetail(id);
-        console.log(res.data);
+        // console.log(res.data);
         setOrders(res.data);
       } catch (error) {
         console.error("Error:", error);
@@ -350,10 +350,7 @@ const OrderDetail = () => {
                 }
                 className="bg-white rounded-none my-5"
               >
-                <Link
-                  // to={`/orders-detail/${orders.id}`}
-                  className="hover:text-current"
-                >
+                <Link className="hover:text-current">
                   <div className="flex">
                     <div className="flex-col my-auto justify-start items-center">
                       <div className="text-xl font-semibold mb-2">
@@ -385,10 +382,7 @@ const OrderDetail = () => {
                 // }
                 className="bg-white rounded-none my-5"
               >
-                <Link
-                  // to={`/orders-detail/${orders.id}`}
-                  className="hover:text-current"
-                >
+                <Link className="hover:text-current">
                   {orders.productOrderDetails.map((product, index) => (
                     <div className="flex py-4 border-b" key={index}>
                       <div className="w-1/4">
@@ -398,9 +392,12 @@ const OrderDetail = () => {
                         />
                       </div>
                       <div className="w-2/4 flex-col my-auto">
-                        <p className="text-xl capitalize font-semibold">
+                        <Link
+                          to={`/product-details/${product.productId}`}
+                          className="text-xl capitalize font-semibold"
+                        >
                           {product.productName}
-                        </p>
+                        </Link>
                         <p className="text-lg">Màu sắc: {product.colorName}</p>
                         <p className="text-lg">Kích cỡ: {product.sizeName}</p>
                         <p className="text-lg">Số lượng: {product.quantity}</p>

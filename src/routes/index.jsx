@@ -15,6 +15,7 @@ import Payment from "../pages/Payment";
 import Favorites from "../pages/Favorite/Favorites";
 import BuyingGuide from "../pages/BuyingGuide";
 import ImageSearch from "../pages/ImageSearch";
+import MyReview from "../pages/MyReview/MyReview";
 
 export const navigation = [{ name: "Home", to: "/" }];
 
@@ -36,6 +37,7 @@ export const privateRoutes = [
   { path: "/order", component: Order },
   { path: "/order-detail/:id", component: OrderDetail },
   { path: "/payment", component: Payment },
+  { path: "/review", component: MyReview },
 ];
 
 export const generatePublicRoutes = () => {

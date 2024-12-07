@@ -25,13 +25,13 @@ const cancel = async (id) =>
 const review = async (id, data) =>
   await axios.post(API_URL + `/review/${id}`, data, { headers: authHeader() });
 
-const getStatus = async (status, page, pageSize, search) =>
+const getStatus = async (status, page, pageSize, key) =>
   await axios.get(API_URL + `/user/${status}`, {
     headers: authHeader(),
     params: {
       page: page,
       pageSize: pageSize,
-      search: search ?? "",
+      key: key ?? "",
     },
   });
 

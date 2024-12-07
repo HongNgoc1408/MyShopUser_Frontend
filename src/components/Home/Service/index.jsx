@@ -3,6 +3,7 @@ import {
   CiDeliveryTruck,
   CiDollar,
   CiHeadphones,
+  CiShop,
   CiUndo,
 } from "react-icons/ci";
 
@@ -19,7 +20,7 @@ const Service = () => {
               <CiDeliveryTruck />
             </div>
             <div className="">
-              <p className="service-title">Free Shipping</p>
+              <p className="service-title">Vận chuyển toàn quốc</p>
             </div>
           </div>
           <div className="flex flex-col items-center gap-5 bg-white py-5">
@@ -30,7 +31,7 @@ const Service = () => {
               <CiUndo />
             </div>
             <div className="">
-              <p className="service-title">Product Replace</p>
+              <p className="service-title">Tư vấn miễn phí</p>
             </div>
           </div>
           <div className="flex flex-col items-center gap-5 bg-white py-5">
@@ -41,7 +42,7 @@ const Service = () => {
               <CiDollar />
             </div>
             <div className="">
-              <p className="service-title">Emi Available</p>
+              <p className="service-title">Thanh toán tiện lợi</p>
             </div>
           </div>
           <div className="flex flex-col items-center gap-5 bg-white py-5">
@@ -52,7 +53,7 @@ const Service = () => {
               <CiHeadphones />
             </div>
             <div className="">
-              <p className="service-title">24/7 Support</p>
+              <p className="service-title">Hỗ trợ 24/7</p>
             </div>
           </div>
           <div className="flex flex-col items-center gap-5 bg-white py-5">
@@ -60,10 +61,10 @@ const Service = () => {
               className="flex items-center justify-center w-[70px] h-[70px] bg-white border border-black rounded-full text-6xl text-navyBlue p-2.5"
               role="presentation"
             >
-              <CiHeadphones />
+              <CiShop />
             </div>
             <div className="">
-              <p className="service-title">24/7 Support</p>
+              <p className="service-title">Giao diện thân thiện</p>
             </div>
           </div>
         </div>

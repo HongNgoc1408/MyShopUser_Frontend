@@ -71,6 +71,10 @@ const Header = ({ onSearch }) => {
     },
     {
       key: "4",
+      label: <Link to={"/review"}>Đánh giá của tôi</Link>,
+    },
+    {
+      key: "5",
       label: (
         <div onClick={showModal} className="cursor-pointer">
           Đăng xuất
@@ -243,7 +247,6 @@ const Header = ({ onSearch }) => {
           allowClear
           onClear={() => setSearchValue("")}
         />
-        
       </Drawer>
     </>
   );

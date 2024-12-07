@@ -7,12 +7,12 @@ import {
   Input,
   Modal,
   notification,
+  Pagination,
   Rate,
   Result,
   Skeleton,
   Statistic,
   Tabs,
-  Tag,
   Upload,
 } from "antd";
 
@@ -34,6 +34,7 @@ import {
   PlusOutlined,
   SmileOutlined,
 } from "@ant-design/icons";
+import { useSearchParams } from "react-router-dom";
 const { Countdown } = Statistic;
 
 const breadcrumb = [
@@ -47,8 +48,13 @@ const breadcrumb = [
 ];
 
 const Order = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(searchParams.get("page") ?? 1);
+  const [pageSize, setPageSize] = useState();
+  const [key, setKey] = useState();
+  const [totalItems, setTotalItems] = useState();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,16 +63,16 @@ const Order = () => {
   const [id, setID] = useState();
   const [isReviewSubmit, setIsReviewSubmit] = useState(false);
   // const [orderDetails, setOrderDetails] = useState(null);
-  const [selectedTab, setSelectedTab] = useState("6");
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         const res = await OrderService.getAll();
 
-        console.log(res.data.items);
+        // console.log(res.data);
 
         setOrders(res.data.items);
+        setTotalItems(res.data.totalItems);
       } catch (error) {
         console.error("Error:", error);
         showError(error);
@@ -105,6 +111,9 @@ const Order = () => {
         review: res.data.productOrderDetails.map((value) => ({
           ...value,
           star: 5,
+          productId: value.productId,
+          colorName: value.colorName,
+          sizeName: value.sizeName,
         })),
       });
     } catch (error) {
@@ -120,8 +129,14 @@ const Order = () => {
     setFileList([]);
   };
 
-  const onFinish = async ({ review }) => {
-
+  const onFinish = async ({ review = [] }) => {
+    if (!id || review.length === 0) {
+      notification.error({
+        message: "Error",
+        description: "No reviews to submit.",
+      });
+      return;
+    }
     if (id) {
       try {
         // console.log(review)
@@ -276,22 +291,17 @@ const Order = () => {
   );
 
   const items = [
-    { key: "6", label: "Tất cả" },
-    { key: "0", label: "Đang xử lý" },
-    { key: "1", label: "Đã duyệt" },
-    // { key: "2", label: "Đang chờ lấy hàng" },
-    { key: "2", label: "Đang vận chuyển" },
-    { key: "3", label: "Đã nhận" },
-    { key: "4", label: "Đã hủy" },
+    { key: 0, value: 0, label: "Đang xử lý" },
+    { key: 1, value: 1, label: "Đã duyệt" },
+    { key: 2, value: 2, label: "Đang vận chuyển" },
+    { key: 3, value: 3, label: "Đã nhận" },
+    { key: 4, value: 4, label: "Đã hủy" },
   ];
 
-  const filteredOrders =
-    selectedTab === "6"
-      ? orders
-      : orders.filter((order) => order.orderStatus === parseInt(selectedTab));
-
-  const onChange = (key) => {
-    setSelectedTab(key);
+  const onChange = async (value) => {
+    const res = await OrderService.getStatus(value, page, pageSize, key);
+    setKey(key);
+    setOrders(res.data?.items);
   };
 
   return (
@@ -488,7 +498,7 @@ const Order = () => {
                   />
                 </div>
 
-                {filteredOrders.length === 0 ? (
+                {orders.length === 0 ? (
                   <div className="text-center text-gray-500 my-5 bg-white">
                     <Result
                       icon={<SmileOutlined />}
@@ -496,7 +506,7 @@ const Order = () => {
                     />
                   </div>
                 ) : (
-                  filteredOrders.map((order) => (
+                  orders.map((order) => (
                     <Card
                       key={order.id}
                       title={
@@ -589,7 +599,10 @@ const Order = () => {
                           danger
                           type="primary"
                           className={`text-lg mt-5 ${
-                            [0, 1].includes(order.orderStatus) ? "" : "hidden"
+                            [0, 1].includes(order.orderStatus) &&
+                            order.paymentMethodName === "COD"
+                              ? ""
+                              : "hidden"
                           }`}
                         >
                           Hủy đơn hàng
@@ -607,7 +620,7 @@ const Order = () => {
                           <Button
                             type="primary"
                             className={`text-lg mt-5 ${
-                              order.orderStatus === 3 &&
+                              [3].includes(order.orderStatus) &&
                               order.reviewed === false
                                 ? ""
                                 : "hidden"
@@ -641,6 +654,19 @@ const Order = () => {
                 )}
               </div>
             </div>
+            <Pagination
+              align="center"
+              hideOnSinglePage
+              showSizeChanger
+              defaultCurrent={page}
+              defaultPageSize={pageSize}
+              total={totalItems}
+              onChange={(newPage, newPageSize) => {
+                setPage(newPage);
+                setPageSize(newPageSize);
+                setSearchParams(`page=${newPage}`);
+              }}
+            />
           </div>
         )}
       </div>

@@ -46,7 +46,7 @@ const Review = ({ id, rating }) => {
             {rating} <span className="text-2xl">trên 5.0</span>
           </div>
           <div>
-            <Rate className="text-2xl" disabled defaultValue={rating} />
+            <Rate className="text-2xl" disabled value={rating} />
           </div>
         </div>
 
@@ -130,7 +130,12 @@ const Review = ({ id, rating }) => {
               <div className="flex bg-gray-100">
                 <div className="justify-center items-center">
                   <Avatar
-                    src={<img src="/User_review.jpg" alt="avatar" />}
+                    src={
+                      <img
+                        src={toImageLink(review.imageURL) || "/avatar.png"}
+                        alt="avatar"
+                      />
+                    }
                     size={64}
                     icon={<UserOutlined />}
                   />
