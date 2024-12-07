@@ -127,6 +127,7 @@ const ProductDetail = () => {
   const onChange = (key) => {
     // console.log(key);
   };
+
   const toggleFavorite = async () => {
     try {
       if (isFavorite) {
@@ -142,6 +143,7 @@ const ProductDetail = () => {
       console.error("Error updating favorite:", error);
     }
   };
+
   const items = [
     {
       key: "1",
@@ -328,7 +330,9 @@ const ProductDetail = () => {
       setIsAddCart(false);
     }
   };
-  // console.log(selectedColorSize);
+
+  // console.log(colorSizes);
+
   return (
     <div className="container mx-auto max-lg:px-8 px-24">
       <div className="my-5">
@@ -344,7 +348,7 @@ const ProductDetail = () => {
                         style={{ width: "58%" }}
                         src={toImageSrc(item)}
                         alt={product.name}
-                        className="mx-auto cursor-pointer"
+                        className="mx-auto cursor-pointer mb-2"
                         onClick={() => handleThumbnailClick(index)}
                       />
                     </div>
@@ -356,7 +360,7 @@ const ProductDetail = () => {
                 theme={{
                   components: {
                     Carousel: {
-                      arrowSize: 28,
+                      arrowSize: 40,
                     },
                   },
                 }}
@@ -366,17 +370,17 @@ const ProductDetail = () => {
                   dotPosition="right"
                   arrows
                   infinite={false}
+                  style={{ width: "100%", height: "100%" }}
                 >
                   {product.imageUrls && product.imageUrls.length > 0
                     ? product.imageUrls.map((item, index) => (
                         <div className="mx-1" key={index}>
-                          <Link>
+                          <Link className="w-full items-center">
                             <Image
-                              style={{ width: "100%", height: "100%" }}
+                              style={{ width: "550px", height: "890px" }}
                               preview={false}
                               src={toImageSrc(item)}
                               alt={product.name}
-                              className="w-full"
                             />
                           </Link>
                         </div>
@@ -402,8 +406,8 @@ const ProductDetail = () => {
             </div>
             <div className="grid grid-cols-1 gap-1">
               <div className="flex">
-                <div className="price-card-product text-orange-600">
-                  <p className="text-2xl">
+                <div className="price-card-product text-orange-600 mt-2">
+                  <p className="text-4xl">
                     {product.discount > 0
                       ? formatVND(
                           (product.price * (100 - product.discount)) / 100
@@ -411,26 +415,26 @@ const ProductDetail = () => {
                       : formatVND(product.price)}
                   </p>
                 </div>
-                <div className="price-card-product text-gray-500 line-through">
+                <div className="price-card-product text-gray-500 line-through mt-2 ml-4">
                   <p className="text-2xl">
                     {product.discount > 0 ? formatVND(product.price) : ""}
                   </p>
                 </div>
-                <div className="cursor-pointer font-semibold bg-orange-50 m-1 text-orange-600">
-                  <p className="text-xl">
+                <div className="cursor-pointer font-semibold bg-orange-50 m-1 text-orange-600 mt-2 ml-4">
+                  <p className="text-2xl">
                     {product.discount > 0 ? formatDis(product.discount) : ""}
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex">
+            <div className="flex mt-2">
               <Rate
                 disabled
                 defaultValue={product.rating > 0 ? product.rating : "0"}
-                className="mx-1 my-auto p-auto text-xl"
+                className="mx-1 my-auto p-auto text-2xl"
               />
               <p className="mx-1 text-xl my-auto p-auto">Còn lại:</p>
-              <p className="mx-1 text-xl my-auto p-auto text-orange-600 flex">
+              <p className="mx-1 text-2xl my-auto p-auto text-orange-600 flex">
                 {selectedColorSize &&
                   selectedSize &&
                   selectedColorSize.sizeInStocks.find(
@@ -440,9 +444,9 @@ const ProductDetail = () => {
                 <span className="text-black">{selectedSize ? ` | ` : ""}</span>
               </p>
 
-              <p className="mx-1 my-auto p-auto text-xl flex">
-                Đã bán:
-                <span className="text-orange-600 ml-2">
+              <p className="flex">
+                <span className="mx-1 text-xl my-auto p-auto">Đã bán:</span>
+                <span className="my-auto p-auto text-orange-600 ml-2 text-2xl">
                   {product.sold > 0 ? product.sold : "0"}
                 </span>
               </p>
@@ -450,34 +454,41 @@ const ProductDetail = () => {
 
             {selectedColorSize && (
               <>
-                <div className="flex">
-                  <p className="mr-1 text-lg">Màu sắc:</p>
-                  <p className="text-lg mr-1 font-semibold">
+                <div className="flex mt-2">
+                  <p className="my-auto mr-1 text-xl">Màu sắc:</p>
+                  <p className="text-2xl mr-1 font-semibold ">
                     {selectedColorSize.colorName}
                   </p>
                 </div>
                 <div className="flex flex-nowrap">
-                  {colorSizes.map((colorSize, index) => (
-                    <div
-                      key={index}
-                      className={`m-1 pt-1 px-1 cursor-pointer rounded-3xl ${
-                        selectedColorSize.colorName === colorSize.colorName
-                          ? "border-2 border-red-500"
-                          : ""
-                      }`}
-                      onClick={() => handleColorChange(colorSize)}
-                    >
-                      <Image
-                        preview={false}
-                        style={{ width: "30px", height: "30px" }}
-                        // height={30}
-                        // width={30}
-                        src={toImageSrc(colorSize.imageUrl)}
-                        alt={`color-${index}`}
-                        className="rounded-full"
-                      />
-                    </div>
-                  ))}
+                  {colorSizes
+                    .filter(
+                      (color) =>
+                        color.sizeInStocks.find(
+                          (sizeStock) => sizeStock.inStock
+                        )?.inStock > 0
+                    )
+                    .map((colorSize, index) => (
+                      <div
+                        key={index}
+                        className={`m-1 pt-1 px-1 cursor-pointer rounded-3xl ${
+                          selectedColorSize.colorName === colorSize.colorName
+                            ? "border-2 border-red-500"
+                            : ""
+                        }`}
+                        onClick={() => handleColorChange(colorSize)}
+                      >
+                        <Image
+                          preview={false}
+                          style={{ width: "30px", height: "35px" }}
+                          // height={30}
+                          // width={30}
+                          src={toImageSrc(colorSize.imageUrl)}
+                          alt={`color-${index}`}
+                          className="rounded-full"
+                        />
+                      </div>
+                    ))}
                 </div>
 
                 <div>

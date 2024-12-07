@@ -124,7 +124,10 @@ const Profile = () => {
       // console.log(values);
       await UserService.updateAddress(values);
 
-      notification.success({ message: "Cập nhật địa chỉ thành công." });
+      notification.success({
+        message: "Cập nhật địa chỉ thành công.",
+        placement: "top",
+      });
       setIsAddressModalOpen(false);
       setAddress(values);
     } catch (error) {
@@ -312,12 +315,17 @@ const Profile = () => {
               <div className="flex gap-5">
                 <div className="w-full">
                   <Form.Item label="Họ và tên">
-                    <Input defaultValue={address.name} value={address.name} />
+                    <Input
+                      readOnly
+                      defaultValue={address.name}
+                      value={address.name}
+                    />
                   </Form.Item>
                 </div>
                 <div className="w-full">
                   <Form.Item label="Số điện thoại">
                     <Input
+                      readOnly
                       defaultValue={address.phoneNumber}
                       value={address.phoneNumber}
                     />
@@ -328,24 +336,31 @@ const Profile = () => {
               <div className="w-full">
                 <Form.Item label="Tỉnh/Thành phố">
                   <Input
+                    readOnly
                     defaultValue={address.province_name}
                     value={address.province_name}
                   />
                 </Form.Item>
                 <Form.Item label="Quận/Huyện">
                   <Input
+                    readOnly
                     defaultValue={address.district_name}
                     value={address.district_name}
                   />
                 </Form.Item>
                 <Form.Item label="Phường/Xã">
                   <Input
+                    readOnly
                     defaultValue={address.ward_name}
                     value={address.ward_name}
                   />
                 </Form.Item>
                 <Form.Item label="Địa chỉ chi tiết">
-                  <Input defaultValue={address.detail} value={address.detail} />
+                  <Input
+                    readOnly
+                    defaultValue={address.detail}
+                    value={address.detail}
+                  />
                 </Form.Item>
               </div>
               <Form.Item>

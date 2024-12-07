@@ -129,11 +129,73 @@ const Order = () => {
     setFileList([]);
   };
 
-  const onFinish = async ({ review = [] }) => {
-    if (!id || review.length === 0) {
+  // const onFinish = async () => {
+  //   console.log(orders, orders.id, orders.reviewed);
+
+  //   if (!orders) {
+  //     notification.error({
+  //       message: "Error",
+  //       description: "Không gửi được đánh giá",
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const formData = new FormData();
+
+  //     orders.review.forEach((item, i) => {
+  //       Object.keys(item).forEach((key) => {
+  //         const value = item[key];
+  //         if (value) {
+  //           formData.append(`reviews[${i}].${key}`, value.toString());
+  //         }
+  //       });
+
+  //       const images = fileList.find(
+  //         (e) =>
+  //           e.productId === item.productId &&
+  //           e.colorName === item.colorName &&
+  //           e.sizeName === item.sizeName
+  //       )?.files;
+
+  //       if (images) {
+  //         images.forEach((image) => {
+  //           if (image.originFileObj) {
+  //             formData.append(`reviews[${i}].images`, image.originFileObj);
+  //           }
+  //         });
+  //       }
+  //     });
+
+  //     await OrderService.review(orders.id, formData);
+  //     await OrderService.getDetail(orders.id);
+
+  //     notification.success({
+  //       message: "Thành công",
+  //       placement: "top",
+  //       description: "Đã gửi đánh giá của bạn.",
+  //       className: "text-green-500",
+  //     });
+
+  //     setFileList([]);
+  //     setIsReviewSubmit(true);
+  //   } catch (error) {
+  //     showError(error);
+  //   } finally {
+  //     setLoading(false);
+  //     setIsModalOpen(false);
+  //   }
+  // };
+
+  const onFinish = async (review) => {
+    console.log("Review:", review);
+    const reviewData = review?.review;
+    console.log(!id, !Array.isArray(reviewData), review.length === 0);
+    if (!id || !Array.isArray(reviewData) || review.length === 0) {
       notification.error({
-        message: "Error",
-        description: "No reviews to submit.",
+        message: "Lỗi",
+        description: "Không gửi được đánh giá",
       });
       return;
     }
@@ -144,8 +206,41 @@ const Order = () => {
         const formData = new FormData();
 
         // review.forEach((e) => delete e.productName) // Xóa productName
+        // Duyệt qua tất cả các mục trong review
+        // reviewData.forEach((item, i) => {
+        //   // Duyệt qua tất cả các khóa của mỗi đối tượng trong review
+        //   Object.keys(item).forEach((key) => {
+        //     const value = item[key];
+        //     if (value) {
+        //       formData.append(`reviews[${i}].${key}`, value.toString()); // Thêm thông tin vào formData
+        //     }
+        //   });
 
-        review.forEach((item, i) => {
+        //   // Tìm các ảnh liên quan đến từng đánh giá
+        //   const images = fileList.find(
+        //     (e) =>
+        //       e.productId === item.productId &&
+        //       e.colorName === item.colorName &&
+        //       e.sizeName === item.sizeName
+        //   )?.files;
+
+        //   // Nếu có ảnh, thêm vào formData
+        //   if (images) {
+        //     images.forEach((image) => {
+        //       if (image.originFileObj) {
+        //         formData.append(`reviews[${i}].images`, image.originFileObj);
+        //       }
+        //     });
+        //   }
+        // });
+        // console.log("FormData:", formData);
+        // formData.forEach((value, key) => {
+        //   console.log(key, value);
+        // });
+        // // Gửi yêu cầu API (giả sử OrderService.review là API gửi đánh giá)
+        // // await OrderService.review(id, formData);
+
+        reviewData.forEach((item, i) => {
           Object.keys(item).forEach((key) => {
             const value = item[key];
             // console.log('value', value)
@@ -169,10 +264,14 @@ const Order = () => {
             });
           }
         });
-
+        // console.log("FormData:", formData);
+        // formData.forEach((value, key) => {
+        //   console.log(key, value);
+        // });
         await OrderService.review(id, formData);
-        await OrderService.getDetail(id);
-        // setOrderDetails(updatedOrder.data);
+        // await OrderService.getDetail(id);
+
+        // // setOrderDetails(updatedOrder.data);
 
         notification.success({
           message: "Thành công",
@@ -291,6 +390,7 @@ const Order = () => {
   );
 
   const items = [
+    { key: 5, value: 5, label: "Tất cả" },
     { key: 0, value: 0, label: "Đang xử lý" },
     { key: 1, value: 1, label: "Đã duyệt" },
     { key: 2, value: 2, label: "Đang vận chuyển" },
@@ -299,14 +399,24 @@ const Order = () => {
   ];
 
   const onChange = async (value) => {
-    const res = await OrderService.getStatus(value, page, pageSize, key);
-    setKey(key);
-    setOrders(res.data?.items);
+    if (value !== 5) {
+      const res = await OrderService.getStatus(value, page, pageSize, key);
+      setKey(key);
+      setOrders(res.data?.items);
+    } else {
+      const res = await OrderService.getAll();
+
+      // console.log(res.data);
+
+      setOrders(res.data.items);
+      setTotalItems(res.data.totalItems);
+    }
   };
 
   return (
     <>
       <Modal
+        centered
         open={isModalOpen}
         onCancel={handleCancel}
         width={600}
@@ -320,7 +430,6 @@ const Order = () => {
           disabled: loading,
         }}
         destroyOnClose
-        centered
         title={`Đánh giá đơn hàng`}
         className="rounded-sm"
         styles={{
@@ -333,6 +442,7 @@ const Order = () => {
             form={form}
             name="changeEmail"
             onFinish={onFinish}
+            // onFinish={() => onFinish()}
           >
             {dom}
           </Form>
@@ -491,7 +601,7 @@ const Order = () => {
               <div className="container mx-auto max-lg:px-8 px-20">
                 <div className="bg-white">
                   <Tabs
-                    defaultActiveKey="6"
+                    defaultActiveKey="5"
                     items={items}
                     onChange={onChange}
                     centered
