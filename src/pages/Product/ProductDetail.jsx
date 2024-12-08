@@ -430,7 +430,7 @@ const ProductDetail = () => {
             <div className="flex mt-2">
               <Rate
                 disabled
-                defaultValue={product.rating > 0 ? product.rating : "0"}
+                value={product.rating > 0 ? product.rating : ""}
                 className="mx-1 my-auto p-auto text-2xl"
               />
               <p className="mx-1 text-xl my-auto p-auto">Còn lại:</p>

@@ -43,7 +43,7 @@ const breadcrumb = [
     title: "Trang chủ",
   },
   {
-    title: "Đơn đặt hàng",
+    title: "Đơn hàng",
   },
 ];
 
@@ -189,56 +189,19 @@ const Order = () => {
   // };
 
   const onFinish = async (review) => {
-    console.log("Review:", review);
+    console.log(review);
     const reviewData = review?.review;
-    console.log(!id, !Array.isArray(reviewData), review.length === 0);
+
     if (!id || !Array.isArray(reviewData) || review.length === 0) {
-      notification.error({
-        message: "Lỗi",
-        description: "Không gửi được đánh giá",
-      });
+      console.error("Không gửi được đánh giá");
       return;
     }
+
     if (id) {
       try {
         // console.log(review)
         setLoading(true);
         const formData = new FormData();
-
-        // review.forEach((e) => delete e.productName) // Xóa productName
-        // Duyệt qua tất cả các mục trong review
-        // reviewData.forEach((item, i) => {
-        //   // Duyệt qua tất cả các khóa của mỗi đối tượng trong review
-        //   Object.keys(item).forEach((key) => {
-        //     const value = item[key];
-        //     if (value) {
-        //       formData.append(`reviews[${i}].${key}`, value.toString()); // Thêm thông tin vào formData
-        //     }
-        //   });
-
-        //   // Tìm các ảnh liên quan đến từng đánh giá
-        //   const images = fileList.find(
-        //     (e) =>
-        //       e.productId === item.productId &&
-        //       e.colorName === item.colorName &&
-        //       e.sizeName === item.sizeName
-        //   )?.files;
-
-        //   // Nếu có ảnh, thêm vào formData
-        //   if (images) {
-        //     images.forEach((image) => {
-        //       if (image.originFileObj) {
-        //         formData.append(`reviews[${i}].images`, image.originFileObj);
-        //       }
-        //     });
-        //   }
-        // });
-        // console.log("FormData:", formData);
-        // formData.forEach((value, key) => {
-        //   console.log(key, value);
-        // });
-        // // Gửi yêu cầu API (giả sử OrderService.review là API gửi đánh giá)
-        // // await OrderService.review(id, formData);
 
         reviewData.forEach((item, i) => {
           Object.keys(item).forEach((key) => {
@@ -269,7 +232,7 @@ const Order = () => {
         //   console.log(key, value);
         // });
         await OrderService.review(id, formData);
-        // await OrderService.getDetail(id);
+        await OrderService.getDetail(id);
 
         // // setOrderDetails(updatedOrder.data);
 
@@ -441,7 +404,7 @@ const Order = () => {
             layout="vertical"
             form={form}
             name="changeEmail"
-            onFinish={onFinish}
+            onFinish={isModalOpen ? onFinish : ""}
             // onFinish={() => onFinish()}
           >
             {dom}

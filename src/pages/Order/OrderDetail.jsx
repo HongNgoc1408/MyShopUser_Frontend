@@ -88,9 +88,9 @@ const OrderDetail = () => {
     {
       title:
         orders.amountPaid > 0 ? (
-          <div className="text-nowrap">Đơn hàng đã thanh toán</div>
+          <div>Đơn hàng đã thanh toán</div>
         ) : (
-          <div className="text-nowrap">Đơn hàng chưa thanh toán</div>
+          <div>Đơn hàng chưa thanh toán</div>
         ),
 
       description: (
@@ -382,40 +382,47 @@ const OrderDetail = () => {
                 // }
                 className="bg-white rounded-none my-5"
               >
-                <Link className="hover:text-current">
-                  {orders.productOrderDetails.map((product, index) => (
-                    <div className="flex py-4 border-b" key={index}>
-                      <div className="w-1/4">
-                        <Image
-                          src={toImageSrc(product.imageUrl)}
-                          style={{ width: "100px", height: " 150px" }}
-                        />
-                      </div>
-                      <div className="w-2/4 flex-col my-auto">
-                        <Link
-                          to={`/product-details/${product.productId}`}
-                          className="text-xl capitalize font-semibold"
-                        >
-                          {product.productName}
-                        </Link>
-                        <p className="text-lg">Màu sắc: {product.colorName}</p>
-                        <p className="text-lg">Kích cỡ: {product.sizeName}</p>
-                        <p className="text-lg">Số lượng: {product.quantity}</p>
-                      </div>
-                      <div className="w-1/4 text-right flex justify-end items-center">
-                        <div className="flex justify-end items-center text-end w-1/2">
-                          <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-gray-500 line-through">
+                {/* <Link className="hover:text-current"> */}
+                {orders.productOrderDetails.map((product, index) => (
+                  <div className="flex py-4 border-b" key={index}>
+                    <div className="w-1/4">
+                      <Image
+                        src={toImageSrc(product.imageUrl)}
+                        style={{ width: "100px", height: " 150px" }}
+                      />
+                    </div>
+                    <div className="w-2/4 flex-col my-auto">
+                      <Link
+                        to={`/product-details/${product.productId}`}
+                        className="text-xl capitalize font-semibold"
+                      >
+                        {product.productName}
+                      </Link>
+                      <p className="text-lg">Màu sắc: {product.colorName}</p>
+                      <p className="text-lg">Kích cỡ: {product.sizeName}</p>
+                      <p className="text-lg">
+                        Giá:
+                        <span className="text-lg capitalize cursor-pointer m-1 text-gray-500 line-through">
+                          {formatVND(product.originPrice)}
+                        </span>
+                        {formatVND(product.price / product.quantity)}
+                      </p>
+                      <p className="text-lg">Số lượng: x{product.quantity}</p>
+                    </div>
+                    <div className="w-1/4 text-right flex justify-end items-center">
+                      <div className="flex justify-end items-center text-end w-1/2">
+                        {/* <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-gray-500 line-through">
                             {formatVND(product.originPrice)}
-                          </p>
+                          </p> */}
 
-                          <p className="text-xl capitalize cursor-pointer font-semibold m-1 text-orange-600">
-                            {formatVND(product.price)}
-                          </p>
-                        </div>
+                        <p className="text-2xl capitalize cursor-pointer font-semibold m-1 text-orange-600">
+                          {formatVND(product.price)}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </Link>
+                  </div>
+                ))}
+                {/* </Link> */}
                 <Divider />
                 <div className="w-full flex justify-end items-end text-right">
                   <div className="w-1/4 flex-col my-auto justify-end items-end text-right text-nowrap">

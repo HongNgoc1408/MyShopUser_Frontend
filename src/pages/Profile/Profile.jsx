@@ -15,7 +15,6 @@ import { UploadOutlined } from "@ant-design/icons";
 import { AvatarContext } from "../../App";
 import TextArea from "antd/es/input/TextArea";
 import AddressService from "../../services/AddressService";
-import { Link } from "react-router-dom";
 
 const Profile = () => {
   const [form] = Form.useForm();

@@ -67,11 +67,11 @@ const Header = ({ onSearch }) => {
     },
     {
       key: "3",
-      label: <Link to={"/order"}>Đơn đặt hàng</Link>,
+      label: <Link to={"/order"}>Đơn hàng</Link>,
     },
     {
       key: "4",
-      label: <Link to={"/review"}>Đánh giá của tôi</Link>,
+      label: <Link to={"/review"}>Lịch sử đánh giá</Link>,
     },
     {
       key: "5",

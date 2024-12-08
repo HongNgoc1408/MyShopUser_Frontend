@@ -326,7 +326,7 @@ const CartDetail = () => {
     if (approximate < 200000) {
       setShippingFee(30000);
       setCurrentStep(1);
-    } else if (approximate >= 200000 && approximate <= 500000) {
+    } else if (approximate >= 200000 && approximate < 500000) {
       setShippingFee(20000);
       setCurrentStep(2);
     } else {

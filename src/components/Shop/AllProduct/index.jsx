@@ -75,6 +75,7 @@ const AllProduct = ({ keySearch }) => {
           );
 
           setProducts(product);
+          
           setTotalItems(product.length);
         } else {
           const res = await ProductService.getFilterProducts({
@@ -90,7 +91,7 @@ const AllProduct = ({ keySearch }) => {
             maxPrice,
           });
           setProducts(res.data.items);
-
+          // console.log(products);
           setTotalItems(res.data.totalItems);
         }
       } catch (error) {
